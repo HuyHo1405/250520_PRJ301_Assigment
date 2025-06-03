@@ -14,7 +14,7 @@ import java.util.List;
  * Status: Hoàn thành
  * Người thực hiện: Huy
  * Ngày hoàn thành: 31/05/2025
- * Phần MainController đã ổn định, không chỉnh sửa thêm.
+ * Phần MainController đã ổn định, có thể chỉnh sửa thêm tính năng nếu yêu cầu bài cần.
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
