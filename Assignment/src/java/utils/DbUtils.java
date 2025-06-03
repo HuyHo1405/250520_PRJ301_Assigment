@@ -1,3 +1,4 @@
+
 package utils;
 
 import java.sql.Connection;
@@ -5,7 +6,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 /**
  * Status: Chờ thực hiện
  * Người thực hiện: [...........]
@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  */
 
 public class DbUtils {
-    private static final String DB_NAME = "PRJ301_PROJECT1";
+    private static final String DB_NAME = "assignment01";
     private static final String DB_USER_NAME = "SA";
     private static final String DB_PASSWORD = "12345";
 
