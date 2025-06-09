@@ -10,26 +10,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import model.dto.CartDTO;
+import model.dto.ProductItemDTO;
 import utils.DbUtils;
 
 /**
- * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
- * [...........] viết các CRUD cần thiết
+ *
+ * @author Admin
  */
-public class CartDAO {
+public class ProductItemDAO {
+    private static final String TABLE_NAME = "product_item";
 
-    private static final String TABLE_NAME = "category";
-
-    private CartDTO mapToCart(ResultSet rs) throws SQLException {
+    private ProductItemDTO mapToProductItem(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
-        Integer parentCategoryId = rs.getObject("parent_category_id") != null ? rs.getInt("parent_category_id") : null;
-        String name = rs.getString("name");
+        int productId = rs.getInt("product_id");
+        String sku = rs.getString("sku");
+        int quantityInStock = rs.getInt("quantity_in_stock");
+        String itemImageLink = rs.getString("item_image_link");
+        double price = rs.getDouble("price");
 
-        return new CartDTO(id, parentCategoryId, name);
+        return new ProductItemDTO(id, productId, sku, quantityInStock, itemImageLink, price);
     }
 
-    private List<CartDTO> retrieve(String condition, Object... params) {
+    private List<ProductItemDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -39,13 +41,13 @@ public class CartDAO {
             }
 
             ResultSet rs = ps.executeQuery();
-            List<CartDTO> cartList = new ArrayList<>();
+            List<ProductItemDTO> itemList = new ArrayList<>();
 
             while (rs.next()) {
-                cartList.add(mapToCart(rs));
+                itemList.add(mapToProductItem(rs));
             }
 
-            return cartList;
+            return itemList;
         } catch (Exception e) {
             System.err.println("Error in retrieve(): " + e.getMessage());
             e.printStackTrace();
@@ -54,33 +56,28 @@ public class CartDAO {
         return null;
     }
 
-    public List<CartDTO> getAllCarts() {
+    public List<ProductItemDTO> getAllItems() {
         return retrieve("1 = 1");
     }
 
-    public CartDTO getCartById(int id) {
-        List<CartDTO> list = retrieve("id = ?", id);
+    public ProductItemDTO getItemById(int id) {
+        List<ProductItemDTO> list = retrieve("id = ?", id);
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
-    public List<CartDTO> getCartsByParentId(Integer parentId) {
-        if (parentId == null) {
-            return retrieve("parent_category_id IS NULL");
-        } else {
-            return retrieve("parent_category_id = ?", parentId);
-        }
+    public List<ProductItemDTO> getItemsByProductId(int productId) {
+        return retrieve("product_id = ?", productId);
     }
 
-    public boolean create(CartDTO cart) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name) VALUES (?, ?)";
+    public boolean create(ProductItemDTO item) {
+        String sql = "INSERT INTO " + TABLE_NAME + " (product_id, sku, quantity_in_stock, item_image_link, price) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            if (cart.getParent_category_id() == null) {
-                ps.setNull(1, java.sql.Types.INTEGER);
-            } else {
-                ps.setInt(1, cart.getParent_category_id());
-            }
-            ps.setString(2, cart.getName());
+            ps.setInt(1, item.getProduct_id());
+            ps.setString(2, item.getSku());
+            ps.setInt(3, item.getQuantity_in_stock());
+            ps.setString(4, item.getItem_image_link());
+            ps.setDouble(5, item.getPrice());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -90,17 +87,16 @@ public class CartDAO {
         return false;
     }
 
-    public boolean update(CartDTO cart) {
-        String sql = "UPDATE " + TABLE_NAME + " SET parent_category_id = ?, name = ? WHERE id = ?";
+    public boolean update(ProductItemDTO item) {
+        String sql = "UPDATE " + TABLE_NAME + " SET product_id = ?, sku = ?, quantity_in_stock = ?, item_image_link = ?, price = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            if (cart.getParent_category_id() == null) {
-                ps.setNull(1, java.sql.Types.INTEGER);
-            } else {
-                ps.setInt(1, cart.getParent_category_id());
-            }
-            ps.setString(2, cart.getName());
-            ps.setInt(3, cart.getId());
+            ps.setInt(1, item.getProduct_id());
+            ps.setString(2, item.getSku());
+            ps.setInt(3, item.getQuantity_in_stock());
+            ps.setString(4, item.getItem_image_link());
+            ps.setDouble(5, item.getPrice());
+            ps.setInt(6, item.getId());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -121,5 +117,4 @@ public class CartDAO {
         }
         return false;
     }
-
 }

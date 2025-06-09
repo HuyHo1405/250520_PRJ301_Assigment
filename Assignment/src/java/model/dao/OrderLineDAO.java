@@ -11,38 +11,36 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import model.dto.ReviewDTO;
+import model.dto.OrderLineDTO;
 import utils.DbUtils;
 
 /**
- * Status: Chờ thực hiện
- * Người thực hiện: [...........]
- * Ngày bắt đầu: [...........]
- * viết các CRUD cần thiết 
+ *
+ * @author Admin
  */
-public class ReviewDAO {
-    private static final String TABLE_NAME = "review";
+public class OrderLineDAO {
+    private static final String TABLE_NAME = "order_line";
 
-    private ReviewDTO mapToReview(ResultSet rs) throws SQLException {
-        return new ReviewDTO(
+    private OrderLineDTO mapToOrderLine(ResultSet rs) throws SQLException {
+        return new OrderLineDTO(
             rs.getInt("id"),
-            rs.getInt("user_id"),
-            rs.getInt("ordered_product_id"),
-            rs.getInt("rating_value"),
-            rs.getString("comment")
+            rs.getInt("order_id"),
+            rs.getInt("item_id"),
+            rs.getInt("quantity"),
+            rs.getDouble("price")
         );
     }
 
-    private List<ReviewDTO> retrieve(String condition, Object... params) {
+    private List<OrderLineDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
             ResultSet rs = ps.executeQuery();
-            List<ReviewDTO> list = new ArrayList<>();
+            List<OrderLineDTO> list = new ArrayList<>();
             while (rs.next()) {
-                list.add(mapToReview(rs));
+                list.add(mapToOrderLine(rs));
             }
             return list;
         } catch (Exception e) {
@@ -52,37 +50,33 @@ public class ReviewDAO {
         return null;
     }
 
-    public List<ReviewDTO> getAllReviews() {
+    public List<OrderLineDTO> getAllOrderLines() {
         return retrieve("1=1");
     }
 
-    public ReviewDTO getReviewById(int id) {
-        List<ReviewDTO> list = retrieve("id = ?", id);
+    public OrderLineDTO getOrderLineById(int id) {
+        List<OrderLineDTO> list = retrieve("id = ?", id);
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
-    public List<ReviewDTO> getReviewsByUserId(int userId) {
-        return retrieve("user_id = ?", userId);
+    public List<OrderLineDTO> getOrderLinesByOrderId(int orderId) {
+        return retrieve("order_id = ?", orderId);
     }
 
-    public List<ReviewDTO> getReviewsByProductId(int productId) {
-        return retrieve("ordered_product_id = ?", productId);
-    }
-
-    public boolean create(ReviewDTO review) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (user_id, ordered_product_id, rating_value, comment) VALUES (?, ?, ?, ?)";
+    public boolean create(OrderLineDTO orderLine) {
+        String sql = "INSERT INTO " + TABLE_NAME + " (order_id, item_id, quantity, price) VALUES (?, ?, ?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, review.getUser_id());
-            ps.setInt(2, review.getOrdered_product_id());
-            ps.setInt(3, review.getRating_value());
-            ps.setString(4, review.getComment());
+            ps.setInt(1, orderLine.getOrder_id());
+            ps.setInt(2, orderLine.getItem_id());
+            ps.setInt(3, orderLine.getQuantity());
+            ps.setDouble(4, orderLine.getPrice());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows == 0) return false;
 
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
-                review.setId(generatedKeys.getInt(1));
+                orderLine.setId(generatedKeys.getInt(1));
             }
             return true;
         } catch (Exception e) {
@@ -92,14 +86,14 @@ public class ReviewDAO {
         return false;
     }
 
-    public boolean update(ReviewDTO review) {
-        String sql = "UPDATE " + TABLE_NAME + " SET user_id = ?, ordered_product_id = ?, rating_value = ?, comment = ? WHERE id = ?";
+    public boolean update(OrderLineDTO orderLine) {
+        String sql = "UPDATE " + TABLE_NAME + " SET order_id = ?, item_id = ?, quantity = ?, price = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, review.getUser_id());
-            ps.setInt(2, review.getOrdered_product_id());
-            ps.setInt(3, review.getRating_value());
-            ps.setString(4, review.getComment());
-            ps.setInt(5, review.getId());
+            ps.setInt(1, orderLine.getOrder_id());
+            ps.setInt(2, orderLine.getItem_id());
+            ps.setInt(3, orderLine.getQuantity());
+            ps.setDouble(4, orderLine.getPrice());
+            ps.setInt(5, orderLine.getId());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {

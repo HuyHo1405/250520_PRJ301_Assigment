@@ -5,22 +5,20 @@
 package model.dto;
 
 /**
- * Status: Chờ thực hiện
- * Người thực hiện: [...........]
- * Ngày bắt đầu: [...........]
- * viết set up các field cho class này
+ *
+ * @author Admin
  */
-public class CartDTO {
+public class VariationDTO {
     private int id;
-    private Integer parent_category_id;
+    private int product_id;
     private String name;
 
-    public CartDTO() {
+    public VariationDTO() {
     }
 
-    public CartDTO(int id, Integer parent_category_id, String name) {
+    public VariationDTO(int id, int product_id, String name) {
         this.id = id;
-        this.parent_category_id = parent_category_id;
+        this.product_id = product_id;
         this.name = name;
     }
 
@@ -32,12 +30,12 @@ public class CartDTO {
         this.id = id;
     }
 
-    public Integer getParent_category_id() {
-        return parent_category_id;
+    public int getProduct_id() {
+        return product_id;
     }
 
-    public void setParent_category_id(Integer parent_category_id) {
-        this.parent_category_id = parent_category_id;
+    public void setProduct_id(int product_id) {
+        this.product_id = product_id;
     }
 
     public String getName() {

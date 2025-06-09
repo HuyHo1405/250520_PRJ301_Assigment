@@ -5,23 +5,21 @@
 package model.dto;
 
 /**
- * Status: Chờ thực hiện
- * Người thực hiện: [...........]
- * Ngày bắt đầu: [...........]
- * viết set up các field cho class này
+ *
+ * @author Admin
  */
-public class CartDTO {
+public class ShippingMethodDTO {
     private int id;
-    private Integer parent_category_id;
     private String name;
+    private double price;
 
-    public CartDTO() {
+    public ShippingMethodDTO() {
     }
 
-    public CartDTO(int id, Integer parent_category_id, String name) {
+    public ShippingMethodDTO(int id, String name, double price) {
         this.id = id;
-        this.parent_category_id = parent_category_id;
         this.name = name;
+        this.price = price;
     }
 
     public int getId() {
@@ -32,19 +30,19 @@ public class CartDTO {
         this.id = id;
     }
 
-    public Integer getParent_category_id() {
-        return parent_category_id;
-    }
-
-    public void setParent_category_id(Integer parent_category_id) {
-        this.parent_category_id = parent_category_id;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }

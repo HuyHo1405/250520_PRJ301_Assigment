@@ -10,42 +10,37 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import model.dto.CartDTO;
+import model.dto.PaymentTypeDTO;
 import utils.DbUtils;
 
 /**
- * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
- * [...........] viết các CRUD cần thiết
+ *
+ * @author Admin
  */
-public class CartDAO {
+public class PaymentTypeDAO {
+    private static final String TABLE_NAME = "payment_type";
 
-    private static final String TABLE_NAME = "category";
-
-    private CartDTO mapToCart(ResultSet rs) throws SQLException {
+    private PaymentTypeDTO mapToPaymentType(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
-        Integer parentCategoryId = rs.getObject("parent_category_id") != null ? rs.getInt("parent_category_id") : null;
-        String name = rs.getString("name");
-
-        return new CartDTO(id, parentCategoryId, name);
+        String value = rs.getString("value");
+        return new PaymentTypeDTO(id, value);
     }
 
-    private List<CartDTO> retrieve(String condition, Object... params) {
+    private List<PaymentTypeDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
 
             ResultSet rs = ps.executeQuery();
-            List<CartDTO> cartList = new ArrayList<>();
-
+            List<PaymentTypeDTO> list = new ArrayList<>();
             while (rs.next()) {
-                cartList.add(mapToCart(rs));
+                list.add(mapToPaymentType(rs));
             }
 
-            return cartList;
+            return list;
         } catch (Exception e) {
             System.err.println("Error in retrieve(): " + e.getMessage());
             e.printStackTrace();
@@ -54,34 +49,24 @@ public class CartDAO {
         return null;
     }
 
-    public List<CartDTO> getAllCarts() {
+    public List<PaymentTypeDTO> getAllPaymentTypes() {
         return retrieve("1 = 1");
     }
 
-    public CartDTO getCartById(int id) {
-        List<CartDTO> list = retrieve("id = ?", id);
+    public PaymentTypeDTO getPaymentTypeById(int id) {
+        List<PaymentTypeDTO> list = retrieve("id = ?", id);
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
-    public List<CartDTO> getCartsByParentId(Integer parentId) {
-        if (parentId == null) {
-            return retrieve("parent_category_id IS NULL");
-        } else {
-            return retrieve("parent_category_id = ?", parentId);
-        }
+    public PaymentTypeDTO getPaymentTypeByValue(String value) {
+        List<PaymentTypeDTO> list = retrieve("value = ?", value);
+        return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
-    public boolean create(CartDTO cart) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name) VALUES (?, ?)";
+    public boolean create(PaymentTypeDTO type) {
+        String sql = "INSERT INTO " + TABLE_NAME + " (value) VALUES (?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            if (cart.getParent_category_id() == null) {
-                ps.setNull(1, java.sql.Types.INTEGER);
-            } else {
-                ps.setInt(1, cart.getParent_category_id());
-            }
-            ps.setString(2, cart.getName());
-
+            ps.setString(1, type.getValue());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in create(): " + e.getMessage());
@@ -90,18 +75,11 @@ public class CartDAO {
         return false;
     }
 
-    public boolean update(CartDTO cart) {
-        String sql = "UPDATE " + TABLE_NAME + " SET parent_category_id = ?, name = ? WHERE id = ?";
+    public boolean update(PaymentTypeDTO type) {
+        String sql = "UPDATE " + TABLE_NAME + " SET value = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            if (cart.getParent_category_id() == null) {
-                ps.setNull(1, java.sql.Types.INTEGER);
-            } else {
-                ps.setInt(1, cart.getParent_category_id());
-            }
-            ps.setString(2, cart.getName());
-            ps.setInt(3, cart.getId());
-
+            ps.setString(1, type.getValue());
+            ps.setInt(2, type.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in update(): " + e.getMessage());
@@ -121,5 +99,4 @@ public class CartDAO {
         }
         return false;
     }
-
 }

@@ -10,26 +10,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import model.dto.CartDTO;
+import model.dto.VariationDTO;
 import utils.DbUtils;
 
 /**
- * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
- * [...........] viết các CRUD cần thiết
+ *
+ * @author Admin
  */
-public class CartDAO {
+public class VariationDAO {
+    private static final String TABLE_NAME = "variation";
 
-    private static final String TABLE_NAME = "category";
-
-    private CartDTO mapToCart(ResultSet rs) throws SQLException {
+    private VariationDTO mapToVariation(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
-        Integer parentCategoryId = rs.getObject("parent_category_id") != null ? rs.getInt("parent_category_id") : null;
+        int productId = rs.getInt("product_id");
         String name = rs.getString("name");
 
-        return new CartDTO(id, parentCategoryId, name);
+        return new VariationDTO(id, productId, name);
     }
 
-    private List<CartDTO> retrieve(String condition, Object... params) {
+    private List<VariationDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -39,13 +38,13 @@ public class CartDAO {
             }
 
             ResultSet rs = ps.executeQuery();
-            List<CartDTO> cartList = new ArrayList<>();
+            List<VariationDTO> variationList = new ArrayList<>();
 
             while (rs.next()) {
-                cartList.add(mapToCart(rs));
+                variationList.add(mapToVariation(rs));
             }
 
-            return cartList;
+            return variationList;
         } catch (Exception e) {
             System.err.println("Error in retrieve(): " + e.getMessage());
             e.printStackTrace();
@@ -54,33 +53,25 @@ public class CartDAO {
         return null;
     }
 
-    public List<CartDTO> getAllCarts() {
+    public List<VariationDTO> getAllVariations() {
         return retrieve("1 = 1");
     }
 
-    public CartDTO getCartById(int id) {
-        List<CartDTO> list = retrieve("id = ?", id);
+    public VariationDTO getVariationById(int id) {
+        List<VariationDTO> list = retrieve("id = ?", id);
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
-    public List<CartDTO> getCartsByParentId(Integer parentId) {
-        if (parentId == null) {
-            return retrieve("parent_category_id IS NULL");
-        } else {
-            return retrieve("parent_category_id = ?", parentId);
-        }
+    public List<VariationDTO> getVariationsByProductId(int productId) {
+        return retrieve("product_id = ?", productId);
     }
 
-    public boolean create(CartDTO cart) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name) VALUES (?, ?)";
+    public boolean create(VariationDTO variation) {
+        String sql = "INSERT INTO " + TABLE_NAME + " (product_id, name) VALUES (?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            if (cart.getParent_category_id() == null) {
-                ps.setNull(1, java.sql.Types.INTEGER);
-            } else {
-                ps.setInt(1, cart.getParent_category_id());
-            }
-            ps.setString(2, cart.getName());
+            ps.setInt(1, variation.getProduct_id());
+            ps.setString(2, variation.getName());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -90,17 +81,13 @@ public class CartDAO {
         return false;
     }
 
-    public boolean update(CartDTO cart) {
-        String sql = "UPDATE " + TABLE_NAME + " SET parent_category_id = ?, name = ? WHERE id = ?";
+    public boolean update(VariationDTO variation) {
+        String sql = "UPDATE " + TABLE_NAME + " SET product_id = ?, name = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            if (cart.getParent_category_id() == null) {
-                ps.setNull(1, java.sql.Types.INTEGER);
-            } else {
-                ps.setInt(1, cart.getParent_category_id());
-            }
-            ps.setString(2, cart.getName());
-            ps.setInt(3, cart.getId());
+            ps.setInt(1, variation.getProduct_id());
+            ps.setString(2, variation.getName());
+            ps.setInt(3, variation.getId());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -121,5 +108,4 @@ public class CartDAO {
         }
         return false;
     }
-
 }
