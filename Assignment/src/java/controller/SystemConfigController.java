@@ -1,7 +1,10 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,10 +15,10 @@ import jakarta.servlet.http.HttpServletResponse;
  * Status: Chờ thực hiện
  * Người thực hiện: [...........]
  * Ngày bắt đầu: [...........]
- * viết servlet cho Cart Servlet
+ * viết servlet cho System Config Controller
  */
-@WebServlet(name = "CartServlet", urlPatterns = {"/CartServlet"})
-public class CartServlet extends HttpServlet {
+@WebServlet(name = "SystemConfigController", urlPatterns = {"/SystemConfigController"})
+public class SystemConfigController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

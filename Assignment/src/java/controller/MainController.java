@@ -1,7 +1,6 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,8 +12,8 @@ import java.util.List;
 /**
  * Status: Hoàn thành
  * Người thực hiện: Huy
- * Ngày hoàn thành: 31/05/2025
- * Phần MainController đã ổn định, có thể chỉnh sửa thêm tính năng nếu yêu cầu bài cần.
+ * Ngày hoàn thành: 10/06/2025
+ * Update thêm các Controllers khác.
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
@@ -22,45 +21,102 @@ public class MainController extends HttpServlet {
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String ERROR_PAGE = "error.jsp";
 
+    // MainController.java
+    public static final List<String> MAIN_ACTIONS = Arrays.asList(
+            "home", // Trang chủ
+            "about", // Trang giới thiệu
+            "contact", // Trang liên hệ
+            "login", // Trang đăng nhập
+            "register", // Trang đăng ký
+            "error" // Trang lỗi chung
+    );
+
+    // UserController.java (Dành cho người dùng cuối)
+    public static final List<String> USER_ACTIONS = Arrays.asList(
+            "profile", // Xem/Sửa thông tin hồ sơ
+            "changePassword", // Đổi mật khẩu
+            "register", // Đăng ký tài khoản (nếu chưa có MainController xử lý)
+            "login", // Đăng nhập (nếu chưa có MainController xử lý)
+            "logout", // Đăng xuất
+            "forgotPassword" // Yêu cầu quên mật khẩu
+    );
+
+    // ProductController.java (Dành cho người dùng cuối)
     public static final List<String> PRODUCT_ACTIONS = Arrays.asList(
             "list", // Hiển thị tất cả sản phẩm
             "view", // Xem chi tiết sản phẩm
             "search", // Tìm kiếm theo từ khoá
-            "category" // Lọc theo danh mục
+            "category", // Lọc theo danh mục
+            "featured", // Xem sản phẩm nổi bật
+            "newArrivals" // Xem sản phẩm mới về
     );
 
+    // CartController.java
     public static final List<String> CART_ACTIONS = Arrays.asList(
-            "view", // Xem giỏ hàng
+            "get", // Xem giỏ hàng
             "add", // Thêm sản phẩm vào giỏ
-            "update", // Cập nhật số lượng
-            "remove", // Xoá sản phẩm khỏi giỏ
-            "clear" // Xoá toàn bộ giỏ
+            "update", // Cập nhật số lượng sản phẩm trong giỏ
+            "remove", // Xóa sản phẩm khỏi giỏ
+            "clear", // Xóa toàn bộ giỏ hàng
+            "checkout" // Tiến hành thanh toán
     );
 
-    public static final List<String> USER_ACTIONS = Arrays.asList(
-            "loginForm", // Hiển thị form đăng nhập
-            "login", // Xử lý đăng nhập
-            "registerForm", // Hiển thị form đăng ký
-            "register", // Xử lý đăng ký
-            "logout", // Đăng xuất
-            "profile", // Xem hồ sơ cá nhân
-            "updateProfile", // Cập nhật thông tin
-            "changePassword" // Đổi mật khẩu
-    );
-
+    // OrderController.java (Dành cho người dùng cuối)
     public static final List<String> ORDER_ACTIONS = Arrays.asList(
-            "checkoutForm", // Trang chọn thanh toán
-            "checkout", // Xác nhận đặt hàng
-            "myOrders", // Xem đơn hàng của tôi
+            "list", // Danh sách đơn hàng của người dùng
             "view", // Xem chi tiết đơn hàng
+            "place", // Đặt đơn hàng mới
             "cancel", // Hủy đơn hàng
-            "status" // Trạng thái đơn hàng
+            "track" // Theo dõi trạng thái đơn hàng
     );
 
+    // ReviewController.java
     public static final List<String> REVIEW_ACTIONS = Arrays.asList(
-            "form", // Hiển thị form đánh giá
-            "submit", // Gửi đánh giá
-            "product" // Xem đánh giá của sản phẩm
+            "listByProduct", // Liệt kê đánh giá theo sản phẩm
+            "submit", // Gửi đánh giá mới
+            "update", // Cập nhật đánh giá
+            "delete", // Xóa đánh giá
+            "view" // Xem chi tiết một đánh giá
+    );
+
+    // AdminOrderController.java
+    public static final List<String> ADMIN_ORDER_ACTIONS = Arrays.asList(
+            "list", // Liệt kê tất cả đơn hàng
+            "view", // Xem chi tiết đơn hàng
+            "updateStatus", // Cập nhật trạng thái đơn hàng
+            "delete", // Xóa đơn hàng (cân nhắc thay bằng vô hiệu hóa)
+            "search", // Tìm kiếm đơn hàng
+            "export" // Xuất dữ liệu đơn hàng
+    );
+
+    // AdminProductController.java
+    public static final List<String> ADMIN_PRODUCT_ACTIONS = Arrays.asList(
+            "list", // Liệt kê tất cả sản phẩm
+            "view", // Xem chi tiết sản phẩm
+            "create", // Tạo sản phẩm mới
+            "update", // Cập nhật thông tin sản phẩm
+            "delete", // Xóa sản phẩm
+            "uploadImages", // Tải ảnh sản phẩm
+            "search" // Tìm kiếm sản phẩm
+    );
+
+    // AdminUserController.java
+    public static final List<String> ADMIN_USER_ACTIONS = Arrays.asList(
+            "list", // Liệt kê tất cả người dùng
+            "view", // Xem chi tiết người dùng
+            "create", // Tạo người dùng mới
+            "update", // Cập nhật thông tin người dùng
+            "delete", // Xóa người dùng
+            "changeRole", // Thay đổi vai trò người dùng
+            "resetPassword" // Đặt lại mật khẩu người dùng
+    );
+
+    // SystemConfigController.java (Admin)
+    public static final List<String> SYSTEM_CONFIG_ACTIONS = Arrays.asList(
+            "get", // Lấy cấu hình hệ thống
+            "update", // Cập nhật cấu hình hệ thống
+            "version", // Lấy phiên bản ứng dụng
+            "clearCache" // Xóa bộ nhớ cache
     );
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -72,26 +128,41 @@ public class MainController extends HttpServlet {
         try {
             String action = request.getParameter("action");
 
-            if (action == null) {
+            if (action == null || action.trim().isEmpty()) {
                 url = ERROR_PAGE;
 
-            } else if (PRODUCT_ACTIONS.contains(action)) {
-                url = "/product"; // ProductServlet
-
-            } else if (CART_ACTIONS.contains(action)) {
-                url = "/cart"; // CartServlet
+            } else if (MAIN_ACTIONS.contains(action)) {
+                url = "/MainController"; // Chính nó xử lý action chính
 
             } else if (USER_ACTIONS.contains(action)) {
-                url = "/user"; // UserServlet
+                url = "/UserController"; // UserController.java
+
+            } else if (PRODUCT_ACTIONS.contains(action)) {
+                url = "/ProductController"; // ProductController.java
+
+            } else if (CART_ACTIONS.contains(action)) {
+                url = "/CartController"; // CartController.java
 
             } else if (ORDER_ACTIONS.contains(action)) {
-                url = "/order"; // OrderServlet
+                url = "/OrderController"; // OrderController.java
 
             } else if (REVIEW_ACTIONS.contains(action)) {
-                url = "/review"; // ReviewServlet
+                url = "/ReviewController"; // ReviewController.java
+
+            } else if (ADMIN_ORDER_ACTIONS.contains(action)) {
+                url = "/AdminOrderController"; // AdminOrderController.java
+
+            } else if (ADMIN_PRODUCT_ACTIONS.contains(action)) {
+                url = "/AdminProductController"; // AdminProductController.java
+
+            } else if (ADMIN_USER_ACTIONS.contains(action)) {
+                url = "/AdminUserController"; // AdminUserController.java
+
+            } else if (SYSTEM_CONFIG_ACTIONS.contains(action)) {
+                url = "/SystemConfigController"; // SystemConfigController.java
 
             } else {
-                url = ERROR_PAGE; // chuyển về error.jsp
+                url = ERROR_PAGE;
             }
 
         } catch (Exception e) {

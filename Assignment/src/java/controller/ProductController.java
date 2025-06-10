@@ -1,7 +1,6 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,11 +11,10 @@ import jakarta.servlet.http.HttpServletResponse;
  * Status: Chờ thực hiện
  * Người thực hiện: [...........]
  * Ngày bắt đầu: [...........]
- * viết servlet cho User Servlet
+ * viết servlet cho Product Controller
  */
-
-@WebServlet(name = "UserServlet", urlPatterns = {"/UserServlet"})
-public class UserServlet extends HttpServlet {
+@WebServlet(name = "ProductController", urlPatterns = {"/ProductController"})
+public class ProductController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

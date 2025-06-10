@@ -1,21 +1,25 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+
 /**
  * Status: Chờ thực hiện
  * Người thực hiện: [...........]
  * Ngày bắt đầu: [...........]
- * viết servlet cho Review Servlet
+ * viết servlet cho Admin Product Controller
  */
-@WebServlet(name = "ReviewServlet", urlPatterns = {"/ReviewServlet"})
-public class ReviewServlet extends HttpServlet {
+@WebServlet(name = "AdminProductController", urlPatterns = {"/AdminProductController"})
+public class AdminProductController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
