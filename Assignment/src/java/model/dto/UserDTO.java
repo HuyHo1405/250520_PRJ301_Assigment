@@ -1,29 +1,33 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package model.dto;
 
 /**
- * Status: Chờ thực hiện
- * Người thực hiện: [...........]
- * Ngày bắt đầu: [...........]
- * viết set up các field cho class này
+ * Status: Đã hoàn thành
+ * Người thực hiện: Huy
+ * Ngày bắt đầu: 13/06/2025
+ * thêm role cho user
  */
 public class UserDTO {
     private int id;
     private String email_address;
     private String phone_number;
     private String hashed_password;
+    private String role;
 
-    public UserDTO() {
+    public UserDTO(String email_address, String phone_number, String hashed_password) {
+        this.id = -1;
+        this.email_address = email_address;
+        this.phone_number = phone_number;
+        this.hashed_password = hashed_password;
+        this.role = "user";
     }
 
-    public UserDTO(int id, String email_address, String phone_number, String hashed_password) {
+    public UserDTO(int id, String email_address, String phone_number, String hashed_password, String role) {
         this.id = id;
         this.email_address = email_address;
         this.phone_number = phone_number;
         this.hashed_password = hashed_password;
+        this.role = role;
     }
 
     public int getId() {
@@ -57,7 +61,13 @@ public class UserDTO {
     public void setHashed_password(String hashed_password) {
         this.hashed_password = hashed_password;
     }
-    
-    
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
     
 }

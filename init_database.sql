@@ -601,3 +601,12 @@ INSERT INTO review (user_id, ordered_product_id, rating_value, comment) VALUES
 (10, 10, 4, 'Good product overall, satisfied.');
 
 SELECT * FROM review;
+
+ALTER TABLE users
+ADD role VARCHAR(50) NOT NULL DEFAULT 'user';
+
+
+ALTER TABLE users
+ADD CONSTRAINT chk_role CHECK (role IN ('admin', 'user'));
+
+SELECT * FROM users

@@ -21,16 +21,6 @@ public class MainController extends HttpServlet {
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String ERROR_PAGE = "error.jsp";
 
-    // MainController.java
-    public static final List<String> MAIN_ACTIONS = Arrays.asList(
-            "home", // Trang chủ
-            "about", // Trang giới thiệu
-            "contact", // Trang liên hệ
-            "login", // Trang đăng nhập
-            "register", // Trang đăng ký
-            "error" // Trang lỗi chung
-    );
-
     // UserController.java (Dành cho người dùng cuối)
     public static final List<String> USER_ACTIONS = Arrays.asList(
             "profile", // Xem/Sửa thông tin hồ sơ
@@ -130,9 +120,6 @@ public class MainController extends HttpServlet {
 
             if (action == null || action.trim().isEmpty()) {
                 url = ERROR_PAGE;
-
-            } else if (MAIN_ACTIONS.contains(action)) {
-                url = "/MainController"; // Chính nó xử lý action chính
 
             } else if (USER_ACTIONS.contains(action)) {
                 url = "/UserController"; // UserController.java

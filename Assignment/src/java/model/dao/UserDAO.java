@@ -14,22 +14,27 @@ import model.dto.UserDTO;
 import utils.DbUtils;
 
 /**
- * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
- * [...........] viết các CRUD cần thiết
+ * Status: đã hoàn thành
+ * Người thực hiện: Huy
+ * Ngày bắt đầu: 13/06/2025
+ * thêm role cho user
  */
 public class UserDAO {
 
     private static final String TABLE_NAME = "users";
 
+    //map
     private UserDTO mapToUser(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String email = rs.getString("email_address");
         String phone = rs.getString("phone_number");
         String password = rs.getString("hashed_password");
-        return new UserDTO(id, email, phone, password);
+        String role = rs.getString("role");
+        return new UserDTO(id, email, phone, password, role);
     }
 
-    private List<UserDTO> retrieve(String condition, Object... params) {
+    //crud
+    public List<UserDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
@@ -52,26 +57,13 @@ public class UserDAO {
         return null;
     }
 
-    public List<UserDTO> getAllUsers() {
-        return retrieve("1 = 1");
-    }
-
-    public UserDTO getUserById(int id) {
-        List<UserDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public UserDTO getUserByEmail(String email) {
-        List<UserDTO> list = retrieve("email_address = ?", email);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
     public boolean create(UserDTO user) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (email_address, phone_number, hashed_password) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME + " (email_address, phone_number, hashed_password, role) VALUES (?, ?, ?, ?)";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getEmail_address());
             ps.setString(2, user.getPhone_number());
             ps.setString(3, user.getHashed_password());
+            ps.setString(4, user.getRole());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in create(): " + e.getMessage());
