@@ -4,8 +4,6 @@
  */
 package utils;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 /**
  *
  * @author ho huy

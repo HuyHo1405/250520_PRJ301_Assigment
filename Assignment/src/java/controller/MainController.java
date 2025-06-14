@@ -23,12 +23,15 @@ public class MainController extends HttpServlet {
 
     // UserController.java (Dành cho người dùng cuối)
     public static final List<String> USER_ACTIONS = Arrays.asList(
-            "profile", // Xem/Sửa thông tin hồ sơ
-            "changePassword", // Đổi mật khẩu
-            "register", // Đăng ký tài khoản (nếu chưa có MainController xử lý)
-            "login", // Đăng nhập (nếu chưa có MainController xử lý)
-            "logout", // Đăng xuất
-            "forgotPassword" // Yêu cầu quên mật khẩu
+        "toLogin",           // Chuyển đến trang đăng nhập
+        "toRegister",        // Chuyển đến trang đăng ký
+        "toProfile",         // Chuyển đến trang hồ sơ người dùng
+        "toForgotPassword",  // Chuyển đến trang quên mật khẩu
+        "register",          // Xử lý đăng ký tài khoản
+        "login",             // Xử lý đăng nhập
+        "logout",            // Xử lý đăng xuất
+        "changePassword",    // Xử lý đổi mật khẩu
+        "update"             // Xử lý cập nhật thông tin hồ sơ
     );
 
     // ProductController.java (Dành cho người dùng cuối)

@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package model.dao;
 
 import java.sql.Connection;
@@ -14,8 +11,10 @@ import model.dto.AddressDTO;
 import utils.DbUtils;
 
 /**
- *
- * @author Admin
+ * Status: đã hoàn thành
+ * Người thực hiện: Thịnh
+ * Ngày bắt đầu: 09/06/2025
+ * viết crud cho class này
  */
 public class AddressDAO {
     private static final String TABLE_NAME = "address";
