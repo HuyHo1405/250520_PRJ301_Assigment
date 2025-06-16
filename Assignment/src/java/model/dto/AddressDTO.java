@@ -20,6 +20,17 @@ public class AddressDTO {
     public AddressDTO() {
     }
 
+    public AddressDTO(int country_id, String unit_number, String street_number, String address_line1, String address_line2, String city, String region) {
+        this.id = -1;
+        this.country_id = country_id;
+        this.unit_number = unit_number;
+        this.street_number = street_number;
+        this.address_line1 = address_line1;
+        this.address_line2 = address_line2;
+        this.city = city;
+        this.region = region;
+    }
+
     public AddressDTO(int id, int country_id, String unit_number, String street_number, String address_line1, String address_line2, String city, String region) {
         this.id = id;
         this.country_id = country_id;
@@ -31,7 +42,6 @@ public class AddressDTO {
         this.region = region;
     }
 
-    
     public int getId() {
         return id;
     }

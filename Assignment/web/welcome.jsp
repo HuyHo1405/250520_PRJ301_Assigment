@@ -20,5 +20,10 @@
             <input type="hidden" name="action" value="toProfile"/>
             <button type="submit">Edit Profile</button>
         </form>
+        
+        <form action="MainController" method="post">
+            <input type="hidden" name="action" value="toAddressManagement"/>
+            <button type="submit">Address Management</button>
+        </form>
     </body>
 </html>

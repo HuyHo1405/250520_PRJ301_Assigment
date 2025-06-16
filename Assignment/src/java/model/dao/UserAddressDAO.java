@@ -27,7 +27,7 @@ public class UserAddressDAO {
         );
     }
 
-    private List<UserAddressDTO> retrieve(String condition, Object... params) {
+    public List<UserAddressDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
@@ -47,16 +47,7 @@ public class UserAddressDAO {
         return null;
     }
 
-    public List<UserAddressDTO> getAddressesByUserId(int userId) {
-        return retrieve("user_id = ?", userId);
-    }
-
-    public UserAddressDTO getSpecificUserAddress(int userId, int addressId) {
-        List<UserAddressDTO> list = retrieve("user_id = ? AND address_id = ?", userId, addressId);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public boolean add(UserAddressDTO userAddress) {
+    public boolean create(UserAddressDTO userAddress) {
         String sql = "INSERT INTO " + TABLE_NAME + " (user_id, address_id, is_default) VALUES (?, ?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userAddress.getUser_id());
@@ -92,18 +83,6 @@ public class UserAddressDAO {
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in delete(): " + e.getMessage());
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean clearDefaultForUser(int userId) {
-        String sql = "UPDATE " + TABLE_NAME + " SET is_default = 0 WHERE user_id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            System.err.println("Error in clearDefaultForUser(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;

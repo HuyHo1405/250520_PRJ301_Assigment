@@ -11,6 +11,13 @@ public class UserUtils {
         return getUser(request) != null;
     }
     
+    public static int getUserId(HttpServletRequest request){
+        if(isLoggedIn(request)){
+            return getUser(request).getId();
+        }
+        return -1;
+    }
+    
     public static UserDTO getUser(HttpServletRequest request){
         HttpSession ss = request.getSession();
         if(ss != null){

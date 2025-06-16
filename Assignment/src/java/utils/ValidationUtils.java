@@ -22,4 +22,15 @@ public class ValidationUtils {
         return isValid(phone, RegexPatterns.PHONE);
     }
     
+    public static boolean isEmpty(String str){
+        return str == null || str.isEmpty();
+    }
+    
+    public static boolean isInvalidId(int id){
+        return id == -1;
+    }
+    
+    public static String checkLength(String name, String value, int maxLength){
+        return (value.length() > maxLength) ? name + " quá dài (tối đa " + maxLength + " ký tự)" : null;
+    }
 }

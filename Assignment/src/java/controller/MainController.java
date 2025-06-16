@@ -21,17 +21,29 @@ public class MainController extends HttpServlet {
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String ERROR_PAGE = "error.jsp";
 
+    public static final List<String> ADDRESS_ACTIONS = Arrays.asList(
+        "toAddressManagement",  // 
+        "toAddAddress",         // 
+        "toEditAddress",        // 
+        "addAddress",           // 
+        "updateAddress",        // 
+        "updateDefaultAddress", // 
+        "removeAddress"         //
+    );
+    
+    
+    
     // UserController.java (Dành cho người dùng cuối)
     public static final List<String> USER_ACTIONS = Arrays.asList(
-        "toLogin",           // Chuyển đến trang đăng nhập
-        "toRegister",        // Chuyển đến trang đăng ký
-        "toProfile",         // Chuyển đến trang hồ sơ người dùng
-        "toForgotPassword",  // Chuyển đến trang quên mật khẩu
-        "register",          // Xử lý đăng ký tài khoản
-        "login",             // Xử lý đăng nhập
-        "logout",            // Xử lý đăng xuất
-        "changePassword",    // Xử lý đổi mật khẩu
-        "update"             // Xử lý cập nhật thông tin hồ sơ
+        "toLogin",              // Chuyển đến trang đăng nhập
+        "toRegister",           // Chuyển đến trang đăng ký
+        "toProfile",            // Chuyển đến trang hồ sơ người dùng
+        "toForgotPassword",     // Chuyển đến trang quên mật khẩu
+        "register",             // Xử lý đăng ký tài khoản
+        "login",                // Xử lý đăng nhập
+        "logout",               // Xử lý đăng xuất
+        "changePassword",       // Xử lý đổi mật khẩu
+        "update" //TODO change name               // Xử lý cập nhật thông tin hồ sơ
     );
 
     // ProductController.java (Dành cho người dùng cuối)
@@ -124,6 +136,9 @@ public class MainController extends HttpServlet {
             if (action == null || action.trim().isEmpty()) {
                 url = ERROR_PAGE;
 
+            } else if (ADDRESS_ACTIONS.contains(action)) {
+                url = "/AddressController"; // AddressController.java
+                
             } else if (USER_ACTIONS.contains(action)) {
                 url = "/UserController"; // UserController.java
 

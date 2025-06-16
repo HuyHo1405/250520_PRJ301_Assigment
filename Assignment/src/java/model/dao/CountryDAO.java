@@ -19,6 +19,7 @@ import utils.DbUtils;
 public class CountryDAO {
     private static final String TABLE_NAME = "country";
 
+    //map
     private CountryDTO mapToCountry(ResultSet rs) throws SQLException {
         return new CountryDTO(
             rs.getInt("id"),
@@ -26,7 +27,8 @@ public class CountryDAO {
         );
     }
 
-    private List<CountryDTO> retrieve(String condition, Object... params) {
+    //crud
+    public List<CountryDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -47,20 +49,6 @@ public class CountryDAO {
         }
 
         return null;
-    }
-
-    public List<CountryDTO> getAllCountries() {
-        return retrieve("1 = 1");
-    }
-
-    public CountryDTO getCountryById(int id) {
-        List<CountryDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public CountryDTO getCountryByName(String name) {
-        List<CountryDTO> list = retrieve("country_name = ?", name);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
     public boolean create(CountryDTO country) {

@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import model.dto.AddressDTO;
@@ -32,7 +33,7 @@ public class AddressDAO {
         );
     }
 
-    private List<AddressDTO> retrieve(String condition, Object... params) {
+    public List<AddressDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
@@ -51,15 +52,6 @@ public class AddressDAO {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public List<AddressDTO> getAllAddresses() {
-        return retrieve("1 = 1");
-    }
-
-    public AddressDTO getAddressById(int id) {
-        List<AddressDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
     public boolean create(AddressDTO address) {
@@ -81,6 +73,37 @@ public class AddressDAO {
         return false;
     }
 
+    public Integer createAndReturnId(AddressDTO address) {
+        String sql = "INSERT INTO " + TABLE_NAME + " (country_id, unit_number, street_number, address_line1, address_line2, city, region) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setInt(1, address.getCountry_id());
+            ps.setString(2, address.getUnit_number());
+            ps.setString(3, address.getStreet_number());
+            ps.setString(4, address.getAddress_line1());
+            ps.setString(5, address.getAddress_line2());
+            ps.setString(6, address.getCity());
+            ps.setString(7, address.getRegion());
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating address failed, no rows affected.");
+            }
+
+            try ( ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // ✅ ID vừa tạo
+                } else {
+                    throw new SQLException("Creating address failed, no ID obtained.");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error in createAndReturnId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null; // ❗ Nếu lỗi
+    }
+    
     public boolean update(AddressDTO address) {
         String sql = "UPDATE " + TABLE_NAME + " SET country_id = ?, unit_number = ?, street_number = ?, address_line1 = ?, address_line2 = ?, city = ?, region = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -112,4 +135,5 @@ public class AddressDAO {
         }
         return false;
     }
+    
 }

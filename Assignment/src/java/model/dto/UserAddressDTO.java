@@ -15,6 +15,12 @@ public class UserAddressDTO {
     public UserAddressDTO() {
     }
 
+    public UserAddressDTO(int user_id, int address_id) {
+        this.user_id = user_id;
+        this.address_id = address_id;
+        this.is_default = false;
+    }
+    
     public UserAddressDTO(int user_id, int address_id, boolean is_default) {
         this.user_id = user_id;
         this.address_id = address_id;
