@@ -34,5 +34,10 @@ public class ProductConfigDTO {
     public void setOption_id(int option_id) {
         this.option_id = option_id;
     }
+
+    @Override
+    public String toString() {
+        return "ProductConfigDTO{" + "item_id=" + item_id + ", option_id=" + option_id + '}';
+    }
     
 }

@@ -25,7 +25,7 @@ public class ShoppingCartDAO {
         return new ShoppingCartDTO(id, userId);
     }
 
-    private List<ShoppingCartDTO> retrieve(String condition, Object... params) {
+    public List<ShoppingCartDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
@@ -46,20 +46,6 @@ public class ShoppingCartDAO {
         }
 
         return null;
-    }
-
-    public List<ShoppingCartDTO> getAllCarts() {
-        return retrieve("1 = 1");
-    }
-
-    public ShoppingCartDTO getCartById(int id) {
-        List<ShoppingCartDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public ShoppingCartDTO getCartByUserId(int userId) {
-        List<ShoppingCartDTO> list = retrieve("user_id = ?", userId);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
     public boolean create(ShoppingCartDTO cart) {
@@ -84,5 +70,42 @@ public class ShoppingCartDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public ShoppingCartDTO findById(int id) {
+        List<ShoppingCartDTO> list = retrieve("id = ?", id);
+        return list != null && !list.isEmpty() ? list.get(0) : null;
+    }
+
+    public ShoppingCartDTO findByUserId(int userId) {
+        List<ShoppingCartDTO> list = retrieve("user_id = ?", userId);
+        return list != null && !list.isEmpty() ? list.get(0) : null;
+    }
+
+    public boolean existsByUserId(int userId) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE user_id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in existsByUserId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int count() {
+        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in count(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

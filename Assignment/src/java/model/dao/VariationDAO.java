@@ -27,7 +27,7 @@ public class VariationDAO {
         return new VariationDTO(id, productId, name);
     }
 
-    private List<VariationDTO> retrieve(String condition, Object... params) {
+    public List<VariationDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -50,19 +50,6 @@ public class VariationDAO {
         }
 
         return null;
-    }
-
-    public List<VariationDTO> getAllVariations() {
-        return retrieve("1 = 1");
-    }
-
-    public VariationDTO getVariationById(int id) {
-        List<VariationDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public List<VariationDTO> getVariationsByProductId(int productId) {
-        return retrieve("product_id = ?", productId);
     }
 
     public boolean create(VariationDTO variation) {
@@ -103,6 +90,30 @@ public class VariationDAO {
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in delete(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public List<VariationDTO> getVariationsByProductId(int productId) {
+        return retrieve("product_id = ?", productId);
+    }
+
+    // ✅ Tìm variation theo tên (phục vụ kiểm tra trùng tên variation trong 1 product, hoặc search)
+    public List<VariationDTO> getVariationsByName(String name) {
+        return retrieve("name LIKE ?", "%" + name + "%");
+    }
+
+    // ✅ Kiểm tra xem variation có tồn tại cho 1 sản phẩm với tên cụ thể
+    public boolean existsByProductIdAndName(int productId, String name) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE product_id = ? AND name = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ps.setString(2, name);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in existsByProductIdAndName(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;

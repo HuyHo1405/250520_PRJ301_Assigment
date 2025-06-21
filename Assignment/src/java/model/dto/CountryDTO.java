@@ -35,4 +35,9 @@ public class CountryDTO {
         this.country_name = country_name;
     }
 
+    @Override
+    public String toString() {
+        return "CountryDTO{" + "id=" + id + ", country_name=" + country_name + '}';
+    }
+
 }

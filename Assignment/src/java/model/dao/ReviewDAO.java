@@ -30,7 +30,7 @@ public class ReviewDAO {
         );
     }
 
-    private List<ReviewDTO> retrieve(String condition, Object... params) {
+    public List<ReviewDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
@@ -47,23 +47,6 @@ public class ReviewDAO {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public List<ReviewDTO> getAllReviews() {
-        return retrieve("1=1");
-    }
-
-    public ReviewDTO getReviewById(int id) {
-        List<ReviewDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public List<ReviewDTO> getReviewsByUserId(int userId) {
-        return retrieve("user_id = ?", userId);
-    }
-
-    public List<ReviewDTO> getReviewsByProductId(int productId) {
-        return retrieve("ordered_product_id = ?", productId);
     }
 
     public boolean create(ReviewDTO review) {
@@ -116,5 +99,45 @@ public class ReviewDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public ReviewDTO findById(int id) {
+        List<ReviewDTO> list = retrieve("id = ?", id);
+        return list != null && !list.isEmpty() ? list.get(0) : null;
+    }
+
+    public boolean exists(int id) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in exists(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int count() {
+        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in count(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<ReviewDTO> getByUserId(int userId) {
+        return retrieve("user_id = ?", userId);
+    }
+
+    public List<ReviewDTO> getByOrderedProductId(int orderedProductId) {
+        return retrieve("ordered_product_id = ?", orderedProductId);
     }
 }

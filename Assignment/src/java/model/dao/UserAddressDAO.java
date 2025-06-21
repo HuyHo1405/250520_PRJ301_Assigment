@@ -87,4 +87,39 @@ public class UserAddressDAO {
         }
         return false;
     }
+    
+    public List<UserAddressDTO> findByUserId(int userId) {
+        return retrieve("user_id = ?", userId);
+    }
+
+    public UserAddressDTO getDefaultAddressByUserId(int userId) {
+        List<UserAddressDTO> list = retrieve("user_id = ? AND is_default = 1", userId);
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
+    }
+
+    public boolean unsetDefaultAddress(int userId) {
+        String sql = "UPDATE " + TABLE_NAME + " SET is_default = 0 WHERE user_id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in unsetDefaultAddress(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean exists(int userId, int addressId) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE user_id = ? AND address_id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, addressId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in exists(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

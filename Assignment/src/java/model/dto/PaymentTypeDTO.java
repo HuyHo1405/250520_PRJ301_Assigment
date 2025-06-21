@@ -34,4 +34,9 @@ public class PaymentTypeDTO {
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "PaymentTypeDTO{" + "id=" + id + ", value=" + value + '}';
+    }
 }

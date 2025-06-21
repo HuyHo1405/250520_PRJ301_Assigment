@@ -30,7 +30,7 @@ public class ProductItemDAO {
         return new ProductItemDTO(id, productId, sku, quantityInStock, itemImageLink, price);
     }
 
-    private List<ProductItemDTO> retrieve(String condition, Object... params) {
+    public List<ProductItemDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -53,19 +53,6 @@ public class ProductItemDAO {
         }
 
         return null;
-    }
-
-    public List<ProductItemDTO> getAllItems() {
-        return retrieve("1 = 1");
-    }
-
-    public ProductItemDTO getItemById(int id) {
-        List<ProductItemDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public List<ProductItemDTO> getItemsByProductId(int productId) {
-        return retrieve("product_id = ?", productId);
     }
 
     public boolean create(ProductItemDTO item) {
@@ -115,5 +102,41 @@ public class ProductItemDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public ProductItemDTO findById(int id) {
+        List<ProductItemDTO> list = retrieve("id = ?", id);
+        return list != null && !list.isEmpty() ? list.get(0) : null;
+    }
+
+    public boolean existsById(int id) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in exists(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int count() {
+        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in count(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<ProductItemDTO> getByProductId(int productId) {
+        return retrieve("product_id = ?", productId);
     }
 }

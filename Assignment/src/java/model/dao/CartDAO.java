@@ -53,23 +53,6 @@ public class CartDAO {
         return null;
     }
 
-    public List<CartDTO> getAllCarts() {
-        return retrieve("1 = 1");
-    }
-
-    public CartDTO getCartById(int id) {
-        List<CartDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public List<CartDTO> getCartsByParentId(Integer parentId) {
-        if (parentId == null) {
-            return retrieve("parent_category_id IS NULL");
-        } else {
-            return retrieve("parent_category_id = ?", parentId);
-        }
-    }
-
     public boolean create(CartDTO cart) {
         String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name) VALUES (?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -121,4 +104,50 @@ public class CartDAO {
         return false;
     }
 
+    public CartDTO findById(int id) {
+        List<CartDTO> list = retrieve("id = ?", id);
+        return (list == null || list.isEmpty()) ? null : list.get(0);
+    }
+
+    public boolean existsById(int id) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in existsById(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int count() {
+        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in count(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int countByParentId(int parentId) {
+        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME + " WHERE parent_category_id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, parentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in countByParentId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

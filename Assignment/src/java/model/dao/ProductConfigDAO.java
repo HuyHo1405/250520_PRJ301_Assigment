@@ -25,7 +25,7 @@ public class ProductConfigDAO {
         return new ProductConfigDTO(itemId, optionId);
     }
 
-    private List<ProductConfigDTO> retrieve(String condition, Object... params) {
+    public List<ProductConfigDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -47,18 +47,6 @@ public class ProductConfigDAO {
         }
 
         return null;
-    }
-
-    public List<ProductConfigDTO> getAllConfigurations() {
-        return retrieve("1 = 1");
-    }
-
-    public List<ProductConfigDTO> getConfigurationsByItemId(int itemId) {
-        return retrieve("item_id = ?", itemId);
-    }
-
-    public List<ProductConfigDTO> getConfigurationsByOptionId(int optionId) {
-        return retrieve("option_id = ?", optionId);
     }
 
     public boolean create(ProductConfigDTO config) {
@@ -86,5 +74,41 @@ public class ProductConfigDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public List<ProductConfigDTO> findByItemId(int itemId) {
+        return retrieve("item_id = ?", itemId);
+    }
+
+    public List<ProductConfigDTO> findByOptionId(int optionId) {
+        return retrieve("option_id = ?", optionId);
+    }
+
+    public boolean existsById(int itemId, int optionId) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE item_id = ? AND option_id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, itemId);
+            ps.setInt(2, optionId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in exists(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int count() {
+        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in count(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

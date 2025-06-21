@@ -44,4 +44,9 @@ public class VariationDTO {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "VariationDTO{" + "id=" + id + ", product_id=" + product_id + ", name=" + name + '}';
+    }
 }

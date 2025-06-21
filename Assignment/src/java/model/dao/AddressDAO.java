@@ -136,4 +136,28 @@ public class AddressDAO {
         return false;
     }
     
+    public AddressDTO findById(int id) {
+        List<AddressDTO> list = retrieve("id = ?", id);
+        return list.isEmpty() ? null : list.get(0);
+    }
+    
+    public boolean existsById(int id){
+        return retrieve("id = ?", id).isEmpty();
+    }
+    
+    public int countByCountryId(int countryId) {
+        String sql = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE country_id = ?";
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, countryId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.err.println("Error in countByCountryId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
 }

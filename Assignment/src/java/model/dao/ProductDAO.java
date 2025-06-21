@@ -29,7 +29,7 @@ public class ProductDAO {
         return new ProductDTO(id, category_id, name, description, coverImageLink);
     }
 
-    private List<ProductDTO> retrieve(String condition, Object... params) {
+    public List<ProductDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -51,15 +51,6 @@ public class ProductDAO {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public List<ProductDTO> getAllProducts() {
-        return retrieve("1 = 1");
-    }
-
-    public ProductDTO getProductById(int id) {
-        List<ProductDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
     public boolean create(ProductDTO product) {
@@ -116,6 +107,38 @@ public class ProductDAO {
 
     public List<ProductDTO> getProductsByName(String name) {
         return retrieve("name LIKE ?", "%" + name + "%");
+    }
+    
+    public ProductDTO findById(int id) {
+        List<ProductDTO> list = retrieve("id = ?", id);
+        return list != null && !list.isEmpty() ? list.get(0) : null;
+    }
+
+    public boolean existsById(int id) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in exists(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int count() {
+        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in count(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }

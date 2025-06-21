@@ -44,4 +44,11 @@ public class CartDTO {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "CartDTO{" + "id=" + id + ", parent_category_id=" + parent_category_id + ", name=" + name + '}';
+    }
+    
+    
 }

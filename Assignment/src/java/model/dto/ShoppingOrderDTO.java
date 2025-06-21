@@ -1,32 +1,49 @@
-
 package model.dto;
 
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * Status: Đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết set up các field cho class này
+ * Người thực hiện: Huy
+ * Ngày bắt đầu: 19/06/2025
+ * Chuyển các trường Date thành Timestamp để chuẩn hóa với JDBC
  */
 public class ShoppingOrderDTO {
 
     private int id;
-    private Date orderDate;
+    private Timestamp orderDate;
     private double orderTotal;
     private int orderStatusId;
     private int paymentMethodId;
     private int shippingMethodId;
     private int addressId;
     private int userId;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
+    private String order_code;
 
     public ShoppingOrderDTO() {
     }
 
-    public ShoppingOrderDTO(int id, Date orderDate, double orderTotal, int orderStatusId, int paymentMethodId,
-            int shippingMethodId, int addressId, int userId, Date createdAt, Date updatedAt) {
+    // Constructor KHÔNG có ID (cho insert mới)
+    public ShoppingOrderDTO(double orderTotal, int orderStatusId, int paymentMethodId, int shippingMethodId, int addressId, int userId) {
+        Timestamp cur = Timestamp.valueOf(LocalDateTime.now());
+        this.id = -1;
+        this.orderDate = cur;
+        this.orderTotal = orderTotal;
+        this.orderStatusId = orderStatusId;
+        this.paymentMethodId = paymentMethodId;
+        this.shippingMethodId = shippingMethodId;
+        this.addressId = addressId;
+        this.userId = userId;
+        this.createdAt = cur;
+        this.updatedAt = cur;
+        this.order_code = null;
+    }
+
+    // Full constructor
+    public ShoppingOrderDTO(int id, Timestamp orderDate, double orderTotal, int orderStatusId, int paymentMethodId, int shippingMethodId, int addressId, int userId, Timestamp createdAt, Timestamp updatedAt, String order_code) {
         this.id = id;
         this.orderDate = orderDate;
         this.orderTotal = orderTotal;
@@ -37,10 +54,10 @@ public class ShoppingOrderDTO {
         this.userId = userId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.order_code = order_code;
     }
 
-    // Getters and setters for all fields
-    // ...
+    // Getters and setters
     public int getId() {
         return id;
     }
@@ -49,11 +66,11 @@ public class ShoppingOrderDTO {
         this.id = id;
     }
 
-    public Date getOrderDate() {
+    public Timestamp getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(Date orderDate) {
+    public void setOrderDate(Timestamp orderDate) {
         this.orderDate = orderDate;
     }
 
@@ -105,19 +122,34 @@ public class ShoppingOrderDTO {
         this.userId = userId;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public String getOrder_code() {
+        return order_code;
+    }
+
+    public void setOrder_code(String order_code) {
+        this.order_code = order_code;
+    }
+
+    @Override
+    public String toString() {
+        return "ShoppingOrderDTO{" + "id=" + id + ", orderDate=" + orderDate + ", orderTotal=" + orderTotal + ", orderStatusId=" + orderStatusId + ", paymentMethodId=" + paymentMethodId + ", shippingMethodId=" + shippingMethodId + ", addressId=" + addressId + ", userId=" + userId + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", order_code=" + order_code + '}';
+    }
+    
+    
 }

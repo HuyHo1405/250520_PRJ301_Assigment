@@ -213,7 +213,7 @@ public class AddressController extends HttpServlet {
             ps.setInt(1, userId);
 
             try ( ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) { // ✅ PHẢI gọi rs.next()
+                if (rs.next()) { 
                     return new AddressDTO(
                         rs.getInt("id"),
                         rs.getInt("country_id"),

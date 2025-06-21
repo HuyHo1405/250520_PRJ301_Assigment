@@ -44,4 +44,9 @@ public class VariationOptionDTO {
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "VariationOptionDTO{" + "id=" + id + ", variation_id=" + variation_id + ", value=" + value + '}';
+    }
 }

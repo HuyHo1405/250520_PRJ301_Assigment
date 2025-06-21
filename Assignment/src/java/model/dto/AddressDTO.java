@@ -106,4 +106,32 @@ public class AddressDTO {
         this.region = region;
     }
     
+    public String getFullAddress() {
+        StringBuilder sb = new StringBuilder();
+        if (unit_number != null && !unit_number.isEmpty()) {
+            sb.append(unit_number).append(", ");
+        }
+        if (street_number != null && !street_number.isEmpty()) {
+            sb.append(street_number).append(", ");
+        }
+        if (address_line1 != null && !address_line1.isEmpty()) {
+            sb.append(address_line1).append(", ");
+        }
+        if (address_line2 != null && !address_line2.isEmpty()) {
+            sb.append(address_line2).append(", ");
+        }
+        if (city != null && !city.isEmpty()) {
+            sb.append(city).append(", ");
+        }
+        if (region != null && !region.isEmpty()) {
+            sb.append(region);
+        }
+        return sb.toString().replaceAll(", $", "");
+    }
+
+    @Override
+    public String toString() {
+        return "AddressDTO{" + "id=" + id + ", country_id=" + country_id + ", unit_number=" + unit_number + ", street_number=" + street_number + ", address_line1=" + address_line1 + ", address_line2=" + address_line2 + ", city=" + city + ", region=" + region + '}';
+    }
+    
 }

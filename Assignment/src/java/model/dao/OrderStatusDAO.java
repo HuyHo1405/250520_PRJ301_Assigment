@@ -25,7 +25,7 @@ public class OrderStatusDAO {
         return new OrderStatusDTO(id, status);
     }
 
-    private List<OrderStatusDTO> retrieve(String condition, Object... params) {
+    public List<OrderStatusDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -46,20 +46,6 @@ public class OrderStatusDAO {
         }
 
         return null;
-    }
-
-    public List<OrderStatusDTO> getAllStatuses() {
-        return retrieve("1 = 1");
-    }
-
-    public OrderStatusDTO getStatusById(int id) {
-        List<OrderStatusDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public OrderStatusDTO getStatusByName(String name) {
-        List<OrderStatusDTO> list = retrieve("status = ?", name);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
     public boolean create(OrderStatusDTO status) {
@@ -97,5 +83,42 @@ public class OrderStatusDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public OrderStatusDTO findById(int id) {
+        List<OrderStatusDTO> list = retrieve("id = ?", id);
+        return (list == null || list.isEmpty()) ? null : list.get(0);
+    }
+
+    public boolean existsById(int id) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in existsById(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int count() {
+        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in count(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public OrderStatusDTO findByStatusName(String statusName) {
+        List<OrderStatusDTO> list = retrieve("status = ?", statusName);
+        return (list == null || list.isEmpty()) ? null : list.get(0);
     }
 }

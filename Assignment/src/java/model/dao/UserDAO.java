@@ -95,5 +95,46 @@ public class UserDAO {
         }
         return false;
     }
+    
+    public UserDTO findById(int id) {
+        List<UserDTO> list = retrieve("id = ?", id);
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
+    }
+    
+    public UserDTO findByEmail(String email) {
+        List<UserDTO> list = retrieve("email_address = ?", email);
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
+    }
+
+    public UserDTO findByPhone(String phone) {
+        List<UserDTO> list = retrieve("phone_number = ?", phone);
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
+    }
+
+    public boolean existsByEmail(String email) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE email_address = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in existsByEmail(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateRole(int userId, String newRole) {
+        String sql = "UPDATE " + TABLE_NAME + " SET role = ? WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newRole);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in updateRole(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
 
 }

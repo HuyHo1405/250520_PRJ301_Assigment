@@ -27,7 +27,7 @@ public class ShippingMethodDAO {
         );
     }
 
-    private List<ShippingMethodDTO> retrieve(String condition, Object... params) {
+    public List<ShippingMethodDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -48,15 +48,6 @@ public class ShippingMethodDAO {
         }
 
         return null;
-    }
-
-    public List<ShippingMethodDTO> getAll() {
-        return retrieve("1=1");
-    }
-
-    public ShippingMethodDTO getById(int id) {
-        List<ShippingMethodDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
     public boolean create(ShippingMethodDTO method) {
@@ -98,5 +89,45 @@ public class ShippingMethodDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public ShippingMethodDTO findById(int id) {
+        List<ShippingMethodDTO> list = retrieve("id = ?", id);
+        return list != null && !list.isEmpty() ? list.get(0) : null;
+    }
+
+    public boolean exists(int id) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in exists(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int count() {
+        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("Error in count(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<ShippingMethodDTO> getByPriceRange(double minPrice, double maxPrice) {
+        return retrieve("price BETWEEN ? AND ?", minPrice, maxPrice);
+    }
+
+    public List<ShippingMethodDTO> getByName(String name) {
+        return retrieve("name LIKE ?", "%" + name + "%");
     }
 }

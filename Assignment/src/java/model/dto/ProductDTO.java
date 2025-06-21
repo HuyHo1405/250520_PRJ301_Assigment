@@ -64,4 +64,9 @@ public class ProductDTO {
     public void setCover_image_link(String cover_image_link) {
         this.cover_image_link = cover_image_link;
     }
+
+    @Override
+    public String toString() {
+        return "ProductDTO{" + "id=" + id + ", category_id=" + category_id + ", name=" + name + ", description=" + description + ", cover_image_link=" + cover_image_link + '}';
+    }
 }

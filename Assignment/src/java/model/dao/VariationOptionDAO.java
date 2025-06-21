@@ -27,7 +27,7 @@ public class VariationOptionDAO {
         return new VariationOptionDTO(id, variationId, value);
     }
 
-    private List<VariationOptionDTO> retrieve(String condition, Object... params) {
+    public List<VariationOptionDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -51,20 +51,7 @@ public class VariationOptionDAO {
 
         return null;
     }
-
-    public List<VariationOptionDTO> getAllOptions() {
-        return retrieve("1 = 1");
-    }
-
-    public VariationOptionDTO getOptionById(int id) {
-        List<VariationOptionDTO> list = retrieve("id = ?", id);
-        return list != null && !list.isEmpty() ? list.get(0) : null;
-    }
-
-    public List<VariationOptionDTO> getOptionsByVariationId(int variationId) {
-        return retrieve("variation_id = ?", variationId);
-    }
-
+    
     public boolean create(VariationOptionDTO option) {
         String sql = "INSERT INTO " + TABLE_NAME + " (variation_id, value) VALUES (?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -103,6 +90,36 @@ public class VariationOptionDAO {
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in delete(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public List<VariationOptionDTO> getOptionsByVariationId(int variationId) {
+        return retrieve("variation_id = ?", variationId);
+    }
+
+    public boolean existsByVariationIdAndValue(int variationId, String value) {
+        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE variation_id = ? AND value = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, variationId);
+            ps.setString(2, value);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.err.println("Error in existsByVariationIdAndValue(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteByVariationId(int variationId) {
+        String sql = "DELETE FROM " + TABLE_NAME + " WHERE variation_id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, variationId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in deleteByVariationId(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;

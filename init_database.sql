@@ -602,6 +602,7 @@ INSERT INTO review (user_id, ordered_product_id, rating_value, comment) VALUES
 
 SELECT * FROM review;
 
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 ALTER TABLE users
 ADD role VARCHAR(50) NOT NULL DEFAULT 'user';
 
@@ -610,3 +611,11 @@ ALTER TABLE users
 ADD CONSTRAINT chk_role CHECK (role IN ('admin', 'user'));
 
 SELECT * FROM users
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+ALTER TABLE shopping_order ADD order_code VARCHAR(50) NULL;
+
+CREATE UNIQUE INDEX uq_order_code ON shopping_order(order_code) WHERE order_code IS NOT NULL;
+
+SELECT * FROM shopping_order
+

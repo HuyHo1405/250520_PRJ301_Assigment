@@ -25,5 +25,10 @@
             <input type="hidden" name="action" value="toAddressManagement"/>
             <button type="submit">Address Management</button>
         </form>
+        
+        <form action="MainController" method="post">
+            <input type="hidden" name="action" value="toAdminOrdersPage"/>
+            <button type="submit">Order Management</button>
+        </form>
     </body>
 </html>

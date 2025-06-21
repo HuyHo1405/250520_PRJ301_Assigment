@@ -64,4 +64,11 @@ public class OrderLineDTO {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    @Override
+    public String toString() {
+        return "OrderLineDTO{" + "id=" + id + ", order_id=" + order_id + ", item_id=" + item_id + ", quantity=" + quantity + ", price=" + price + '}';
+    }
+    
+    
 }

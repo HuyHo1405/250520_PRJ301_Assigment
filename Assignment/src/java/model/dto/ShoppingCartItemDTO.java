@@ -54,4 +54,9 @@ public class ShoppingCartItemDTO {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public String toString() {
+        return "ShoppingCartItemDTO{" + "id=" + id + ", cart_id=" + cart_id + ", item_id=" + item_id + ", quantity=" + quantity + '}';
+    }
 }

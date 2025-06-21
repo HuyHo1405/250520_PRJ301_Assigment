@@ -34,4 +34,9 @@ public class ShoppingCartDTO {
     public void setUser_id(int user_id) {
         this.user_id = user_id;
     }
+
+    @Override
+    public String toString() {
+        return "ShoppingCartDTO{" + "id=" + id + ", user_id=" + user_id + '}';
+    }
 }

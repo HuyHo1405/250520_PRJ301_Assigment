@@ -50,4 +50,9 @@ public class UserAddressDTO {
     public void setIs_default(boolean is_default) {
         this.is_default = is_default;
     }
+
+    @Override
+    public String toString() {
+        return "UserAddressDTO{" + "user_id=" + user_id + ", address_id=" + address_id + ", is_default=" + is_default + '}';
+    }
 }

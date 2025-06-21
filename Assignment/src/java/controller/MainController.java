@@ -12,118 +12,123 @@ import java.util.List;
 /**
  * Status: Hoàn thành
  * Người thực hiện: Huy
- * Ngày hoàn thành: 10/06/2025
- * Update thêm các Controllers khác.
+ * Ngày hoàn thành: 19/06/2025
+ * Sửa lại một số tên action để ko bị trùng lặp
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
 
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String ERROR_PAGE = "error.jsp";
+    private static final String WELCOME_PAGE = "welcome.jsp";
 
     public static final List<String> ADDRESS_ACTIONS = Arrays.asList(
-        "toAddressManagement",  // 
-        "toAddAddress",         // 
-        "toEditAddress",        // 
-        "addAddress",           // 
-        "updateAddress",        // 
-        "updateDefaultAddress", // 
-        "removeAddress"         //
+            "toAddressManagement",
+            "toAddAddress",
+            "toEditAddress",
+            "addAddress",
+            "updateAddress",
+            "updateDefaultAddress",
+            "removeAddress"
     );
-    
-    
-    
+
     // UserController.java (Dành cho người dùng cuối)
     public static final List<String> USER_ACTIONS = Arrays.asList(
-        "toLogin",              // Chuyển đến trang đăng nhập
-        "toRegister",           // Chuyển đến trang đăng ký
-        "toProfile",            // Chuyển đến trang hồ sơ người dùng
-        "toForgotPassword",     // Chuyển đến trang quên mật khẩu
-        "register",             // Xử lý đăng ký tài khoản
-        "login",                // Xử lý đăng nhập
-        "logout",               // Xử lý đăng xuất
-        "changePassword",       // Xử lý đổi mật khẩu
-        "update" //TODO change name               // Xử lý cập nhật thông tin hồ sơ
+            "toLogin",
+            "toRegister",
+            "toProfile",
+            "toForgotPassword",
+            "register",
+            "login",
+            "logout",
+            "changePassword",
+            "updateProfile" // Đổi từ "update" → rõ nghĩa hơn
     );
 
     // ProductController.java (Dành cho người dùng cuối)
     public static final List<String> PRODUCT_ACTIONS = Arrays.asList(
-            "list", // Hiển thị tất cả sản phẩm
-            "view", // Xem chi tiết sản phẩm
-            "search", // Tìm kiếm theo từ khoá
-            "category", // Lọc theo danh mục
-            "featured", // Xem sản phẩm nổi bật
-            "newArrivals" // Xem sản phẩm mới về
+            "listProducts",
+            "viewProduct",
+            "searchProducts",
+            "categoryProducts",
+            "featuredProducts",
+            "newArrivals"
     );
 
     // CartController.java
     public static final List<String> CART_ACTIONS = Arrays.asList(
-            "get", // Xem giỏ hàng
-            "add", // Thêm sản phẩm vào giỏ
-            "update", // Cập nhật số lượng sản phẩm trong giỏ
-            "remove", // Xóa sản phẩm khỏi giỏ
-            "clear", // Xóa toàn bộ giỏ hàng
-            "checkout" // Tiến hành thanh toán
+            "getCart",
+            "addToCart",
+            "updateCart",
+            "removeFromCart",
+            "clearCart",
+            "checkoutCart"
     );
 
     // OrderController.java (Dành cho người dùng cuối)
     public static final List<String> ORDER_ACTIONS = Arrays.asList(
-            "list", // Danh sách đơn hàng của người dùng
-            "view", // Xem chi tiết đơn hàng
-            "place", // Đặt đơn hàng mới
-            "cancel", // Hủy đơn hàng
-            "track" // Theo dõi trạng thái đơn hàng
+            "listMyOrders",
+            "viewMyOrder",
+            "placeOrder",
+            "cancelOrder",
+            "trackOrder"
     );
 
     // ReviewController.java
     public static final List<String> REVIEW_ACTIONS = Arrays.asList(
-            "listByProduct", // Liệt kê đánh giá theo sản phẩm
-            "submit", // Gửi đánh giá mới
-            "update", // Cập nhật đánh giá
-            "delete", // Xóa đánh giá
-            "view" // Xem chi tiết một đánh giá
+            "listReviewsByProduct",
+            "submitReview",
+            "updateReview",
+            "deleteReview",
+            "viewReview"
     );
 
     // AdminOrderController.java
     public static final List<String> ADMIN_ORDER_ACTIONS = Arrays.asList(
-            "list", // Liệt kê tất cả đơn hàng
-            "view", // Xem chi tiết đơn hàng
-            "updateStatus", // Cập nhật trạng thái đơn hàng
-            "delete", // Xóa đơn hàng (cân nhắc thay bằng vô hiệu hóa)
-            "search", // Tìm kiếm đơn hàng
-            "export" // Xuất dữ liệu đơn hàng
+            "toAdminOrdersPage",
+            "viewOrderDetail",
+            "updateOrderStatus",
+            "disableOrder", // Thay delete → rõ nghĩa hơn (soft delete)
+            "searchOrders",
+            "exportOrders"
     );
 
     // AdminProductController.java
     public static final List<String> ADMIN_PRODUCT_ACTIONS = Arrays.asList(
-            "list", // Liệt kê tất cả sản phẩm
-            "view", // Xem chi tiết sản phẩm
-            "create", // Tạo sản phẩm mới
-            "update", // Cập nhật thông tin sản phẩm
-            "delete", // Xóa sản phẩm
-            "uploadImages", // Tải ảnh sản phẩm
-            "search" // Tìm kiếm sản phẩm
+            "listAllProducts",
+            "viewProductDetail",
+            "createProduct",
+            "updateProduct",
+            "disableProduct",
+            "uploadProductImages",
+            "searchProducts"
     );
 
     // AdminUserController.java
     public static final List<String> ADMIN_USER_ACTIONS = Arrays.asList(
-            "list", // Liệt kê tất cả người dùng
-            "view", // Xem chi tiết người dùng
-            "create", // Tạo người dùng mới
-            "update", // Cập nhật thông tin người dùng
-            "delete", // Xóa người dùng
-            "changeRole", // Thay đổi vai trò người dùng
-            "resetPassword" // Đặt lại mật khẩu người dùng
+            "listAllUsers",
+            "viewUserDetail",
+            "createUser",
+            "updateUser",
+            "disableUser",
+            "changeUserRole",
+            "resetUserPassword"
     );
 
     // SystemConfigController.java (Admin)
     public static final List<String> SYSTEM_CONFIG_ACTIONS = Arrays.asList(
-            "get", // Lấy cấu hình hệ thống
-            "update", // Cập nhật cấu hình hệ thống
-            "version", // Lấy phiên bản ứng dụng
-            "clearCache" // Xóa bộ nhớ cache
+            "getSystemConfig",
+            "updateSystemConfig",
+            "getAppVersion",
+            "clearSystemCache"
     );
 
+    //
+    public static final List<String> WELCOME_ACTIONS = Arrays.asList(
+            "toWelcome",
+            ""
+    );
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -165,6 +170,10 @@ public class MainController extends HttpServlet {
 
             } else if (SYSTEM_CONFIG_ACTIONS.contains(action)) {
                 url = "/SystemConfigController"; // SystemConfigController.java
+            
+            } else if (WELCOME_ACTIONS.contains(action)) {
+                System.out.println("hello?");
+                url = WELCOME_PAGE; // SystemConfigController.java
 
             } else {
                 url = ERROR_PAGE;

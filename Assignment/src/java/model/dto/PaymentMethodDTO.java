@@ -86,4 +86,13 @@ public class PaymentMethodDTO {
     public void setIs_default(boolean is_default) {
         this.is_default = is_default;
     }
+    
+    public String getName() {
+        return provider + " (" + account_number + ")";
+    }
+
+    @Override
+    public String toString() {
+        return "PaymentMethodDTO{" + "id=" + id + ", user_id=" + user_id + ", payment_type_id=" + payment_type_id + ", provider=" + provider + ", account_number=" + account_number + ", expiry_date=" + expiry_date + ", is_default=" + is_default + '}';
+    }
 }

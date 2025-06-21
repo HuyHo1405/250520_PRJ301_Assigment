@@ -64,4 +64,10 @@ public class ReviewDTO {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    @Override
+    public String toString() {
+        return "ReviewDTO{" + "id=" + id + ", user_id=" + user_id + ", ordered_product_id=" + ordered_product_id + ", rating_value=" + rating_value + ", comment=" + comment + '}';
+    }
+    
 }
