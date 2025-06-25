@@ -1,105 +1,85 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="model.dto.AddressDTO"%>
-<%@page import="java.util.List"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Quản lý địa chỉ</title>
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý địa chỉ</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 8px; border: 1px solid #ccc; }
+        th { background-color: #f0f0f0; }
+        .error { color: red; margin: 10px 0; }
+        .top-actions { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
 
-        <%
-            String error = (String) request.getAttribute("error");
-            if (error == null) error = "";
+<h1>Quản lý địa chỉ</h1>
+<hr>
 
-            AddressDTO defaultAddress = (AddressDTO) request.getAttribute("defaultAddress");
-            List<AddressDTO> otherAddresses = (List<AddressDTO>) request.getAttribute("otherAddresses");
-            if (otherAddresses == null) otherAddresses = java.util.Collections.emptyList();
-        %>
+<div class="top-actions">
+    <form action="MainController" method="post">
+        <input type="hidden" name="action" value="searchAddress" />
+        <input type="text" name="strKeyword" placeholder="Tìm theo thành phố hoặc vùng..." value="${param.strKeyword}" />
+        <button type="submit">Tìm kiếm</button>
+    </form>
 
-        <h1>Quản lý địa chỉ</h1>
+    <form action="MainController" method="post">
+        <input type="hidden" name="action" value="toAddAddress" />
+        <button type="submit">Thêm địa chỉ mới</button>
+    </form>
+</div>
 
-        <% if (!error.isEmpty()) { %>
-        <p style="color:red;"><%= error %></p>
-        <% } %>
+<c:if test="${not empty error}">
+    <p class="error">${error}</p>
+</c:if>
 
-        <!-- ✅ Địa chỉ mặc định -->
-        <h2>Địa chỉ mặc định</h2>
-        <% if (defaultAddress == null) { %>
-        <p>Chưa có địa chỉ mặc định.</p>
-        <% } else { %>
-        <div>
-            <strong><%= defaultAddress.getAddress_line1() %></strong><br>
-            <%= defaultAddress.getAddress_line2() != null ? defaultAddress.getAddress_line2() + "<br>" : "" %>
-            <%= defaultAddress.getCity() + ", " + defaultAddress.getRegion() %><br>
-            Quốc gia ID: <%= defaultAddress.getCountry_id() %><br>
-        </div>
-        <% } %>
+<table>
+    <tr>
+        <th>Address</th>
+        <th>City</th>
+        <th>Region</th>
+        <th>Action</th>
+    </tr>
+    <c:forEach var="addr" items="${addressList}">
+        <tr <c:if test="${addr.id != defaultAddressId}">style="font-weight:bold;"</c:if>>
+            <td>${addr.fullAddress} ${addr.id != defaultAddressId? '': '(default)'}</td>
+            <td>${addr.city}</td>
+            <td>${addr.region}</td>
+            <td>
+                <form action="MainController" method="post" style="display:inline;">
+                    <input type="hidden" name="action" value="toEditAddress"/>
+                    <input type="hidden" name="addressId" value="${addr.id}"/>
+                    <button type="submit">Sửa</button>
+                </form>
 
-        <hr>
-
-        <!-- ✅ Danh sách các địa chỉ khác -->
-        <h2>Các địa chỉ khác</h2>
-        <% if (otherAddresses.isEmpty()) { %>
-        <p>Không có địa chỉ nào khác.</p>
-        <% } else { %>
-        <table border="1" cellpadding="5" cellspacing="0">
-            <tr>
-                <th>Địa chỉ</th>
-                <th>Thành phố</th>
-                <th>Region</th>
-                <th>Thao tác</th>
-            </tr>
-            <% for (AddressDTO addr : otherAddresses) { %>
-            <tr>
-                <td><%= addr.getAddress_line1() + " " + (addr.getAddress_line2() != null ? addr.getAddress_line2() : "") %></td>
-                <td><%= addr.getCity() %></td>
-                <td><%= addr.getRegion() %></td>
-                <td>
+                <c:if test="${addr.id != defaultAddressId}">
                     <form action="MainController" method="post" style="display:inline;">
                         <input type="hidden" name="action" value="updateDefaultAddress"/>
-                        <input type="hidden" name="addressId" value="<%= addr.getId() %>"/>
+                        <input type="hidden" name="addressId" value="${addr.id}"/>
                         <button type="submit">Đặt làm mặc định</button>
                     </form>
 
-                    <form action="MainController" method="post">
-                        <input type="hidden" name="action" value="toEditAddress"/>
-                        <input type="hidden" name="addressId" value="<%= addr.getId() %>"/>
-                        <input type="hidden" name="countryId" value="<%= addr.getCountry_id() %>"/>
-                        <input type="hidden" name="unitNumber" value="<%= addr.getUnit_number() != null ? addr.getUnit_number() : "" %>"/>
-                        <input type="hidden" name="streetNumber" value="<%= addr.getStreet_number() != null ? addr.getStreet_number() : "" %>"/>
-                        <input type="hidden" name="addressLine1" value="<%= addr.getAddress_line1() != null ? addr.getAddress_line1() : "" %>"/>
-                        <input type="hidden" name="addressLine2" value="<%= addr.getAddress_line2() != null ? addr.getAddress_line2() : "" %>"/>
-                        <input type="hidden" name="city" value="<%= addr.getCity() != null ? addr.getCity() : "" %>"/>
-                        <input type="hidden" name="region" value="<%= addr.getRegion() != null ? addr.getRegion() : "" %>"/>
-
-                        <button type="submit">Sửa</button>
-                    </form>
-
-                    <form action="MainController" method="post">
+                    <form action="MainController" method="post" style="display:inline;">
                         <input type="hidden" name="action" value="removeAddress"/>
-                        <input type="hidden" name="addressId" value="<%= addr.getId() %>"/>
+                        <input type="hidden" name="addressId" value="${addr.id}"/>
                         <button type="submit" onclick="return confirm('Xóa địa chỉ này?')">Xóa</button>
                     </form>
-                </td>
-            </tr>
-            <% } %>
-        </table>
-        <% } %>
+                </c:if>
+            </td>
+        </tr>
+    </c:forEach>
+</table>
 
-        <hr>
+<hr>
 
-        <form action="MainController" method="post">
-            <input type="hidden" name="action" value="toAddAddress"/>
-            <button type="submit">Thêm địa chỉ mới</button>
-        </form>
+<form action="MainController" method="post" style="display:inline;">
+    <input type="hidden" name="action" value="toWelcome"/>
+    <button type="submit">Quay lại hồ sơ</button>
+</form>
 
-        <br>
-        <form action="MainController" method="post">
-            <input type="hidden" name="action" value="toWelcome"/>
-            <button type="submit">Quay lại hồ sơ</button>
-        </form>
-
-    </body>
+</body>
 </html>

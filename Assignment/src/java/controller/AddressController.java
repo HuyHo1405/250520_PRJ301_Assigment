@@ -33,9 +33,11 @@ public class AddressController extends HttpServlet {
 
     //static fields
     private static final String WELCOME_PAGE = "welcome.jsp";
+    private static final String PROFILE_PAGE = "profile.jsp";
     private static final String ADDRESS_FORM_PAGE = "address-form.jsp";
     private static final String ADDRESS_MANAGEMENT_PAGE = "address-management.jsp";
     private static final String ERROR_PAGE = "error.jsp";
+    
     private final CountryDAO CDAO = new CountryDAO();
     private final AddressDAO ADAO = new AddressDAO();
     private final UserAddressDAO UADAO = new UserAddressDAO();
@@ -50,6 +52,10 @@ public class AddressController extends HttpServlet {
             String action = request.getParameter("action");
 
             switch (action) {
+                case "toProfile":
+                    prepareAddressManagementView(request, UserUtils.getUserId(request));
+                    url = PROFILE_PAGE;
+                    break;
                 case "toAddAddress":
                     request.setAttribute("countries", CDAO.retrieve("1 = 1"));
                     request.setAttribute("actionType", "addAddress");
@@ -66,6 +72,9 @@ public class AddressController extends HttpServlet {
                     break;
                 case "addAddress":
                     url = handleAddAddress(request, response);
+                    break;
+                case "searchAddress":
+                    url = handleSearchAddress(request, response);
                     break;
                 case "updateAddress":
                     url = handleUpdateAddress(request, response);
@@ -128,93 +137,89 @@ public class AddressController extends HttpServlet {
     }// </editor-fold>
 
     //handle methods
-    public String handleAddAddress(HttpServletRequest request, HttpServletResponse response) {
-        int countryId = toInt(request.getParameter("countryId"));
-        String unitNum = request.getParameter("unitNumber");
-        String streetNum = request.getParameter("streetNumber");
-        String addressLine1 = request.getParameter("addressLine1");
-        String addressLine2 = request.getParameter("addressLine2");
-        String city = request.getParameter("city");
-        String region = request.getParameter("region");
+    private String handleAddAddress(HttpServletRequest request, HttpServletResponse response) {
+        AddressDTO address = extractAddressFromRequest(request, -1);
+        String error = validateAddressFields(address);
 
-        String error;
-        if((error = validateField(countryId, unitNum, streetNum, addressLine1, addressLine2, city, region)) != null){
+        if (error != null) {
             request.setAttribute("error", error);
             return ADDRESS_FORM_PAGE;
         }
-        
-        int addressId = ADAO.createAndReturnId(new AddressDTO(countryId, unitNum, streetNum, addressLine1, addressLine2, city, region));
-        int userId = UserUtils.getUser(request).getId();
-        UADAO.create(new UserAddressDTO(userId, addressId));
-        prepareAddressManagementView(request, UserUtils.getUserId(request));
-        return ADDRESS_MANAGEMENT_PAGE;
-    }
 
-    public String handleUpdateAddress(HttpServletRequest request, HttpServletResponse response) {
-        int addressId = toInt(request.getParameter("addressId"));
-        int countryId = toInt(request.getParameter("countryId"));
-        String unitNum = request.getParameter("unitNumber");
-        String streetNum = request.getParameter("streetNumber");
-        String addressLine1 = request.getParameter("addressLine1");
-        String addressLine2 = request.getParameter("addressLine2");
-        String city = request.getParameter("city");
-        String region = request.getParameter("region");
-        
-        String error;
-        if((error = validateField(countryId, unitNum, streetNum, addressLine1, addressLine2, city, region)) != null){
-            request.setAttribute("error", error);
-            return ADDRESS_FORM_PAGE;
-        }
-        
-        ADAO.update(new AddressDTO(addressId, countryId, unitNum, streetNum, addressLine1, addressLine2, city, region));
-        request.setAttribute("defaultAddress", getDefaultAddress(UserUtils.getUserId(request)));
-        request.setAttribute("otherAddresses", getOtherAddress("1 = 1", UserUtils.getUserId(request)));
-        return ADDRESS_MANAGEMENT_PAGE;
-    }
-
-    public String handleUpdateDefaultAddress(HttpServletRequest request, HttpServletResponse response) {
-        int addressId = toInt(request.getParameter("addressId"));
-        if(ValidationUtils.isInvalidId(addressId)){
-            request.setAttribute("error", "Không tìm thấy địa chỉ");
-            return ADDRESS_MANAGEMENT_PAGE;
-        }
-        
+        int addressId = ADAO.createAndReturnId(address);
         int userId = UserUtils.getUserId(request);
-        AddressDTO cur = getDefaultAddress(userId);
-        if(cur != null){
-            UADAO.update(new UserAddressDTO(userId, cur.getId(), false));
-        }
+        UADAO.create(new UserAddressDTO(userId, addressId));
+        prepareAddressManagementView(request, userId);
+        return ADDRESS_MANAGEMENT_PAGE;
+    }
+    
+    private String handleSearchAddress(HttpServletRequest request, HttpServletResponse response) {
+        String keyword = request.getParameter("strKeyword");
+        int userId = UserUtils.getUserId(request);
         
-        UADAO.update(new UserAddressDTO(userId, addressId, true));
+        request.setAttribute("defaultAddressId", getDefaultAddress(userId).getId());
+        request.setAttribute("addressList", getUserAddress("full_address LIKE ?", userId, "%" + keyword + "%"));
+        return ADDRESS_MANAGEMENT_PAGE;
+    }
+
+    private String handleUpdateAddress(HttpServletRequest request, HttpServletResponse response) {
+        int addressId = toInt(request.getParameter("addressId"));
+        AddressDTO address = extractAddressFromRequest(request, addressId);
+        String error = validateAddressFields(address);
+
+        if (error != null) {
+            request.setAttribute("error", error);
+            return ADDRESS_FORM_PAGE;
+        }
+
+        ADAO.update(address);
         prepareAddressManagementView(request, UserUtils.getUserId(request));
         return ADDRESS_MANAGEMENT_PAGE;
     }
 
-    public String handleDeleteAddress(HttpServletRequest request, HttpServletResponse response) {
+    private String handleUpdateDefaultAddress(HttpServletRequest request, HttpServletResponse response) {
         int addressId = toInt(request.getParameter("addressId"));
-        if(ValidationUtils.isInvalidId(addressId)){
+        if (ValidationUtils.isInvalidId(addressId)) {
             request.setAttribute("error", "Không tìm thấy địa chỉ");
             return ADDRESS_MANAGEMENT_PAGE;
         }
+
+        int userId = UserUtils.getUserId(request);
+        AddressDTO currentDefault = getDefaultAddress(userId);
+        if (currentDefault != null) {
+            UADAO.update(new UserAddressDTO(userId, currentDefault.getId(), false));
+        }
+
+        UADAO.update(new UserAddressDTO(userId, addressId, true));
+        prepareAddressManagementView(request, userId);
+        return ADDRESS_MANAGEMENT_PAGE;
+    }
+
+    private String handleDeleteAddress(HttpServletRequest request, HttpServletResponse response) {
+        int addressId = toInt(request.getParameter("addressId"));
+        if (ValidationUtils.isInvalidId(addressId)) {
+            request.setAttribute("error", "Không tìm thấy địa chỉ");
+            return ADDRESS_MANAGEMENT_PAGE;
+        }
+
         int userId = UserUtils.getUserId(request);
         UADAO.delete(userId, addressId);
-        prepareAddressManagementView(request, UserUtils.getUserId(request));
+        prepareAddressManagementView(request, userId);
         return ADDRESS_MANAGEMENT_PAGE;
     }
 
-    //joint table
+    //
     private AddressDTO getDefaultAddress(int userId) {
-        String sql = "SELECT a.* FROM address a "
-                + "JOIN user_address ua ON a.id = ua.address_id "
-                + "WHERE ua.user_id = ? AND ua.is_default = 1";
+        String sql = "SELECT a.* FROM address a " +
+                     "JOIN user_address ua ON a.id = ua.address_id " +
+                     "WHERE ua.user_id = ? AND ua.is_default = 1";
 
-        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
-
+        try (Connection conn = DbUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
-
-            try ( ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) { 
-                    return new AddressDTO(
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new AddressDTO(
                         rs.getInt("id"),
                         rs.getInt("country_id"),
                         rs.getString("unit_number"),
@@ -225,38 +230,37 @@ public class AddressController extends HttpServlet {
                         rs.getString("region")
                 );
             }
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private List<AddressDTO> getOtherAddress(String condition, Object... params) {
-        String sql = "SELECT a.* FROM address a "
-                + "JOIN user_address ua ON a.id = ua.address_id "
-                + "WHERE ua.is_default = 0 AND ua.user_id = ? AND " + condition;
+    private List<AddressDTO> getUserAddress(String condition, Object... params) {
+        String sql = "SELECT a.* FROM address a " +
+                     "JOIN user_address ua ON a.id = ua.address_id " +
+                     "WHERE ua.user_id = ? AND " + condition;
 
         List<AddressDTO> list = new ArrayList<>();
-        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DbUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
 
-            try ( ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(new AddressDTO(
-                            rs.getInt("id"),
-                            rs.getInt("country_id"),
-                            rs.getString("unit_number"),
-                            rs.getString("street_number"),
-                            rs.getString("address_line1"),
-                            rs.getString("address_line2"),
-                            rs.getString("city"),
-                            rs.getString("region")
-                    ));
-                }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new AddressDTO(
+                        rs.getInt("id"),
+                        rs.getInt("country_id"),
+                        rs.getString("unit_number"),
+                        rs.getString("street_number"),
+                        rs.getString("address_line1"),
+                        rs.getString("address_line2"),
+                        rs.getString("city"),
+                        rs.getString("region")
+                ));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -264,40 +268,54 @@ public class AddressController extends HttpServlet {
         return list;
     }
 
-    //some useful methods
-    private int toInt(String n) {
+    private AddressDTO extractAddressFromRequest(HttpServletRequest request, int id) {
+        return new AddressDTO(
+                id,
+                toInt(request.getParameter("countryId")),
+                request.getParameter("unitNumber"),
+                request.getParameter("streetNumber"),
+                request.getParameter("addressLine1"),
+                request.getParameter("addressLine2"),
+                request.getParameter("city"),
+                request.getParameter("region")
+        );
+    }
+
+    private String validateAddressFields(AddressDTO address) {
+        if (ValidationUtils.isInvalidId(address.getCountryId()) ||
+                ValidationUtils.isEmpty(address.getUnitNumber()) ||
+                ValidationUtils.isEmpty(address.getStreetNumber()) ||
+                ValidationUtils.isEmpty(address.getAddressLine1()) ||
+                ValidationUtils.isEmpty(address.getCity()) ||
+                ValidationUtils.isEmpty(address.getRegion())) {
+            return "Vui lòng điền đầy đủ thông tin.";
+        }
+
+        String error;
+        if ((error = ValidationUtils.checkLength("unit number", address.getUnitNumber(), 20)) != null ||
+            (error = ValidationUtils.checkLength("street number", address.getStreetNumber(), 20)) != null ||
+            (error = ValidationUtils.checkLength("address line 1", address.getAddressLine1(), 255)) != null ||
+            (error = ValidationUtils.checkLength("address line 2", address.getAddressLine2(), 255)) != null ||
+            (error = ValidationUtils.checkLength("city", address.getCity(), 100)) != null ||
+            (error = ValidationUtils.checkLength("region", address.getRegion(), 100)) != null) {
+            return error;
+        }
+
+        return null;
+    }
+
+    private void prepareAddressManagementView(HttpServletRequest request, int userId) {
+        request.setAttribute("defaultAddressId", getDefaultAddress(userId).getId());
+        request.setAttribute("addressList", getUserAddress("1=1", userId));
+    }
+
+    private int toInt(String s) {
         try {
-            return Integer.parseInt(n);
+            return Integer.parseInt(s);
         } catch (NumberFormatException e) {
             return -1;
         }
     }
 
-    private String validateField(int countryId, String unitNum, String streetNum, String addressLine1, String addressLine2, String city, String region){
-        if (ValidationUtils.isInvalidId(countryId)
-                || ValidationUtils.isEmpty(unitNum) || ValidationUtils.isEmpty(streetNum) || ValidationUtils.isEmpty(addressLine1)
-                || ValidationUtils.isEmpty(city) || ValidationUtils.isEmpty(region)) {
-            return "Vui lòng điền đầy đủ thông tin.";
-        }
-        
-        String error;
-        if ((error = ValidationUtils.checkLength("unit number", unitNum, 20)) != null
-                || (error = ValidationUtils.checkLength("street number", streetNum, 20)) != null
-                || (error = ValidationUtils.checkLength("address line 1", addressLine1, 255)) != null
-                || (error = ValidationUtils.checkLength("address line 2", addressLine2, 255)) != null
-                || (error = ValidationUtils.checkLength("city", city, 100)) != null
-                || (error = ValidationUtils.checkLength("region", region, 100)) != null) {
-            return error;
-        }
-
-        if (addressLine2 != null && addressLine2.length() > 255) {
-            return "Địa chỉ dòng 2 quá dài (tối đa 255 ký tự).";
-        }
-        return null;
-    }
     
-    private void prepareAddressManagementView(HttpServletRequest request, int userId) {
-        request.setAttribute("defaultAddress", getDefaultAddress(userId));
-        request.setAttribute("otherAddresses", getOtherAddress("1 = 1", userId));
-    }
 }

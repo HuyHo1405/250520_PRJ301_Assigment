@@ -1,45 +1,41 @@
-
 package model.dto;
+
+import java.util.Objects;
 
 /**
  * Status: Đã hoàn thành
  * Người thực hiện: Thịnh
  * Ngày bắt đầu: 09/06/2025
- * viết set up các field cho class này
  */
 public class AddressDTO {
     private int id;
-    private int country_id;
-    private String unit_number;
-    private String street_number;
-    private String address_line1;
-    private String address_line2;
+    private int countryId;
+    private String unitNumber;
+    private String streetNumber;
+    private String addressLine1;
+    private String addressLine2;
     private String city;
     private String region;
+    private String fullAddress;
 
     public AddressDTO() {
-    }
-
-    public AddressDTO(int country_id, String unit_number, String street_number, String address_line1, String address_line2, String city, String region) {
         this.id = -1;
-        this.country_id = country_id;
-        this.unit_number = unit_number;
-        this.street_number = street_number;
-        this.address_line1 = address_line1;
-        this.address_line2 = address_line2;
-        this.city = city;
-        this.region = region;
     }
 
-    public AddressDTO(int id, int country_id, String unit_number, String street_number, String address_line1, String address_line2, String city, String region) {
+    public AddressDTO(int countryId, String unitNumber, String streetNumber, String addressLine1, String addressLine2, String city, String region) {
+        this(-1, countryId, unitNumber, streetNumber, addressLine1, addressLine2, city, region);
+    }
+
+    public AddressDTO(int id, int countryId, String unitNumber, String streetNumber, String addressLine1, String addressLine2, String city, String region) {
         this.id = id;
-        this.country_id = country_id;
-        this.unit_number = unit_number;
-        this.street_number = street_number;
-        this.address_line1 = address_line1;
-        this.address_line2 = address_line2;
+        this.countryId = countryId;
+        this.unitNumber = unitNumber;
+        this.streetNumber = streetNumber;
+        this.addressLine1 = addressLine1;
+        this.addressLine2 = addressLine2;
         this.city = city;
         this.region = region;
+        this.fullAddress = generateFullAddress();
     }
 
     public int getId() {
@@ -50,44 +46,48 @@ public class AddressDTO {
         this.id = id;
     }
 
-    public int getCountry_id() {
-        return country_id;
+    public int getCountryId() {
+        return countryId;
     }
 
-    public void setCountry_id(int country_id) {
-        this.country_id = country_id;
+    public void setCountryId(int countryId) {
+        this.countryId = countryId;
     }
 
-    public String getUnit_number() {
-        return unit_number;
+    public String getUnitNumber() {
+        return unitNumber;
     }
 
-    public void setUnit_number(String unit_number) {
-        this.unit_number = unit_number;
+    public void setUnitNumber(String unitNumber) {
+        this.unitNumber = unitNumber;
+        updateFullAddress();
     }
 
-    public String getStreet_number() {
-        return street_number;
+    public String getStreetNumber() {
+        return streetNumber;
     }
 
-    public void setStreet_number(String street_number) {
-        this.street_number = street_number;
+    public void setStreetNumber(String streetNumber) {
+        this.streetNumber = streetNumber;
+        updateFullAddress();
     }
 
-    public String getAddress_line1() {
-        return address_line1;
+    public String getAddressLine1() {
+        return addressLine1;
     }
 
-    public void setAddress_line1(String address_line1) {
-        this.address_line1 = address_line1;
+    public void setAddressLine1(String addressLine1) {
+        this.addressLine1 = addressLine1;
+        updateFullAddress();
     }
 
-    public String getAddress_line2() {
-        return address_line2;
+    public String getAddressLine2() {
+        return addressLine2;
     }
 
-    public void setAddress_line2(String address_line2) {
-        this.address_line2 = address_line2;
+    public void setAddressLine2(String addressLine2) {
+        this.addressLine2 = addressLine2;
+        updateFullAddress();
     }
 
     public String getCity() {
@@ -96,6 +96,7 @@ public class AddressDTO {
 
     public void setCity(String city) {
         this.city = city;
+        updateFullAddress();
     }
 
     public String getRegion() {
@@ -104,34 +105,46 @@ public class AddressDTO {
 
     public void setRegion(String region) {
         this.region = region;
+        updateFullAddress();
     }
-    
+
     public String getFullAddress() {
+        return fullAddress;
+    }
+
+    private void updateFullAddress() {
+        this.fullAddress = generateFullAddress();
+    }
+
+    private String generateFullAddress() {
         StringBuilder sb = new StringBuilder();
-        if (unit_number != null && !unit_number.isEmpty()) {
-            sb.append(unit_number).append(", ");
-        }
-        if (street_number != null && !street_number.isEmpty()) {
-            sb.append(street_number).append(", ");
-        }
-        if (address_line1 != null && !address_line1.isEmpty()) {
-            sb.append(address_line1).append(", ");
-        }
-        if (address_line2 != null && !address_line2.isEmpty()) {
-            sb.append(address_line2).append(", ");
-        }
-        if (city != null && !city.isEmpty()) {
-            sb.append(city).append(", ");
-        }
-        if (region != null && !region.isEmpty()) {
-            sb.append(region);
-        }
+        appendIfNotNull(sb, unitNumber);
+        appendIfNotNull(sb, streetNumber);
+        appendIfNotNull(sb, addressLine1);
+        appendIfNotNull(sb, addressLine2);
+        appendIfNotNull(sb, city);
+        appendIfNotNull(sb, region);
         return sb.toString().replaceAll(", $", "");
+    }
+
+    private void appendIfNotNull(StringBuilder sb, String value) {
+        if (Objects.nonNull(value) && !value.trim().isEmpty()) {
+            sb.append(value.trim()).append(", ");
+        }
     }
 
     @Override
     public String toString() {
-        return "AddressDTO{" + "id=" + id + ", country_id=" + country_id + ", unit_number=" + unit_number + ", street_number=" + street_number + ", address_line1=" + address_line1 + ", address_line2=" + address_line2 + ", city=" + city + ", region=" + region + '}';
+        return "AddressDTO{" +
+                "id=" + id +
+                ", countryId=" + countryId +
+                ", unitNumber='" + unitNumber + '\'' +
+                ", streetNumber='" + streetNumber + '\'' +
+                ", addressLine1='" + addressLine1 + '\'' +
+                ", addressLine2='" + addressLine2 + '\'' +
+                ", city='" + city + '\'' +
+                ", region='" + region + '\'' +
+                ", fullAddress='" + fullAddress + '\'' +
+                '}';
     }
-    
 }

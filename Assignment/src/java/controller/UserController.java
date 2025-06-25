@@ -47,10 +47,6 @@ public class UserController extends HttpServlet {
                     request.setAttribute("actionType", "register");
                     url = USER_FORM_PAGE;
                     break;
-                case "toProfile":
-                    request.setAttribute("actionType", "profile");
-                    url = USER_FORM_PAGE;
-                    break;
                 case "toForgotPassword":
                     request.setAttribute("actionType", "forgotPassword");
                     url = USER_FORM_PAGE;

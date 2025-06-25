@@ -23,9 +23,9 @@ import java.util.List;
  * @author ho huy
  */
 @WebFilter(filterName = "AuthFilter", urlPatterns = {"/*"})
-public class AuthFilter implements Filter {
+public class AuthenticationFilter implements Filter {
     
-    public AuthFilter() {
+    public AuthenticationFilter() {
     }    
     
     @Override

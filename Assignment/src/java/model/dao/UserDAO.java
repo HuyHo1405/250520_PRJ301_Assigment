@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.dto.UserDTO;
 import utils.DbUtils;
+import utils.HashUtils;
 
 /**
  * Status: đã hoàn thành
@@ -135,6 +136,16 @@ public class UserDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public static void main(String[] args) {
+        UserDAO udao = new UserDAO();
+        List<UserDTO> ls = udao.retrieve("1=1");
+        for (UserDTO user : ls) {
+            System.out.println(user);
+            user.setHashed_password(HashUtils.hashPassword(user.getHashed_password()));
+            udao.update(user);
+        }
     }
 
 }

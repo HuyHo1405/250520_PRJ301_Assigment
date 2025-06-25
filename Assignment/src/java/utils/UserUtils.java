@@ -26,16 +26,19 @@ public class UserUtils {
         return null;
     }
     
-    private static boolean hasRole(UserDTO user, String role){
+    private static boolean hasRole(HttpServletRequest request, String role){
+        UserDTO user = getUser(request);
+        if(user == null)
+            return false;
         return user.getRole().equals(role);
     }
     
-    public static boolean isAdmin(UserDTO user){
-        return hasRole(user, "AD");
+    public static boolean isAdmin(HttpServletRequest request){
+        return hasRole(request, "AD");
     }
     
-    public static boolean isMemeber(UserDTO user){
-        return hasRole(user, "MB");
+    public static boolean isMemeber(HttpServletRequest request){
+        return hasRole(request, "MB");
     }
     
 }

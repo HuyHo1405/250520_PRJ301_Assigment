@@ -1,4 +1,3 @@
-
 package model.dao;
 
 import java.sql.Connection;
@@ -12,10 +11,9 @@ import model.dto.AddressDTO;
 import utils.DbUtils;
 
 /**
- * Status: đã hoàn thành
+ * Status: Đã hoàn thành
  * Người thực hiện: Thịnh
  * Ngày bắt đầu: 09/06/2025
- * viết crud cho class này
  */
 public class AddressDAO {
     private static final String TABLE_NAME = "address";
@@ -51,17 +49,17 @@ public class AddressDAO {
             System.err.println("Error in retrieve(): " + e.getMessage());
             e.printStackTrace();
         }
-        return null;
+        return new ArrayList<>();
     }
 
     public boolean create(AddressDTO address) {
         String sql = "INSERT INTO " + TABLE_NAME + " (country_id, unit_number, street_number, address_line1, address_line2, city, region) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, address.getCountry_id());
-            ps.setString(2, address.getUnit_number());
-            ps.setString(3, address.getStreet_number());
-            ps.setString(4, address.getAddress_line1());
-            ps.setString(5, address.getAddress_line2());
+            ps.setInt(1, address.getCountryId());
+            ps.setString(2, address.getUnitNumber());
+            ps.setString(3, address.getStreetNumber());
+            ps.setString(4, address.getAddressLine1());
+            ps.setString(5, address.getAddressLine2());
             ps.setString(6, address.getCity());
             ps.setString(7, address.getRegion());
 
@@ -75,13 +73,14 @@ public class AddressDAO {
 
     public Integer createAndReturnId(AddressDTO address) {
         String sql = "INSERT INTO " + TABLE_NAME + " (country_id, unit_number, street_number, address_line1, address_line2, city, region) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DbUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setInt(1, address.getCountry_id());
-            ps.setString(2, address.getUnit_number());
-            ps.setString(3, address.getStreet_number());
-            ps.setString(4, address.getAddress_line1());
-            ps.setString(5, address.getAddress_line2());
+            ps.setInt(1, address.getCountryId());
+            ps.setString(2, address.getUnitNumber());
+            ps.setString(3, address.getStreetNumber());
+            ps.setString(4, address.getAddressLine1());
+            ps.setString(5, address.getAddressLine2());
             ps.setString(6, address.getCity());
             ps.setString(7, address.getRegion());
 
@@ -90,9 +89,9 @@ public class AddressDAO {
                 throw new SQLException("Creating address failed, no rows affected.");
             }
 
-            try ( ResultSet rs = ps.getGeneratedKeys()) {
+            try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    return rs.getInt(1); // ✅ ID vừa tạo
+                    return rs.getInt(1);
                 } else {
                     throw new SQLException("Creating address failed, no ID obtained.");
                 }
@@ -101,17 +100,17 @@ public class AddressDAO {
             System.err.println("Error in createAndReturnId(): " + e.getMessage());
             e.printStackTrace();
         }
-        return null; // ❗ Nếu lỗi
+        return null;
     }
-    
+
     public boolean update(AddressDTO address) {
         String sql = "UPDATE " + TABLE_NAME + " SET country_id = ?, unit_number = ?, street_number = ?, address_line1 = ?, address_line2 = ?, city = ?, region = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, address.getCountry_id());
-            ps.setString(2, address.getUnit_number());
-            ps.setString(3, address.getStreet_number());
-            ps.setString(4, address.getAddress_line1());
-            ps.setString(5, address.getAddress_line2());
+            ps.setInt(1, address.getCountryId());
+            ps.setString(2, address.getUnitNumber());
+            ps.setString(3, address.getStreetNumber());
+            ps.setString(4, address.getAddressLine1());
+            ps.setString(5, address.getAddressLine2());
             ps.setString(6, address.getCity());
             ps.setString(7, address.getRegion());
             ps.setInt(8, address.getId());
@@ -135,19 +134,19 @@ public class AddressDAO {
         }
         return false;
     }
-    
+
     public AddressDTO findById(int id) {
         List<AddressDTO> list = retrieve("id = ?", id);
         return list.isEmpty() ? null : list.get(0);
     }
-    
-    public boolean existsById(int id){
-        return retrieve("id = ?", id).isEmpty();
+
+    public boolean existsById(int id) {
+        return !retrieve("id = ?", id).isEmpty();
     }
-    
+
     public int countByCountryId(int countryId) {
         String sql = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE country_id = ?";
-        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, countryId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -159,5 +158,4 @@ public class AddressDAO {
         }
         return 0;
     }
-    
 }

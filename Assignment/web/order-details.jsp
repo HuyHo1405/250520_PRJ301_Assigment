@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="model.dto.*, java.util.List" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,102 +8,77 @@
     <title>Order Details</title>
 </head>
 <body>
-<h1>Chi tiết đơn hàng</h1>
+<h1>Order Details</h1>
 
-<%
-    ShoppingOrderDTO order = (ShoppingOrderDTO) request.getAttribute("order");
-    OrderStatusDTO orderStatus = (OrderStatusDTO) request.getAttribute("orderStatus");
-    PaymentMethodDTO paymentMethod = (PaymentMethodDTO) request.getAttribute("paymentMethod");
-    PaymentTypeDTO paymentType = (PaymentTypeDTO) request.getAttribute("paymentType");
-    ShippingMethodDTO shippingMethod = (ShippingMethodDTO) request.getAttribute("shippingMethod");
-    AddressDTO address = (AddressDTO) request.getAttribute("defaultAdress");
-    UserDTO user = (UserDTO) request.getAttribute("user");
-    List<OrderLineDTO> orderItemList = (List<OrderLineDTO>) request.getAttribute("OrderItemList");
-    List<OrderStatusDTO> statusList = (List<OrderStatusDTO>) request.getAttribute("OrderStatusList"); // Bạn nhớ set từ servlet
-%>
-
-<h2>Thông tin đơn hàng</h2>
+<h2>Order Information</h2>
 <form action="MainController" method="post">
     <input type="hidden" name="action" value="updateOrderStatus">
-    <input type="hidden" name="orderId" value="<%= order.getId() %>">
+    <input type="hidden" name="orderId" value="${order.id}">
 
     <ul>
-        <li><strong>Mã đơn hàng:</strong> <%= order.getOrder_code() %></li>
-        <li><strong>Trạng thái:</strong>
+        <li><strong>Order Code:</strong> ${order.order_code}</li>
+        <li><strong>Status:</strong>
             <select name="orderStatusId">
-                <%
-                    if (statusList != null) {
-                        for (OrderStatusDTO status : statusList) {
-                %>
-                <option value="<%= status.getId() %>" <%= status.getId() == orderStatus.getId() ? "selected" : "" %>>
-                    <%= status.getStatus() %>
-                </option>
-                <%
-                        }
-                    }
-                %>
+                <c:forEach var="status" items="${OrderStatusList}">
+                    <option value="${status.id}" ${status.id == orderStatus.id ? 'selected' : ''}>
+                        ${status.status}
+                    </option>
+                </c:forEach>
             </select>
-            <button type="submit">Cập nhật trạng thái</button>
+            <button type="submit">Update Status</button>
         </li>
-        <li><strong>Ngày đặt hàng:</strong> <%= order.getOrderDate() %></li>
-        <li><strong>Tổng tiền:</strong> <%= order.getOrderTotal() %> VND</li>
+        <li><strong>Order Date:</strong> ${order.orderDate}</li>
+        <li><strong>Total:</strong> ${order.orderTotal} VND</li>
     </ul>
 </form>
 
-<h2>Thông tin thanh toán</h2>
+<h2>Payment Information</h2>
 <ul>
-    <li><strong>Phương thức thanh toán:</strong> <%= paymentMethod.getName() %></li>
-    <li><strong>Loại thanh toán:</strong> <%= paymentType.getValue() %></li>
+    <li><strong>Payment Method:</strong> ${paymentMethod.name}</li>
+    <li><strong>Payment Type:</strong> ${paymentType.value}</li>
 </ul>
 
-<h2>Thông tin giao hàng</h2>
+<h2>Shipping Information</h2>
 <ul>
-    <li><strong>Phương thức vận chuyển:</strong> <%= shippingMethod.getName() %> - <%= shippingMethod.getPrice() %> VND</li>
-    <li><strong>Địa chỉ giao hàng:</strong> <%= address.getFullAddress() %></li>
+    <li><strong>Shipping Method:</strong> ${shippingMethod.name} - ${shippingMethod.price} VND</li>
+    <li><strong>Shipping Address:</strong> ${defaultAdress.fullAddress}</li>
 </ul>
 
-<h2>Thông tin khách hàng</h2>
+<h2>Customer Information</h2>
 <ul>
-    <li><strong>Email:</strong> <%= user.getEmail_address() %></li>
-    <li><strong>Điện thoại:</strong> <%= user.getPhone_number() %></li>
+    <li><strong>Email:</strong> ${user.email_address}</li>
+    <li><strong>Phone:</strong> ${user.phone_number}</li>
 </ul>
 
-<h2>Sản phẩm trong đơn</h2>
-<%
-    if (orderItemList != null && !orderItemList.isEmpty()) {
-%>
-<table border="1" cellpadding="5" cellspacing="0">
-    <tr>
-        <th>ID</th>
-        <th>Item ID</th>
-        <th>Số lượng</th>
-        <th>Giá</th>
-    </tr>
-    <%
-        for (OrderLineDTO item : orderItemList) {
-    %>
-    <tr>
-        <td><%= item.getId() %></td>
-        <td><%= item.getItem_id() %></td>
-        <td><%= item.getQuantity() %></td>
-        <td><%= item.getPrice() %></td>
-    </tr>
-    <%
-        }
-    %>
-</table>
-<%
-    } else {
-%>
-<p>Không có sản phẩm nào trong đơn hàng.</p>
-<%
-    }
-%>
+<h2>Order Items</h2>
+<c:choose>
+    <c:when test="${not empty OrderItemList}">
+        <table border="1" cellpadding="5" cellspacing="0">
+            <tr>
+                <th>ID</th>
+                <th>Item ID</th>
+                <th>Quantity</th>
+                <th>Price</th>
+            </tr>
+            <c:forEach var="item" items="${OrderItemList}">
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.item_id}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.price}</td>
+                </tr>
+            </c:forEach>
+        </table>
+    </c:when>
+    <c:otherwise>
+        <p>No items in this order.</p>
+    </c:otherwise>
+</c:choose>
 
-<!-- Form để quay về danh sách đơn hàng -->
-<form action="MainController" method="post"">
+<!-- Back to order list -->
+<form action="MainController" method="post">
     <input type="hidden" name="action" value="toAdminOrdersPage">
-    <button type="submit">Quay lại danh sách đơn hàng</button>
+    <button type="submit">Back to Order List</button>
 </form>
 
 </body>

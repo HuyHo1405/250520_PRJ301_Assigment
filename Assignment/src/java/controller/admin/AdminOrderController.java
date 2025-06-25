@@ -138,59 +138,50 @@ public class AdminOrderController extends HttpServlet {
     private String handleViewOrderDetail(HttpServletRequest request, HttpServletResponse response) {
 
         int orderId = toInt(request.getParameter("orderId"));
-        System.out.println("orderId = " + orderId);
 
         if (ValidationUtils.isInvalidId(orderId)) {
-            System.out.println("Invalid order ID.");
             return error(request, "Invalid order ID.");
         }
 
         ShoppingOrderDTO order = SODAO.findById(orderId);
         System.out.println("order = " + order);
         if (order == null) {
-            System.out.println("Không tìm thấy đơn hàng.");
             return error(request, "Không tìm thấy đơn hàng.");
         }
 
         OrderStatusDTO status = OSDAO.findById(order.getOrderStatusId());
         System.out.println("status = " + status);
         if (status == null) {
-            System.out.println("Không tìm thấy trạng thái đơn hàng.");
             return error(request, "Không tìm thấy trạng thái đơn hàng.");
         }
 
         PaymentMethodDTO paymentMethod = PMDAO.findById(order.getPaymentMethodId());
         System.out.println("paymentMethod = " + paymentMethod);
         if (paymentMethod == null) {
-            System.out.println("Không tìm thấy phương thức thanh toán.");
             return error(request, "Không tìm thấy phương thức thanh toán.");
         }
 
         PaymentTypeDTO type = PTDAO.findById(paymentMethod.getPayment_type_id());
         System.out.println("paymentType = " + type);
         if (type == null) {
-            System.out.println("Không tìm thấy loại thanh toán.");
             return error(request, "Không tìm thấy loại thanh toán.");
         }
 
         ShippingMethodDTO shippingMethod = SMDAO.findById(order.getShippingMethodId());
         System.out.println("shippingMethod = " + shippingMethod);
         if (shippingMethod == null) {
-            System.out.println("Không tìm thấy phương thức giao hàng.");
             return error(request, "Không tìm thấy phương thức giao hàng.");
         }
 
         AddressDTO address = ADAO.findById(order.getAddressId());
         System.out.println("address = " + address);
         if (address == null) {
-            System.out.println("Không tìm thấy địa chỉ.");
             return error(request, "Không tìm thấy địa chỉ.");
         }
 
         UserDTO user = UDAO.findById(order.getUserId());
         System.out.println("user = " + user);
         if (user == null) {
-            System.out.println("Không tìm thấy người dùng.");
             return error(request, "Không tìm thấy người dùng.");
         }
 

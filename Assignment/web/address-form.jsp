@@ -1,72 +1,65 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="model.dto.CountryDTO"%>
-<%@page import="java.util.List"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title><%= request.getAttribute("formTitle") != null ? request.getAttribute("formTitle") : "Địa chỉ" %></title>
+    <title>${formTitle != null ? formTitle : 'Address Form'}</title>
 </head>
 <body>
 
-<%
-    String error = (String) request.getAttribute("error");
-    if (error == null) error = "";
+<c:set var="error" value="${empty error ? '' : error}" />
+<c:set var="action" value="${actionType eq 'editAddress' ? 'updateAddress' : 'addAddress'}" />
+<c:set var="countries" value="${not empty countries ? countries : emptyList}" />
+<c:if test="${countries == null}"><c:set var="countries" value="${emptyList}" /></c:if>
 
-    List<CountryDTO> countries = (List<CountryDTO>) request.getAttribute("countries");
-    if (countries == null) countries = java.util.Collections.emptyList();
+<h1>${formTitle != null ? formTitle : 'Address Form'}</h1>
+<hr>
 
-    String action = (String) request.getAttribute("actionType"); // "addAddress" hoặc "editAddress"
-    if (action == null) action = "addAddress";
-    if(action.equals("editAddress")) action = "updateAddress";
-    
-    String addressId = request.getParameter("addressId");
-    String inputUnitNumber = request.getParameter("unitNumber") != null ? request.getParameter("unitNumber") : "";
-    String inputStreetNumber = request.getParameter("streetNumber") != null ? request.getParameter("streetNumber") : "";
-    String inputAddress1 = request.getParameter("addressLine1") != null ? request.getParameter("addressLine1") : "";
-    String inputAddress2 = request.getParameter("addressLine2") != null ? request.getParameter("addressLine2") : "";
-    String inputCity = request.getParameter("city") != null ? request.getParameter("city") : "";
-    String inputRegion = request.getParameter("region") != null ? request.getParameter("region") : "";
-    String selectedCountryId = request.getParameter("countryId") != null ? request.getParameter("countryId") : "";
-%>
-
-<h1><%= request.getAttribute("formTitle") != null ? request.getAttribute("formTitle") : "Địa chỉ" %></h1>
-
-<% if (!error.isEmpty()) { %>
-    <p style="color:red;"><%= error %></p>
-<% } %>
+<c:if test="${not empty error}">
+    <p style="color:red;">${error}</p>
+</c:if>
 
 <form action="MainController" method="post">
-    <input type="hidden" name="action" value="<%= action %>"/>
-    <% if (addressId != null && !addressId.isEmpty()) { %>
-        <input type="hidden" name="addressId" value="<%= addressId %>"/>
-    <% } %>
+    <input type="hidden" name="action" value="${action}" />
 
-    Quốc gia:
+    <c:if test="${not empty param.addressId}">
+        <input type="hidden" name="addressId" value="${param.addressId}" />
+    </c:if>
+
+    Country:
     <select name="countryId" required>
-        <option value="">-- Chọn quốc gia --</option>
-        <% for (CountryDTO country : countries) { 
-            String selected = String.valueOf(country.getId()).equals(selectedCountryId) ? "selected" : "";
-        %>
-            <option value="<%= country.getId() %>" <%= selected %>><%= country.getCountry_name() %></option>
-        <% } %>
+        <option value="">-- Select country --</option>
+        <c:forEach var="country" items="${countries}">
+            <option value="${country.id}"
+                    <c:if test="${param.countryId == country.id}">selected</c:if>>
+                ${country.country_name}
+            </option>
+        </c:forEach>
     </select><br>
 
-    Unit Number: <input type="text" name="unitNumber" value="<%= inputUnitNumber %>" maxlength="20"><br>
-    Street Number: <input type="text" name="streetNumber" value="<%= inputStreetNumber %>" maxlength="20"><br>
-    Địa chỉ 1: <input type="text" name="addressLine1" value="<%= inputAddress1 %>" required maxlength="255"><br>
-    Địa chỉ 2: <input type="text" name="addressLine2" value="<%= inputAddress2 %>" maxlength="255"><br>
-    Thành phố: <input type="text" name="city" value="<%= inputCity %>" required maxlength="100"><br>
-    Vùng/Region: <input type="text" name="region" value="<%= inputRegion %>" maxlength="100"><br>
+    Unit Number: <input type="text" name="unitNumber" value="${param.unitNumber}" maxlength="20"><br>
+    Street Number: <input type="text" name="streetNumber" value="${param.streetNumber}" maxlength="20"><br>
+    Address Line 1: <input type="text" name="addressLine1" value="${param.addressLine1}" required maxlength="255"><br>
+    Address Line 2: <input type="text" name="addressLine2" value="${param.addressLine2}" maxlength="255"><br>
+    City: <input type="text" name="city" value="${param.city}" required maxlength="100"><br>
+    Region: <input type="text" name="region" value="${param.region}" maxlength="100"><br>
 
-    <button type="submit"><%= action.equals("updateAddress") ? "Cập nhật" : "Thêm mới" %></button>
+    <button type="submit">
+        <c:choose>
+            <c:when test="${action eq 'updateAddress'}">Update</c:when>
+            <c:otherwise>Add New</c:otherwise>
+        </c:choose>
+    </button>
 </form>
 
 <br>
 <form action="MainController" method="post">
-    <input type="hidden" name="action" value="toManageAddresses"/>
-    <button type="submit">Quay lại danh sách</button>
+    <input type="hidden" name="action" value="toAddressManagement" />
+    <button type="submit">Back to List</button>
 </form>
 
 </body>
 </html>
+    

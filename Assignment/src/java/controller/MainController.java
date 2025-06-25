@@ -23,10 +23,12 @@ public class MainController extends HttpServlet {
     private static final String WELCOME_PAGE = "welcome.jsp";
 
     public static final List<String> ADDRESS_ACTIONS = Arrays.asList(
+            "toProfile",
             "toAddressManagement",
             "toAddAddress",
             "toEditAddress",
             "addAddress",
+            "searchAddress",
             "updateAddress",
             "updateDefaultAddress",
             "removeAddress"
@@ -36,7 +38,6 @@ public class MainController extends HttpServlet {
     public static final List<String> USER_ACTIONS = Arrays.asList(
             "toLogin",
             "toRegister",
-            "toProfile",
             "toForgotPassword",
             "register",
             "login",
