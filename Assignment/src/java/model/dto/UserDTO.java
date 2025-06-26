@@ -13,6 +13,7 @@ public class UserDTO {
     private String phone_number;
     private String hashed_password;
     private String role;
+    private boolean is_active;
 
     public UserDTO(String email_address, String phone_number, String hashed_password) {
         this.id = -1;
@@ -20,14 +21,24 @@ public class UserDTO {
         this.phone_number = phone_number;
         this.hashed_password = hashed_password;
         this.role = "user";
+        this.is_active = true;
     }
 
-    public UserDTO(int id, String email_address, String phone_number, String hashed_password, String role) {
+    public UserDTO(int id, String email_address, String phone_number, String hashed_password, String role, boolean is_active) {
         this.id = id;
         this.email_address = email_address;
         this.phone_number = phone_number;
         this.hashed_password = hashed_password;
         this.role = role;
+        this.is_active = is_active;
+    }
+
+    public boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(boolean is_active) {
+        this.is_active = is_active;
     }
 
     public int getId() {

@@ -13,16 +13,34 @@ public class ProductDTO {
     private String name;
     private String description;
     private String cover_image_link;
+    private boolean is_active;
 
     public ProductDTO() {
     }
+    public ProductDTO(int category_id, String name, String description, String cover_image_link) {
+        this.id = -1;
+        this.category_id = category_id;
+        this.name = name;
+        this.description = description;
+        this.cover_image_link = cover_image_link;
+        this.is_active = true;
+    }
 
-    public ProductDTO(int id, int category_id, String name, String description, String cover_image_link) {
+    public ProductDTO(int id, int category_id, String name, String description, String cover_image_link, boolean is_active) {
         this.id = id;
         this.category_id = category_id;
         this.name = name;
         this.description = description;
         this.cover_image_link = cover_image_link;
+        this.is_active = is_active;
+    }
+
+    public boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(boolean is_active) {
+        this.is_active = is_active;
     }
 
     public int getId() {

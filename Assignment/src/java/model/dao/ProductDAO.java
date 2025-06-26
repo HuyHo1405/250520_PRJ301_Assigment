@@ -1,4 +1,3 @@
-
 package model.dao;
 
 import java.sql.Connection;
@@ -11,10 +10,8 @@ import model.dto.ProductDTO;
 import utils.DbUtils;
 
 /**
- * Status: đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết crud cho class này
+ * Status: đã hoàn thành Người thực hiện: Thịnh Ngày bắt đầu: 09/06/2025 viết
+ * crud cho class này
  */
 public class ProductDAO {
 
@@ -26,7 +23,8 @@ public class ProductDAO {
         String name = rs.getString("name");
         String description = rs.getString("description");
         String coverImageLink = rs.getString("cover_image_link");
-        return new ProductDTO(id, category_id, name, description, coverImageLink);
+        boolean is_active = rs.getBoolean("is_active");
+        return new ProductDTO(id, category_id, name, description, coverImageLink, is_active);
     }
 
     public List<ProductDTO> retrieve(String condition, Object... params) {
@@ -54,14 +52,14 @@ public class ProductDAO {
     }
 
     public boolean create(ProductDTO product) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (category_id, name, description, cover_image_link) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME + " (category_id, name, description, cover_image_link, is_active) VALUES (?, ?, ?, ?, ?)";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, product.getCategory_id());
             ps.setString(2, product.getName());
             ps.setString(3, product.getDescription());
             ps.setString(4, product.getCover_image_link());
-
+            ps.setBoolean(5, product.getIs_active());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in create(): " + e.getMessage());
@@ -71,7 +69,7 @@ public class ProductDAO {
     }
 
     public boolean update(ProductDTO product) {
-        String sql = "UPDATE " + TABLE_NAME + " SET category_id = ?, name = ?, description = ?, cover_image_link = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET category_id = ?, name = ?, description = ?, cover_image_link = ?,  WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, product.getCategory_id());
@@ -79,7 +77,7 @@ public class ProductDAO {
             ps.setString(3, product.getDescription());
             ps.setString(4, product.getCover_image_link());
             ps.setInt(5, product.getId());
-
+            ps.setBoolean(5, product.getIs_active());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in update(): " + e.getMessage());
@@ -108,7 +106,7 @@ public class ProductDAO {
     public List<ProductDTO> getProductsByName(String name) {
         return retrieve("name LIKE ?", "%" + name + "%");
     }
-    
+
     public ProductDTO findById(int id) {
         List<ProductDTO> list = retrieve("id = ?", id);
         return list != null && !list.isEmpty() ? list.get(0) : null;
@@ -116,7 +114,7 @@ public class ProductDAO {
 
     public boolean existsById(int id) {
         String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             return rs.next();
@@ -129,7 +127,7 @@ public class ProductDAO {
 
     public int count() {
         String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("total");
@@ -139,6 +137,18 @@ public class ProductDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public boolean disable(int id) {
+        String sql = "UPDATE " + TABLE_NAME + " SET is_active = 0 WHERE id = ?";
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in disable(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

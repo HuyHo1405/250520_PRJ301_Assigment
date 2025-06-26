@@ -118,7 +118,8 @@ public class MainController extends HttpServlet {
 
     // SystemConfigController.java (Admin)
     public static final List<String> SYSTEM_CONFIG_ACTIONS = Arrays.asList(
-            "getSystemConfig",
+            "toSystemConfigManagement",
+            "toSystemConfig","getSystemConfig",
             "updateSystemConfig",
             "getAppVersion",
             "clearSystemCache"
