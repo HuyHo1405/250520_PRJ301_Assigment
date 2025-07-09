@@ -10,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Comparator;
 import java.util.List;
 import model.dao.CountryDAO;
 import model.dao.OrderStatusDAO;
@@ -23,8 +24,8 @@ import utils.CacheManager;
 import utils.ValidationUtils;
 
 /**
- * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
- * [...........] viết servlet cho System Config Controller
+ * Status: Chờ thực hiện Người thực hiện: [...........] gày bắt
+ * đầu:[...........] viết servlet cho System Config Controller
  */
 @WebServlet(name = "SystemConfigController", urlPatterns = {"/SystemConfigController"})
 public class SystemConfigController extends HttpServlet {
@@ -59,6 +60,12 @@ public class SystemConfigController extends HttpServlet {
                     break;
                 case "updateSystemConfig":
                     url = handleUpdateSystemConfig(request, response);
+                    break;
+                case "addSystemConfig":
+                    url = handleAddSystemConfig(request, response);
+                    break;
+                case "removeSystemConfig":
+                    url = handleRemoveSystemConfig(request, response);
                     break;
                 case "getAppVersion":
                     url = handleGetAppVersion(request, response);
@@ -136,10 +143,15 @@ public class SystemConfigController extends HttpServlet {
 
     // Hàm tổng hợp, gọi cả 4 hàm trên
     private String prepareManagementView(HttpServletRequest request) {
-        List<OrderStatusDTO> orderStatusList = OSDAO.retrieve("1 = 1");
-        List<PaymentTypeDTO> paymentTypeList = PTDAO.retrieve("1 = 1");
-        List<ShippingMethodDTO> shippingMethodList = SMDAO.retrieve("1 = 1");
-        List<CountryDTO> countryList = CDAO.retrieve("1 = 1");
+        List<OrderStatusDTO> orderStatusList = OSDAO.retrieve("is_active = 1");
+        List<PaymentTypeDTO> paymentTypeList = PTDAO.retrieve("is_active = 1");
+        List<ShippingMethodDTO> shippingMethodList = SMDAO.retrieve("is_active = 1");
+        List<CountryDTO> countryList = CDAO.retrieve("is_active = 1");
+
+        orderStatusList.sort(Comparator.comparingInt(OrderStatusDTO::getId));
+        paymentTypeList.sort(Comparator.comparingInt(PaymentTypeDTO::getId));
+        shippingMethodList.sort(Comparator.comparingInt(ShippingMethodDTO::getId));
+        countryList.sort(Comparator.comparingInt(CountryDTO::getId));
 
         request.setAttribute("orderStatusList", orderStatusList);
         request.setAttribute("paymentTypeList", paymentTypeList);
@@ -226,6 +238,101 @@ public class SystemConfigController extends HttpServlet {
 
         request.setAttribute("message", "Đã xoá cache hệ thống thành công.");
         return SYSTEM_CONFIG_PAGE;
+    }
+
+    private String handleAddSystemConfig(HttpServletRequest request, HttpServletResponse response) {
+        String type = request.getParameter("type");
+
+        switch (type) {
+            case "orderStatus": {
+                String status = request.getParameter("status");
+                if (ValidationUtils.isEmpty(status)) {
+                    request.setAttribute("error", "Tên trạng thái đơn hàng không được để trống.");
+                    return SYSTEM_CONFIG_PAGE;
+                }
+                OSDAO.create(new OrderStatusDTO(status.trim()));
+                break;
+            }
+
+            case "paymentType": {
+                String value = request.getParameter("value");
+                if (ValidationUtils.isEmpty(value)) {
+                    request.setAttribute("error", "Tên phương thức thanh toán không được để trống.");
+                    return SYSTEM_CONFIG_PAGE;
+                }
+                PTDAO.create(new PaymentTypeDTO(value.trim()));
+                break;
+            }
+
+            case "shippingMethod": {
+                String name = request.getParameter("name");
+                double price = toDouble(request.getParameter("price"));
+                if (ValidationUtils.isEmpty(name) || price < 0) {
+                    request.setAttribute("error", "Tên hoặc giá phương thức giao hàng không hợp lệ.");
+                    return SYSTEM_CONFIG_PAGE;
+                }
+                SMDAO.create(new ShippingMethodDTO(name.trim(), price));
+                break;
+            }
+
+            case "country": {
+                String name = request.getParameter("name");
+                if (ValidationUtils.isEmpty(name)) {
+                    request.setAttribute("error", "Tên quốc gia không được để trống.");
+                    return SYSTEM_CONFIG_PAGE;
+                }
+                CDAO.create(new CountryDTO(name.trim()));
+                break;
+            }
+
+            default:
+                request.setAttribute("error", "Loại cấu hình không hợp lệ.");
+                return SYSTEM_CONFIG_PAGE;
+        }
+
+        prepareManagementView(request);
+        return SYSTEM_CONFIG_MANAGEMENT_PAGE;
+    }
+
+    private String handleRemoveSystemConfig(HttpServletRequest request, HttpServletResponse response) {
+        String type = request.getParameter("type");
+        int id = toInt(request.getParameter("id"));
+
+        if (ValidationUtils.isInvalidId(id)) {
+            request.setAttribute("error", "ID cấu hình không hợp lệ.");
+            return SYSTEM_CONFIG_MANAGEMENT_PAGE;
+        }
+
+        boolean success = false;
+        String successMessage = "Đã vô hiệu hoá cấu hình thành công.";
+        String errorMessage = "Không thể vô hiệu hoá cấu hình.";
+
+        switch (type) {
+            case "orderStatus":
+                success = OSDAO.disableOrderStatus(id);
+                break;
+            case "paymentType":
+                success = PTDAO.disablePaymentType(id);
+                break;
+            case "shippingMethod":
+                success = SMDAO.disableShippingMethod(id);
+                break;
+            case "country":
+                success = CDAO.disableCountry(id);
+                break;
+            default:
+                request.setAttribute("error", "Loại cấu hình không hợp lệ.");
+                return SYSTEM_CONFIG_MANAGEMENT_PAGE;
+        }
+
+        if (success) {
+            request.setAttribute("message", successMessage);
+        } else {
+            request.setAttribute("error", errorMessage);
+        }
+
+        prepareManagementView(request); // Refresh data after operation
+        return SYSTEM_CONFIG_MANAGEMENT_PAGE;
     }
 
 }

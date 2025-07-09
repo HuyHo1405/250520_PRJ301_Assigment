@@ -6,10 +6,12 @@ package controller.admin;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
 import model.dao.ProductDAO;
 import model.dto.ProductDTO;
@@ -20,13 +22,13 @@ import utils.ValidationUtils;
  * [...........] viết servlet cho Admin Product Controller
  */
 @WebServlet(name = "AdminProductController", urlPatterns = {"/AdminProductController"})
+@MultipartConfig
 public class AdminProductController extends HttpServlet {
 
     private static final String WELCOME_PAGE = "welcome.jsp";
     private static final String ERROR_PAGE = "error.jsp";
     private static final String PRODUCT_LIST_PAGE = "admin-product-management.jsp";
     private static final String PRODUCT_DETAIL_PAGE = "product-detail.jsp";
-    private static final String PRODUCT_FORM_PAGE = "product-form.jsp";
 
     private final ProductDAO PDAO = new ProductDAO();
 
@@ -41,25 +43,25 @@ public class AdminProductController extends HttpServlet {
 
             switch (action) {
                 case "listAllProducts":
-                    url = handleListAllProducts(request);
+                    url = handleListAllProducts(request, response);
                     break;
                 case "viewProductDetail":
-                    url = handleViewProductDetail(request);
+                    url = handleViewProductDetail(request, response);
                     break;
                 case "createProduct":
-                    url = handleCreateProduct(request);
+                    url = handleCreateProduct(request, response);
                     break;
                 case "updateProduct":
-                    url = handleUpdateProduct(request);
+                    url = handleUpdateProduct(request, response);
                     break;
                 case "disableProduct":
-                    url = handleDisableProduct(request);
+                    url = handleDisableProduct(request, response);
                     break;
                 case "uploadProductImages":
-                    url = handleUploadProductImages(request);
+                    url = handleUploadProductImages(request, response);
                     break;
                 case "searchProducts":
-                    url = handleSearchProducts(request);
+                    url = handleSearchProducts(request, response);
                     break;
                 default:
                     url = ERROR_PAGE;
@@ -69,6 +71,7 @@ public class AdminProductController extends HttpServlet {
             url = ERROR_PAGE;
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
+
         }
 
     }
@@ -112,13 +115,27 @@ public class AdminProductController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private String handleListAllProducts(HttpServletRequest request) {
-        List<ProductDTO> list = PDAO.retrieve("1=1");
+    private String handleListAllProducts(HttpServletRequest request, HttpServletResponse response) {
+        String keyword = request.getParameter("keyword");
+        List<ProductDTO> list;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            list = PDAO.getProductsByName(keyword); // hàm tìm kiếm sản phẩm
+        } else {
+            list = PDAO.retrieve("is_active = 1"); // lấy tất cả sản phẩm
+        }
+
         request.setAttribute("productList", list);
+
+        String editId = request.getParameter("editId");
+        if (editId != null && !editId.trim().isEmpty()) {
+            request.setAttribute("editId", editId);
+        }
+
         return PRODUCT_LIST_PAGE;
     }
 
-    private String handleViewProductDetail(HttpServletRequest request) {
+    private String handleViewProductDetail(HttpServletRequest request, HttpServletResponse response) {
         int id = toInt(request.getParameter("productId"));
         if (ValidationUtils.isInvalidId(id)) {
             return error(request, "ID sản phẩm không hợp lệ.");
@@ -133,7 +150,7 @@ public class AdminProductController extends HttpServlet {
         return PRODUCT_DETAIL_PAGE;
     }
 
-    private String handleCreateProduct(HttpServletRequest request) {
+    private String handleCreateProduct(HttpServletRequest request, HttpServletResponse response) {
         try {
             int categoryId = toInt(request.getParameter("categoryId"));
             String name = request.getParameter("name");
@@ -145,69 +162,104 @@ public class AdminProductController extends HttpServlet {
 
             request.setAttribute(success ? "message" : "errorMsg",
                     success ? "Tạo sản phẩm thành công." : "Tạo sản phẩm thất bại.");
+
+            if (success) {
+                // Lấy sản phẩm vừa tạo bằng tên (ưu tiên chính xác nếu tên duy nhất)
+                List<ProductDTO> createdList = PDAO.getProductsByName(name);
+                ProductDTO created = (createdList != null && !createdList.isEmpty()) ? createdList.get(0) : null;
+
+                if (created != null) {
+                    List<ProductDTO> showOnlyCreated = new java.util.ArrayList<>();
+                    showOnlyCreated.add(created);
+                    request.setAttribute("productList", showOnlyCreated);
+                } else {
+                    request.setAttribute("productList", new java.util.ArrayList<>()); // danh sách rỗng nếu không tìm thấy
+                }
+
+                return PRODUCT_LIST_PAGE;
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMsg", "Lỗi xử lý tạo sản phẩm.");
         }
 
-        return handleListAllProducts(request);
+        return handleListAllProducts(request, response);
     }
 
-    private String handleUpdateProduct(HttpServletRequest request) {
+    private String handleUpdateProduct(HttpServletRequest request, HttpServletResponse response) {
         try {
             int productId = toInt(request.getParameter("productId"));
 
             if (productId <= 0) {
                 request.setAttribute("errorMsg", "ID sản phẩm không hợp lệ.");
-                return handleListAllProducts(request);
+                return handleListAllProducts(request, response);
             }
 
-            // Kiểm tra xem sản phẩm có tồn tại không
             ProductDTO existing = PDAO.findById(productId);
             if (existing == null) {
                 request.setAttribute("errorMsg", "Sản phẩm không tồn tại.");
-                return handleListAllProducts(request);
+                return handleListAllProducts(request, response);
             }
 
-            // Lấy dữ liệu từ form
             int categoryId = toInt(request.getParameter("categoryId"));
             String name = request.getParameter("name");
             String description = request.getParameter("description");
-            String coverImageLink = request.getParameter("coverImageLink");
+            String imageLink = request.getParameter("coverImageLink"); // lấy từ input
 
-            // Tạo đối tượng mới để cập nhật
-            ProductDTO updated = new ProductDTO(categoryId, name, description, coverImageLink);
-            boolean success = PDAO.update(updated);
+            // Cập nhật dữ liệu
+            existing.setName(name);
+            existing.setDescription(description);
+            existing.setCategory_id(categoryId);
+            existing.setCover_image_link(imageLink); // gán link ảnh mới
+
+            boolean success = PDAO.update(existing);
 
             request.setAttribute(success ? "message" : "errorMsg",
                     success ? "Cập nhật sản phẩm thành công." : "Cập nhật sản phẩm thất bại.");
+
+            List<ProductDTO> list = Arrays.asList(PDAO.findById(productId));
+            request.setAttribute("productList", list);
+            request.setAttribute("editId", String.valueOf(productId)); // giữ chế độ chỉnh sửa
+
+            return PRODUCT_LIST_PAGE;
+
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMsg", "Lỗi xử lý khi cập nhật sản phẩm.");
+            return handleListAllProducts(request, response);
         }
-
-        return handleListAllProducts(request);
     }
 
-    private String handleDisableProduct(HttpServletRequest request) {
+    private String handleDisableProduct(HttpServletRequest request, HttpServletResponse response) {
         int id = toInt(request.getParameter("productId"));
         boolean success = PDAO.disable(id);
 
         request.setAttribute(success ? "message" : "errorMsg",
                 success ? "Đã xóa sản phẩm." : "Xóa sản phẩm thất bại.");
-        return handleListAllProducts(request);
+        return handleListAllProducts(request, response);
     }
 
-    private String handleUploadProductImages(HttpServletRequest request) {
+    private String handleUploadProductImages(HttpServletRequest request, HttpServletResponse response) {
         // Upload xử lý riêng qua multipart hoặc file handler
         request.setAttribute("message", "Chức năng đang phát triển.");
-        return PRODUCT_FORM_PAGE;
+        return "";
     }
 
-    private String handleSearchProducts(HttpServletRequest request) {
+    private String handleSearchProducts(HttpServletRequest request, HttpServletResponse response) {
         String keyword = request.getParameter("keyword");
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return handleListAllProducts(request, response);
+        }
         List<ProductDTO> list = PDAO.getProductsByName(keyword);
         request.setAttribute("productList", list);
+
+        // Giữ lại editId nếu có
+        String editId = request.getParameter("editId");
+        if (editId != null) {
+            request.setAttribute("editId", editId);
+        }
+
         return PRODUCT_LIST_PAGE;
     }
 

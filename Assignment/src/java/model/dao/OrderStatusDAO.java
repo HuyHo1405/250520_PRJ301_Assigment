@@ -1,4 +1,3 @@
-
 package model.dao;
 
 import java.sql.Connection;
@@ -11,24 +10,24 @@ import model.dto.OrderStatusDTO;
 import utils.DbUtils;
 
 /**
- * Status: đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết crud cho class này
+ * Status: đã hoàn thành Người thực hiện: Thịnh Ngày bắt đầu: 09/06/2025 viết
+ * crud cho class này
  */
 public class OrderStatusDAO {
+
     private static final String TABLE_NAME = "order_status";
 
-    private OrderStatusDTO mapToOrderStatus(ResultSet rs) throws SQLException {
+    public OrderStatusDTO mapToOrderStatus(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String status = rs.getString("status");
-        return new OrderStatusDTO(id, status);
+        boolean is_active = rs.getBoolean("is_active");
+        return new OrderStatusDTO(id, status, is_active);
     }
 
     public List<OrderStatusDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
@@ -50,7 +49,7 @@ public class OrderStatusDAO {
 
     public boolean create(OrderStatusDTO status) {
         String sql = "INSERT INTO " + TABLE_NAME + " (status) VALUES (?)";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status.getStatus());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -62,7 +61,7 @@ public class OrderStatusDAO {
 
     public boolean update(OrderStatusDTO status) {
         String sql = "UPDATE " + TABLE_NAME + " SET status = ? WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status.getStatus());
             ps.setInt(2, status.getId());
             return ps.executeUpdate() > 0;
@@ -75,7 +74,7 @@ public class OrderStatusDAO {
 
     public boolean delete(int id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -84,41 +83,23 @@ public class OrderStatusDAO {
         }
         return false;
     }
-    
-    public OrderStatusDTO findById(int id) {
-        List<OrderStatusDTO> list = retrieve("id = ?", id);
-        return (list == null || list.isEmpty()) ? null : list.get(0);
-    }
 
-    public boolean existsById(int id) {
-        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
+    public boolean disableOrderStatus(int id) {
+        String sql = "UPDATE " + TABLE_NAME + " SET is_active = ? WHERE id = ?";
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, false); // Set is_active to false
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            System.err.println("Error in existsById(): " + e.getMessage());
+            System.err.println("Error in disableOrderStatus(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
-    public int count() {
-        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-        } catch (Exception e) {
-            System.err.println("Error in count(): " + e.getMessage());
-            e.printStackTrace();
-        }
-        return 0;
+    public OrderStatusDTO findById(int id) {
+        List<OrderStatusDTO> list = retrieve("id = ?", id);
+        return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
-    public OrderStatusDTO findByStatusName(String statusName) {
-        List<OrderStatusDTO> list = retrieve("status = ?", statusName);
-        return (list == null || list.isEmpty()) ? null : list.get(0);
-    }
 }

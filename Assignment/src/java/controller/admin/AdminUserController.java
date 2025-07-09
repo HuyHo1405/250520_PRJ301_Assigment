@@ -13,7 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.dao.UserDAO;
 import model.dto.UserDTO;
-import utils.UserUtils;
+import utils.HashUtils;
+import utils.MailUtils;
+import utils.ResetTokenManager;
 import utils.ValidationUtils;
 
 /**
@@ -23,11 +25,9 @@ import utils.ValidationUtils;
 @WebServlet(name = "AdminUserController", urlPatterns = {"/AdminUserController"})
 public class AdminUserController extends HttpServlet {
 
-    private static final String WELCOME_PAGE = "welcome.jsp";
     private static final String ERROR_PAGE = "error.jsp";
     private static final String USER_LIST_PAGE = "admin-user-management.jsp";
     private static final String USER_DETAIL_PAGE = "user-detail.jsp";
-    private static final String USER_FORM_PAGE = "admin-user-form.jsp";
 
     private final UserDAO UDAO = new UserDAO();
 
@@ -35,7 +35,7 @@ public class AdminUserController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        String url = WELCOME_PAGE;
+        String url = "";
 
         try {
             String action = request.getParameter("action");
@@ -43,9 +43,6 @@ public class AdminUserController extends HttpServlet {
             switch (action) {
                 case "listAllUsers":
                     url = handleListAllUsers(request, response);
-                    break;
-                case "viewUserDetail":
-                    url = handleViewUserDetail(request, response);
                     break;
                 case "createUser":
                     url = handleCreateUser(request, response);
@@ -59,9 +56,21 @@ public class AdminUserController extends HttpServlet {
                 case "changeUserRole":
                     url = handleChangeUserRole(request, response);
                     break;
-                case "resetUserPassword":
-                    url = handleResetUserPassword(request, response);
+                case "forgotPassword":
+                    url = handleForgotPassword(request, response);
                     break;
+                case "toResetPassword":
+                    String email = request.getParameter("email");
+                    request.setAttribute("email", email);
+                    url = "reset-password.jsp";
+                    break;
+                case "resetPassword":
+                    url = handleResetPassword(request, response);
+                    break;
+                case "toForgotPassword":
+                    url = "forgot-password.jsp";
+                    break;
+
                 default:
                     url = ERROR_PAGE;
             }
@@ -76,33 +85,19 @@ public class AdminUserController extends HttpServlet {
 
     // Methods
     private String handleListAllUsers(HttpServletRequest request, HttpServletResponse response) {
-        List<UserDTO> list = UDAO.retrieve("1 = 1");
+        List<UserDTO> list = UDAO.retrieve("is_active = 1");
         request.setAttribute("userList", list);
         return USER_LIST_PAGE;
-    }
-
-    private String handleViewUserDetail(HttpServletRequest request, HttpServletResponse response) {
-        int userId = toInt(request.getParameter("userId"));
-        if (ValidationUtils.isInvalidId(userId)) {
-            return error(request, "ID người dùng không hợp lệ.");
-        }
-
-        UserDTO user = UDAO.findById(userId);
-        if (user == null) {
-            return error(request, "Không tìm thấy người dùng.");
-        }
-
-        request.setAttribute("user", user);
-        return USER_DETAIL_PAGE;
     }
 
     private String handleCreateUser(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
         String password = request.getParameter("password");
+        String hashedPassword = HashUtils.hashPassword(password);
         String role = request.getParameter("role");
 
-        UserDTO user = new UserDTO(email, phone, password);
+        UserDTO user = new UserDTO(email, phone, hashedPassword);
         boolean success = UDAO.create(user);
 
         request.setAttribute(success ? "message" : "errorMsg",
@@ -112,46 +107,49 @@ public class AdminUserController extends HttpServlet {
     }
 
     private String handleUpdateUser(HttpServletRequest request, HttpServletResponse response) {
+        int userId = toInt(request.getParameter("userId"));
         String newEmail = request.getParameter("email");
         String newPhone = request.getParameter("phone");
 
         boolean checkEmpty = newEmail == null || newPhone == null || newEmail.isEmpty() || newPhone.isEmpty();
         boolean validateEmail = !ValidationUtils.isValidEmail(newEmail);
         boolean validatePhone = !ValidationUtils.isValidPhone(newPhone);
-        
+
         String error = "";
-        if(checkEmpty){
+        if (checkEmpty) {
             error = "Vui lòng điền đầy đủ thông tin.";
-        }else if(validateEmail){
+        } else if (validateEmail) {
             error = "Email không hợp lệ.";
-        }else if(validatePhone){
+        } else if (validatePhone) {
             error = "Số điện thoại không hợp lệ.";
         }
-        
+
         if (checkEmpty || validateEmail || validatePhone) {
-            request.setAttribute("error", error);
-            request.setAttribute("actionType", "profile");
-            request.setAttribute("inputEmail", newEmail);
-            request.setAttribute("inputPhone", newPhone);
-            return USER_FORM_PAGE;
+            request.setAttribute("errorMsg", error);
+            return handleListAllUsers(request, response);
         }
 
-        UserDTO user = UserUtils.getUser(request);
-
-        // Nếu email thay đổi → kiểm tra có bị trùng hay không
-        if (!user.getEmail_address().equals(newEmail)) {
-            if (isExistedEmail(newEmail)) {
-                request.setAttribute("error", "Email đã được đăng ký.");
-                return USER_FORM_PAGE;
-            }
-            user.setEmail_address(newEmail);
+        // Check if email is already used by another user
+        List<UserDTO> existingUsers = UDAO.retrieve("email_address = ? AND id != ?", newEmail, userId);
+        if (!existingUsers.isEmpty()) {
+            request.setAttribute("errorMsg", "Email đã được đăng ký.");
+            return handleListAllUsers(request, response);
         }
+
+        UserDTO user = UDAO.findById(userId);
+        if (user == null) {
+            request.setAttribute("errorMsg", "Không tìm thấy người dùng.");
+            return handleListAllUsers(request, response);
+        }
+
+        user.setEmail_address(newEmail);
         user.setPhone_number(newPhone);
 
-        UDAO.update(user);
-        request.getSession().invalidate();
-        request.setAttribute("actionType", "login");
-        return USER_FORM_PAGE;
+        boolean success = UDAO.update(user);
+        request.setAttribute(success ? "message" : "errorMsg",
+                success ? "Cập nhật người dùng thành công." : "Cập nhật thất bại.");
+
+        return handleListAllUsers(request, response);
     }
 
     private String handleDisableUser(HttpServletRequest request, HttpServletResponse response) {
@@ -173,18 +171,14 @@ public class AdminUserController extends HttpServlet {
         request.setAttribute(success ? "message" : "errorMsg",
                 success ? "Cập nhật vai trò thành công." : "Cập nhật vai trò thất bại.");
 
-        return handleViewUserDetail(request, response);
-    }
-
-    private String handleResetUserPassword(HttpServletRequest request, HttpServletResponse response) {
-        return handleViewUserDetail(request, response);
+        return handleListAllUsers(request, response);
     }
 
     //some useful methods
-    private boolean isExistedEmail(String email){
+    private boolean isExistedEmail(String email) {
         return !UDAO.retrieve("email_address = ?", email).isEmpty();
     }
-    
+
     private int toInt(String value) {
         try {
             return Integer.parseInt(value.trim());
@@ -236,5 +230,63 @@ public class AdminUserController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    private String handleForgotPassword(HttpServletRequest request, HttpServletResponse response) {
+        String email = request.getParameter("email");
+
+        UserDAO dao = new UserDAO();
+        UserDTO user = dao.findByEmail(email);
+
+        if (user == null) {
+            request.setAttribute("errorMsg", "Email không tồn tại.");
+            return "forgot-password.jsp";
+        }
+
+        // Tạo link reset có token (hết hạn sau 10 phút)
+        String token = ResetTokenManager.generateToken(email); // ← tạo token an toàn
+        String baseURL = request.getRequestURL().toString().replace(request.getRequestURI(), request.getContextPath());
+        String resetLink = baseURL + "/MainController?action=toResetPassword&token=" + token;
+
+        try {
+            MailUtils.sendResetPasswordEmail(email, resetLink); // ← gửi mail tới chính email user
+            request.setAttribute("message", "📩 Đã gửi liên kết đặt lại mật khẩu đến email của bạn.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMsg", "Gửi email thất bại: " + e.getMessage());
+        }
+
+        return "forgot-password.jsp";
+    }
+
+    private String handleResetPassword(HttpServletRequest request, HttpServletResponse response) {
+        String email = request.getParameter("email");
+        String newPassword = request.getParameter("newPassword");
+        String confirmPassword = request.getParameter("confirmPassword");
+
+        if (newPassword == null || confirmPassword == null || !newPassword.equals(confirmPassword)) {
+            request.setAttribute("errorMsg", "Mật khẩu xác nhận không khớp.");
+            request.setAttribute("email", email); // giữ lại email để điền lại form
+            return "reset-password.jsp";
+        }
+
+        UserDAO dao = new UserDAO();
+        UserDTO user = dao.findByEmail(email);
+
+        if (user == null) {
+            request.setAttribute("errorMsg", "Không tìm thấy tài khoản.");
+            return "reset-password.jsp";
+        }
+
+        String hashedPassword = HashUtils.hashPassword(newPassword);
+        user.setHashed_password(hashedPassword);
+        boolean success = dao.update(user);
+
+        if (success) {
+            return "user-form.jsp";
+        } else {
+            request.setAttribute("errorMsg", "Đặt lại mật khẩu thất bại.");
+            return "reset-password.jsp";
+        }
+    }
 
 }

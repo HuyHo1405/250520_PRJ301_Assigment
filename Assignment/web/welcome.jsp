@@ -1,30 +1,46 @@
+<%-- 
+    Document   : welcome
+    Created on : 14-Jun-2025, 12:08:08
+    Author     : ho huy
+--%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@page import="utils.UserUtils"%>
+<%@page import="model.dto.UserDTO"%>
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <title>Welcome</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
     </head>
     <body>
+        <h1>Hello <%= UserUtils.getUser(request).getEmail_address()%>!</h1>
 
-        <h1>Hello ${sessionScope.user.email_address}!</h1>
-        <hr>
-
-        <form action="MainController" method="post" style="display:inline;">
-            <input type="hidden" name="action" value="toAdminOrdersPage"/>
-            <button type="submit">Order Management</button>
+        <form action="MainController" method="post">
+            <input type="hidden" name="action" value="toProfile"/>
+            <button type="submit">Edit Profile</button>
         </form>
 
-        <form action="MainController" method="post" style="display:inline;">
-            <input type="hidden" name="action" value="toProfile"/>
-            <button type="submit">My Profile</button>
+        <form action="MainController" method="post">
+            <input type="hidden" name="action" value="toAddressManagement"/>
+            <button type="submit">Address Management</button>
         </form>
 
         <form action="MainController" method="post">
             <input type="hidden" name="action" value="toSystemConfig"/>
             <button type="submit">System Config</button>
         </form>
+
+        <form action="MainController" method="post">
+            <input type="hidden" name="action" value="listAllUsers"/>
+            <button type="submit">Admin User Management</button>
+        </form>
+        
+        <form action="MainController" method="post">
+            <input type="hidden" name="action" value="listAllProducts"/>
+            <button type="submit">Admin Product Management</button>
+        </form>
+
 
     </body>
 </html>

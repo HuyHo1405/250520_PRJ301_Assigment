@@ -1,4 +1,3 @@
-
 package model.dao;
 
 import java.sql.Connection;
@@ -11,19 +10,19 @@ import model.dto.CountryDTO;
 import utils.DbUtils;
 
 /**
- * Status: đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết crud cho class này
+ * Status: đã hoàn thành Người thực hiện: Thịnh Ngày bắt đầu: 09/06/2025 viết
+ * crud cho class này
  */
 public class CountryDAO {
+
     private static final String TABLE_NAME = "country";
 
     //map
-    private CountryDTO mapToCountry(ResultSet rs) throws SQLException {
+    public CountryDTO mapToCountry(ResultSet rs) throws SQLException {
         return new CountryDTO(
-            rs.getInt("id"),
-            rs.getString("country_name")
+                rs.getInt("id"),
+                rs.getString("country_name"),
+                rs.getBoolean("is_active")
         );
     }
 
@@ -31,7 +30,7 @@ public class CountryDAO {
     public List<CountryDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
@@ -50,10 +49,14 @@ public class CountryDAO {
 
         return null;
     }
+    
+    public List<CountryDTO> getAllCountries(){
+        return retrieve("1 = 1");
+    }
 
     public boolean create(CountryDTO country) {
         String sql = "INSERT INTO " + TABLE_NAME + " (country_name) VALUES (?)";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, country.getCountry_name());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -65,7 +68,7 @@ public class CountryDAO {
 
     public boolean update(CountryDTO country) {
         String sql = "UPDATE " + TABLE_NAME + " SET country_name = ? WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, country.getCountry_name());
             ps.setInt(2, country.getId());
             return ps.executeUpdate() > 0;
@@ -78,7 +81,7 @@ public class CountryDAO {
 
     public boolean delete(int id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -87,41 +90,19 @@ public class CountryDAO {
         }
         return false;
     }
-    
-    public CountryDTO findById(int id) {
-        List<CountryDTO> list = retrieve("id = ?", id);
-        return (list == null || list.isEmpty()) ? null : list.get(0);
-    }
 
-    public boolean existsById(int id) {
-        String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
+    
+    public boolean disableCountry(int id) {
+        String sql = "UPDATE " + TABLE_NAME + " SET is_active = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
+            ps.setBoolean(1, false); // Set is_active to false
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            System.err.println("Error in existsById(): " + e.getMessage());
+            System.err.println("Error in disableCountry(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
-    public int count() {
-        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-        } catch (Exception e) {
-            System.err.println("Error in count(): " + e.getMessage());
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public CountryDTO findByName(String countryName) {
-        List<CountryDTO> list = retrieve("country_name = ?", countryName);
-        return (list == null || list.isEmpty()) ? null : list.get(0);
-    }
 }

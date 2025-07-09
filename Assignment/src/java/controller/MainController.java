@@ -10,10 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Status: Hoàn thành
- * Người thực hiện: Huy
- * Ngày hoàn thành: 19/06/2025
- * Sửa lại một số tên action để ko bị trùng lặp
+ * Status: Hoàn thành Người thực hiện: Huy Ngày hoàn thành: 19/06/2025 Sửa lại
+ * một số tên action để ko bị trùng lặp
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
@@ -23,12 +21,10 @@ public class MainController extends HttpServlet {
     private static final String WELCOME_PAGE = "welcome.jsp";
 
     public static final List<String> ADDRESS_ACTIONS = Arrays.asList(
-            "toProfile",
             "toAddressManagement",
             "toAddAddress",
             "toEditAddress",
             "addAddress",
-            "searchAddress",
             "updateAddress",
             "updateDefaultAddress",
             "removeAddress"
@@ -38,7 +34,7 @@ public class MainController extends HttpServlet {
     public static final List<String> USER_ACTIONS = Arrays.asList(
             "toLogin",
             "toRegister",
-            "toForgotPassword",
+            "toProfile",
             "register",
             "login",
             "logout",
@@ -108,19 +104,24 @@ public class MainController extends HttpServlet {
     // AdminUserController.java
     public static final List<String> ADMIN_USER_ACTIONS = Arrays.asList(
             "listAllUsers",
-            "viewUserDetail",
             "createUser",
             "updateUser",
             "disableUser",
             "changeUserRole",
-            "resetUserPassword"
+            "toResetPassword",
+            "forgotPassword",
+            "resetPassword",
+            "toForgotPassword"
     );
 
     // SystemConfigController.java (Admin)
     public static final List<String> SYSTEM_CONFIG_ACTIONS = Arrays.asList(
             "toSystemConfigManagement",
-            "toSystemConfig","getSystemConfig",
+            "toSystemConfig",
+            "getSystemConfig",
+            "addSystemConfig",
             "updateSystemConfig",
+            "removeSystemConfig",
             "getAppVersion",
             "clearSystemCache"
     );
@@ -130,7 +131,7 @@ public class MainController extends HttpServlet {
             "toWelcome",
             ""
     );
-    
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -145,7 +146,7 @@ public class MainController extends HttpServlet {
 
             } else if (ADDRESS_ACTIONS.contains(action)) {
                 url = "/AddressController"; // AddressController.java
-                
+
             } else if (USER_ACTIONS.contains(action)) {
                 url = "/UserController"; // UserController.java
 
@@ -172,7 +173,7 @@ public class MainController extends HttpServlet {
 
             } else if (SYSTEM_CONFIG_ACTIONS.contains(action)) {
                 url = "/SystemConfigController"; // SystemConfigController.java
-            
+
             } else if (WELCOME_ACTIONS.contains(action)) {
                 System.out.println("hello?");
                 url = WELCOME_PAGE; // SystemConfigController.java

@@ -10,15 +10,36 @@ package model.dto;
 public class OrderStatusDTO {
     private int id;
     private String status;
-
-    public OrderStatusDTO() {
-    }
+    private boolean is_active = true;
 
     public OrderStatusDTO(int id, String status) {
         this.id = id;
         this.status = status;
     }
 
+    public OrderStatusDTO() {
+    }
+
+    public OrderStatusDTO(String status) {
+        this.id = -1;
+        this.status = status;
+        this.is_active = true;
+    }
+    
+    public OrderStatusDTO(int id, String status, boolean is_active) {
+        this.id = id;
+        this.status = status;
+        this.is_active = is_active;
+    }
+
+    public boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(boolean is_active) {
+        this.is_active = is_active;
+    }
+    
     public int getId() {
         return id;
     }
@@ -39,6 +60,5 @@ public class OrderStatusDTO {
     public String toString() {
         return "OrderStatusDTO{" + "id=" + id + ", status=" + status + '}';
     }
-    
     
 }

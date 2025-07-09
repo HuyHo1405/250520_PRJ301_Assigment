@@ -42,7 +42,8 @@ public class AuthenticationFilter implements Filter {
         List<String> ignoreActions = Arrays.asList(
             "toLogin", "login",
             "toRegister", "register",
-            "toForgotPassword", "forgotPassword"
+            "toForgotPassword", "forgotPassword",
+            "toResetPassword", "resetPassword"
         );
 
         // Bỏ qua kiểm tra đăng nhập cho các action cho phép

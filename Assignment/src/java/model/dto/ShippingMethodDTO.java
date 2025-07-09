@@ -11,6 +11,7 @@ public class ShippingMethodDTO {
     private int id;
     private String name;
     private double price;
+    private boolean is_active = true;
 
     public ShippingMethodDTO() {
     }
@@ -19,6 +20,30 @@ public class ShippingMethodDTO {
         this.id = id;
         this.name = name;
         this.price = price;
+    }
+
+    public ShippingMethodDTO(String name, double price) {
+        this.id = -1;
+        this.name = name;
+        this.price = price;
+        this.is_active = true;
+    }
+
+    
+    
+    public ShippingMethodDTO(int id, String name, double price, boolean is_active) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.is_active = is_active;
+    }
+
+    public boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(boolean is_active) {
+        this.is_active = is_active;
     }
 
     public int getId() {
