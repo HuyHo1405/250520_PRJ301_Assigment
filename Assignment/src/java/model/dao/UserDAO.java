@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import model.dto.UserDTO;
 import utils.DbUtils;
-import utils.HashUtils;
 
 /**
  * Status: đã hoàn thành Người thực hiện: Huy Ngày bắt đầu: 13/06/2025 thêm role
@@ -29,7 +28,7 @@ public class UserDAO {
         return new UserDTO(id, email, phone, password, role, is_active);
     }
 
-    //crud
+    //basic crud
     public List<UserDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -96,6 +95,7 @@ public class UserDAO {
         return false;
     }
 
+    //advance crud
     public UserDTO findById(int id) {
         List<UserDTO> list = retrieve("id = ?", id);
         return (list != null && !list.isEmpty()) ? list.get(0) : null;
@@ -138,7 +138,7 @@ public class UserDAO {
     }
 
     public boolean disableUser(int userId) {
-        String sql = "UPDATE " + TABLE_NAME + " SET is_active = FALSE WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET is_active = 0 WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             return ps.executeUpdate() > 0;
@@ -147,17 +147,6 @@ public class UserDAO {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-        UserDAO udao = new UserDAO();
-        List<UserDTO> ls = udao.retrieve("1=1");
-        for (UserDTO user : ls) {
-            System.out.println(user);
-            user.setHashed_password(HashUtils.hashPassword(user.getHashed_password()));
-            udao.update(user);
-        }
-
     }
 
 }
