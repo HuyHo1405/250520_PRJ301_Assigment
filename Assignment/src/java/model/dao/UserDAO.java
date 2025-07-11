@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.dto.UserDTO;
 import utils.DbUtils;
+import utils.HashUtils;
 
 /**
  * Status: đã hoàn thành Người thực hiện: Huy Ngày bắt đầu: 13/06/2025 thêm role
@@ -69,12 +70,13 @@ public class UserDAO {
     }
 
     public boolean update(UserDTO user) {
-        String sql = "UPDATE " + TABLE_NAME + " SET email_address = ?, phone_number = ?, hashed_password = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET email_address = ?, phone_number = ?, hashed_password = ?, is_active = ? WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getEmail_address());
             ps.setString(2, user.getPhone_number());
             ps.setString(3, user.getHashed_password());
-            ps.setInt(4, user.getId());
+            ps.setBoolean(4, user.getIs_active());
+            ps.setInt(5, user.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in update(): " + e.getMessage());
@@ -137,16 +139,7 @@ public class UserDAO {
         return false;
     }
 
-    public boolean disableUser(int userId) {
-        String sql = "UPDATE " + TABLE_NAME + " SET is_active = 0 WHERE id = ?";
-        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            System.err.println("Error in disableUser(): " + e.getMessage());
-            e.printStackTrace();
-        }
-        return false;
-    }
+    
 
+    
 }

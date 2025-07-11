@@ -28,9 +28,14 @@ public class ShippingMethodDTO {
         this.price = price;
         this.is_active = true;
     }
+    
+    public ShippingMethodDTO(String name, double price, boolean is_active) {
+        this.id = -1;
+        this.name = name;
+        this.price = price;
+        this.is_active = is_active;
+    }
 
-    
-    
     public ShippingMethodDTO(int id, String name, double price, boolean is_active) {
         this.id = id;
         this.name = name;

@@ -21,6 +21,7 @@ public class MainController extends HttpServlet {
     private static final String WELCOME_PAGE = "welcome.jsp";
 
     public static final List<String> ADDRESS_ACTIONS = Arrays.asList(
+            "toProfile",
             "toAddressManagement",
             "toAddAddress",
             "toEditAddress",
@@ -103,26 +104,24 @@ public class MainController extends HttpServlet {
 
     // AdminUserController.java
     public static final List<String> ADMIN_USER_ACTIONS = Arrays.asList(
-            "listAllUsers",
+            "toAdminUserPage",
             "createUser",
-            "updateUser",
-            "disableUser",
-            "changeUserRole",
-            "toResetPassword",
-            "forgotPassword",
-            "resetPassword",
-            "toForgotPassword"
+//            "updateUser",
+            "toggleIsActiveUser",
+            "changeUserRole"
+//            "toResetPassword",
+//            "forgotPassword",
+//            "resetPassword",
+//            "toForgotPassword"
     );
 
     // SystemConfigController.java (Admin)
     public static final List<String> SYSTEM_CONFIG_ACTIONS = Arrays.asList(
             "toSystemConfigManagement",
-            "toSystemConfig",
             "getSystemConfig",
             "addSystemConfig",
             "updateSystemConfig",
-            "removeSystemConfig",
-            "getAppVersion",
+            "toggleIsActiveSystemConfig",
             "clearSystemCache"
     );
 
@@ -175,7 +174,6 @@ public class MainController extends HttpServlet {
                 url = "/SystemConfigController"; // SystemConfigController.java
 
             } else if (WELCOME_ACTIONS.contains(action)) {
-                System.out.println("hello?");
                 url = WELCOME_PAGE; // SystemConfigController.java
 
             } else {

@@ -8,7 +8,9 @@
     <title>Order Details</title>
 </head>
 <body>
+    
 <h1>Order Details</h1>
+<hr>
 
 <h2>Order Information</h2>
 <form action="MainController" method="post">
@@ -75,10 +77,9 @@
     </c:otherwise>
 </c:choose>
 
-<!-- Back to order list -->
+<hr>
 <form action="MainController" method="post">
-    <input type="hidden" name="action" value="toAdminOrdersPage">
-    <button type="submit">Back to Order List</button>
+    <button name="action" value="toAdminOrdersPage">Back to Order List</button>
 </form>
 
 </body>

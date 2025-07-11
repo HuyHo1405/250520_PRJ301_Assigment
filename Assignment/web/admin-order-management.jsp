@@ -27,6 +27,7 @@
 <body>
 
 <h1>Order Management</h1>
+<hr>
 
 <c:if test="${not empty errorMsg}">
     <div class="error">${errorMsg}</div>
@@ -46,7 +47,7 @@
             <th>Order Code</th>
             <th>Order Date</th>
             <th>Total</th>
-            <th>Status ID</th>
+            <th>Status</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -59,7 +60,7 @@
                         <td>${order.order_code}</td>
                         <td>${order.orderDate}</td>
                         <td>${order.orderTotal}</td>
-                        <td>${order.orderStatusId}</td>
+                        <td>${statusMap[order.orderStatusId]}</td>
                         <td>
                             <form action="MainController" method="get" style="display:inline;">
                                 <input type="hidden" name="action" value="viewOrderDetail" />
@@ -86,9 +87,9 @@
     </tbody>
 </table>
 
+    <hr>
 <form action="MainController" method="post">
-    <input type="hidden" name="action" value="toWelcome"/>
-    <button type="submit">Back to Profile</button>
+    <button name="action" value="toSystemConfigManagement">Back</button>
 </form>
 
 </body>

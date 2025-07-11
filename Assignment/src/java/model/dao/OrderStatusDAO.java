@@ -60,10 +60,11 @@ public class OrderStatusDAO {
     }
 
     public boolean update(OrderStatusDTO status) {
-        String sql = "UPDATE " + TABLE_NAME + " SET status = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET status = ?, is_active = ? WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status.getStatus());
-            ps.setInt(2, status.getId());
+            ps.setBoolean(2, status.getIs_active());
+            ps.setInt(3, status.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in update(): " + e.getMessage());
@@ -84,10 +85,10 @@ public class OrderStatusDAO {
         return false;
     }
 
-    public boolean disableOrderStatus(int id) {
+    public boolean toggleIsActive(int id, boolean currStatus) {
         String sql = "UPDATE " + TABLE_NAME + " SET is_active = ? WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setBoolean(1, false); // Set is_active to false
+            ps.setBoolean(1, !currStatus);
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -102,4 +103,10 @@ public class OrderStatusDAO {
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
+    public static void main(String[] args) {
+        OrderStatusDAO dao = new OrderStatusDAO();
+        for (OrderStatusDTO x : dao.retrieve("is_active = 1")) {
+            System.out.println(x);
+        }
+    }
 }

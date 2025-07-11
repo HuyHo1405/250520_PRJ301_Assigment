@@ -21,6 +21,12 @@ public class PaymentTypeDTO {
         this.is_active = true;
     }
     
+    public PaymentTypeDTO(String value, boolean is_active) {
+        this.id = -1;
+        this.value = value;
+        this.is_active = is_active;
+    }
+    
     public PaymentTypeDTO(int id, String value, boolean is_active) {
         this.id = id;
         this.value = value;
@@ -34,7 +40,7 @@ public class PaymentTypeDTO {
 
     
 
-    public boolean isIs_active() {
+    public boolean getIs_active() {
         return is_active;
     }
 
