@@ -36,7 +36,7 @@
                                     <td>${user.id}</td>
                                     <td>${user.email_address}</td>
                                     <td>${user.phone_number}</td>
-                                    <td>${user.hashed_password}</td>
+                                    <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${user.hashed_password}</td>
                                     <td>
                                         <input form="editUser" type="hidden" name="action" value="updateUser"/>
                                         <input form="editUser" type="hidden" name="userId" value="${user.id}"/>

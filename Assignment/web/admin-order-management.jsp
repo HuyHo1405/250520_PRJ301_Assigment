@@ -6,22 +6,7 @@
     <meta charset="UTF-8">
     <title>Order Management</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 8px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .error {
-            color: red;
-            margin-bottom: 10px;
-        }
+        
     </style>
 </head>
 <body>
@@ -40,7 +25,7 @@
     <a href="AdminOrderController?action=exportOrders" style="margin-left: 20px;">📥 Export CSV</a>
 </form>
 
-<table>
+<table border="1" style="border-collapse:collapse;">
     <thead>
         <tr>
             <th>ID</th>

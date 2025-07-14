@@ -7,15 +7,15 @@ package model.dto;
  * Ngày bắt đầu: 09/06/2025
  * viết set up các field cho class này
  */
-public class CartDTO {
+public class CategoryDTO {
     private int id;
     private Integer parent_category_id;
     private String name;
 
-    public CartDTO() {
+    public CategoryDTO() {
     }
 
-    public CartDTO(int id, Integer parent_category_id, String name) {
+    public CategoryDTO(int id, Integer parent_category_id, String name) {
         this.id = id;
         this.parent_category_id = parent_category_id;
         this.name = name;

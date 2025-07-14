@@ -20,27 +20,30 @@
                 <c:when test="${action eq 'login'}">Login Form</c:when>
                 <c:when test="${action eq 'register'}">Register Form</c:when>
                 <c:when test="${action eq 'profile'}">Edit Profile Form</c:when>
-                <c:when test="${action eq 'forgotPassword'}">???</c:when>
-                <c:when test="${action eq 'changePassword'}">???</c:when>
+                <c:when test="${action eq 'forgotPassword'}">Forgot Password Form</c:when>
+                <c:when test="${action eq 'resetPassword'}">Reset Password Form</c:when>
             </c:choose>
         </h1>
         
         <hr>
-
+        
         <c:if test="${not empty errorMsg}">
             <p style="color:red;">${errorMsg}</p>
         </c:if>
+            
+        <c:if test="${not empty message}">
+            <p style="color:green;">${message}</p>
+        </c:if>
 
-        <!-- Gộp form -->
         <form action="MainController" method="post">
             <input type="hidden" name="action" value="${action}"/>
 
             <c:if test="${action eq 'login' or action eq 'register' or action eq 'profile' or action eq 'forgotPassword'}">
-                Email: <input type="email" name="email" value="${inputEmail}" required><br>
+                Email: <input type="email" name="email" value="${param.email}" required><br>
             </c:if>
 
             <c:if test="${action eq 'register' or action eq 'profile'}">
-                Phone: <input type="text" name="phone" value="${inputPhone}" required><br>
+                Phone: <input type="text" name="phone" value="${param.phone}" required><br>
             </c:if>
 
             <c:if test="${action eq 'login' or action eq 'register'}">
@@ -51,8 +54,8 @@
                 Confirm Password: <input type="password" name="confirmPassword" required><br>
             </c:if>
 
-            <c:if test="${action eq 'changePassword'}">
-                Old Password: <input type="password" name="oldPassword" required><br>
+            <c:if test="${action eq 'resetPassword'}">
+                <input type="hidden" name="token" value="${param.token}"><br>
                 New Password: <input type="password" name="newPassword" required><br>
                 Confirm New Password: <input type="password" name="confirmNewPassword" required><br>
             </c:if>
@@ -62,13 +65,12 @@
                     <c:when test="${action eq 'login'}">Login</c:when>
                     <c:when test="${action eq 'register'}">Register</c:when>
                     <c:when test="${action eq 'profile'}">Submit</c:when>
-                    <c:when test="${action eq 'forgotPassword'}">???</c:when>
-                    <c:when test="${action eq 'changePassword'}">???</c:when>
+                    <c:when test="${action eq 'forgotPassword'}">Submit</c:when>
+                    <c:when test="${action eq 'resetPassword'}">Reset Password</c:when>
                 </c:choose>
             </button>
         </form>
 
-        <!-- Nút phụ -->
         <br>
         <c:choose>
             <c:when test="${action eq 'login'}">
@@ -76,7 +78,7 @@
                     <button name="action" value="toRegister">Register</button>
                 </form>
                 <form action="MainController" method="post" style="display: inline">
-                    <button name="action" value="forgotPassword">Forgot Password</button>
+                    <button name="action" value="toForgotPassword">Forgot Password</button>
                 </form>
             </c:when>
 

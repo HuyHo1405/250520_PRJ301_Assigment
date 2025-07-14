@@ -98,6 +98,34 @@ public class VariationOptionDAO {
     public List<VariationOptionDTO> getOptionsByVariationId(int variationId) {
         return retrieve("variation_id = ?", variationId);
     }
+    
+    public List<VariationOptionDTO> getOptionsByProductId(int productId) {
+        String sql = "SELECT DISTINCT\n"
+                + "    VO.*\n"
+                + "FROM\n"
+                + "    product_item AS PI\n"
+                + "JOIN\n"
+                + "    product_configuration AS PC ON PI.id = PC.item_id\n"
+                + "JOIN\n"
+                + "    variation_option AS VO ON PC.option_id = VO.id\n"
+                + "JOIN\n"
+                + "    Variation AS V ON VO.variation_id = V.id\n"
+                + "WHERE\n"
+                + "    PI.product_id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ResultSet rs = ps.executeQuery();
+            List<VariationOptionDTO> list = new ArrayList<>();
+            while (rs.next()) {
+                list.add(mapToVariationOption(rs));
+            }
+            return list;
+        } catch (Exception e) {
+            System.err.println("Error in create(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public boolean existsByVariationIdAndValue(int variationId, String value) {
         String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE variation_id = ? AND value = ?";

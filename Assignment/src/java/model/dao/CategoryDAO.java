@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import model.dto.CartDTO;
+import model.dto.CategoryDTO;
 import utils.DbUtils;
 
 /**
@@ -16,19 +16,19 @@ import utils.DbUtils;
  * Ngày bắt đầu: 09/06/2025
  * viết crud cho class này
  */
-public class CartDAO {
+public class CategoryDAO {
 
     private static final String TABLE_NAME = "category";
 
-    private CartDTO mapToCart(ResultSet rs) throws SQLException {
+    private CategoryDTO mapToCart(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         Integer parentCategoryId = rs.getObject("parent_category_id") != null ? rs.getInt("parent_category_id") : null;
         String name = rs.getString("name");
 
-        return new CartDTO(id, parentCategoryId, name);
+        return new CategoryDTO(id, parentCategoryId, name);
     }
 
-    private List<CartDTO> retrieve(String condition, Object... params) {
+    public List<CategoryDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -38,7 +38,7 @@ public class CartDAO {
             }
 
             ResultSet rs = ps.executeQuery();
-            List<CartDTO> cartList = new ArrayList<>();
+            List<CategoryDTO> cartList = new ArrayList<>();
 
             while (rs.next()) {
                 cartList.add(mapToCart(rs));
@@ -53,7 +53,7 @@ public class CartDAO {
         return null;
     }
 
-    public boolean create(CartDTO cart) {
+    public boolean create(CategoryDTO cart) {
         String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name) VALUES (?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -72,7 +72,7 @@ public class CartDAO {
         return false;
     }
 
-    public boolean update(CartDTO cart) {
+    public boolean update(CategoryDTO cart) {
         String sql = "UPDATE " + TABLE_NAME + " SET parent_category_id = ?, name = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -104,8 +104,8 @@ public class CartDAO {
         return false;
     }
 
-    public CartDTO findById(int id) {
-        List<CartDTO> list = retrieve("id = ?", id);
+    public CategoryDTO findById(int id) {
+        List<CategoryDTO> list = retrieve("id = ?", id);
         return (list == null || list.isEmpty()) ? null : list.get(0);
     }
 
