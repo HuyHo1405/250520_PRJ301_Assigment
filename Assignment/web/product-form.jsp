@@ -119,7 +119,7 @@
             <div>
                 <form action="MainController" method="POST">
                     <input type="hidden" name="productId" value="${product.id}"/>
-                    <button type="submit" name="action" value="toManageProductVariations">
+                    <button type="submit" name="action" value="toAdminProductItemPage">
                         Manage Variations & Options for this Product
                     </button>
                 </form>

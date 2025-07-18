@@ -100,7 +100,7 @@ public class CountryDAO {
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            System.err.println("Error in disableCountry(): " + e.getMessage());
+            System.err.println("Error in toggle(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;

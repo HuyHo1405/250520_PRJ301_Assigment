@@ -11,10 +11,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import model.dao.CategoryDAO;
 import model.dao.CountryDAO;
 import model.dao.OrderStatusDAO;
 import model.dao.PaymentTypeDAO;
 import model.dao.ShippingMethodDAO;
+import model.dto.CategoryDTO;
 import model.dto.CountryDTO;
 import model.dto.OrderStatusDTO;
 import model.dto.PaymentTypeDTO;
@@ -37,6 +39,7 @@ public class SystemConfigController extends HttpServlet {
     private final PaymentTypeDAO PTDAO = new PaymentTypeDAO();
     private final ShippingMethodDAO SMDAO = new ShippingMethodDAO();
     private final CountryDAO CDAO = new CountryDAO();
+    private final CategoryDAO CADAO = new CategoryDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -48,6 +51,7 @@ public class SystemConfigController extends HttpServlet {
 
             switch (action) {
                 case "toSystemConfigManagement":
+                    System.out.println("here");
                     prepareManagementView(request);
                     url = SYSTEM_CONFIG_MANAGEMENT_PAGE;
                     break;
@@ -141,10 +145,12 @@ public class SystemConfigController extends HttpServlet {
         List<PaymentTypeDTO> paymentTypeList = PTDAO.retrieve("1 = 1 ORDER BY is_active DESC");
         List<ShippingMethodDTO> shippingMethodList = SMDAO.retrieve("1 = 1 ORDER BY is_active DESC");
         List<CountryDTO> countryList = CDAO.retrieve("1 = 1 ORDER BY is_active DESC");
+        List<CategoryDTO> categoryList = CADAO.retrieve("1 = 1 ORDER BY is_active DESC"); // ✅ thêm dòng này
+
         String editId = request.getParameter("editId");
         String editType = request.getParameter("editType");
         String addType = request.getParameter("addModeType");
-        
+
         request.setAttribute("appVersion", APP_VERSION);
         request.setAttribute("editType", editType);
         request.setAttribute("addModeType", addType);
@@ -153,6 +159,7 @@ public class SystemConfigController extends HttpServlet {
         request.setAttribute("paymentTypeList", paymentTypeList);
         request.setAttribute("shippingMethodList", shippingMethodList);
         request.setAttribute("countryList", countryList);
+        request.setAttribute("categoryList", categoryList); // ✅ truyền category xuống JSP
 
         return SYSTEM_CONFIG_MANAGEMENT_PAGE;
     }
@@ -218,7 +225,23 @@ public class SystemConfigController extends HttpServlet {
                 CDAO.update(new CountryDTO(id, name.trim(), isActive));
                 break;
             }
+            
+            case "category": {
+                int id = toInt(request.getParameter("id"));
+                String name = request.getParameter("value");
+                int parentId = toInt(request.getParameter("parentId")); // có thể là -1
 
+                if (ValidationUtils.isInvalidId(id) || ValidationUtils.isEmpty(name)) {
+                    request.setAttribute("error", "Thông tin danh mục không hợp lệ.");
+                    prepareManagementView(request);
+                    return SYSTEM_CONFIG_MANAGEMENT_PAGE;
+                }
+
+                CategoryDTO category = new CategoryDTO(id, parentId, name.trim(), isActive); // constructor cần đủ
+                CADAO.update(category);
+                break;
+            }
+            
             default:
                 request.setAttribute("error", "Loại cấu hình không hợp lệ.");
                 prepareManagementView(request);
@@ -288,6 +311,18 @@ public class SystemConfigController extends HttpServlet {
                 CDAO.create(new CountryDTO(name.trim(), Boolean.parseBoolean(isActive)));
                 break;
             }
+            
+            case "category": {
+                String name = request.getParameter("value");
+                int parentId = toInt(request.getParameter("parentId"));
+                if (ValidationUtils.isEmpty(name)) {
+                    request.setAttribute("error", "Tên danh mục không được để trống.");
+                    prepareManagementView(request);
+                    return SYSTEM_CONFIG_MANAGEMENT_PAGE;
+                }
+                CADAO.create(new CategoryDTO(parentId, name.trim(), Boolean.parseBoolean(isActive)));
+                break;
+            }
 
             default:
                 request.setAttribute("error", "Loại cấu hình không hợp lệ.");
@@ -303,10 +338,6 @@ public class SystemConfigController extends HttpServlet {
         String type = request.getParameter("type");
         int id = toInt(request.getParameter("id"));
         String currStatus = request.getParameter("status");
-
-        System.out.println(currStatus);
-        System.out.println(type);
-        System.out.println(id);
         
         if (ValidationUtils.isInvalidId(id)) {
             request.setAttribute("errorMsg", "Invalid Id");
@@ -336,6 +367,9 @@ public class SystemConfigController extends HttpServlet {
                 break;
             case "country":
                 success = CDAO.toggleIsActive(id, Boolean.parseBoolean(currStatus));
+                break;
+            case "category":
+                success = CADAO.toggleIsActive(id, Boolean.parseBoolean(currStatus));
                 break;
             default:
                 request.setAttribute("error", "Loại cấu hình không hợp lệ.");

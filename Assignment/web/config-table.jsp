@@ -24,12 +24,16 @@
         <c:set var="type" value="${param.type}" />
         <c:set var="fieldName" value="${param.fieldName}" />
         <c:set var="list" value="${requestScope[param.listName]}" />
+        <c:set var="categoryList" value="${requestScope.categoryList}" />
 
         <table border="1" style="border-collapse:collapse;">
             <tr>
                 <th>ID</th>
                 <th>Value</th>
-                    <c:if test="${type eq 'shippingMethod'}">
+                    <c:if test="${type eq 'category'}">
+                    <th>Parent</th>
+                    </c:if>
+                <c:if test="${type eq 'shippingMethod'}">
                     <th>Price</th>
                     </c:if>
                 <th>Status</th>
@@ -45,9 +49,22 @@
                         <tr>
                             <td><input form="editForm" type="text" name="id" value="${dto.id}" readonly /></td>
                             <td><input form="editForm" type="text" name="value" value="${dto[fieldName]}" /></td>
-                                <c:if test="${type eq 'shippingMethod'}">
+                                <c:if test="${type eq 'category'}">
+                                <td>
+                                    <select form="editForm" name="parentId">
+                                        <option value="-1">-- Không có --</option>
+                                        <c:forEach var="cat" items="${categoryList}">
+                                            <c:if test="${cat.id != dto.id}">
+                                                <option value="${cat.id}" ${cat.id == dto.parent_category_id ? 'selected' : ''}>${cat.name}</option>
+                                            </c:if>
+                                        </c:forEach>
+                                    </select>
+                                </td>
+                            </c:if>
+
+                            <c:if test="${type eq 'shippingMethod'}">
                                 <td><input form="editForm" type="number" name="price" value="${dto.price}" /></td>
-                                </c:if>
+                            </c:if>
                             <td>
                                 <select form="editForm" name="isActive">
                                     <option value="${true}" ${dto.is_active ? 'selected' : ''}>Active</option>
@@ -71,6 +88,9 @@
                             <td>${dto[fieldName]}</td>
                             <c:if test="${type eq 'shippingMethod'}">
                                 <td>${dto.price}</td>
+                            </c:if>
+                            <c:if test="${type eq 'category'}">
+                                <td>${dto.parent_category_id == -1? '-': dto.parent_category_id} </td>
                             </c:if>
                             <td>${dto.is_active ? 'Active': 'Not Active'}</td>
                             <td>
@@ -100,7 +120,18 @@
                 <tr>
                     <td>(New)</td>
                     <td><input form="addForm" type="text" name="value" placeholder="Enter value" required /></td>
-                        <c:if test="${type eq 'shippingMethod'}">
+
+                    <c:if test="${type eq 'category'}">
+                        <td>
+                            <select form="addForm" name="parentId">
+                                <option value="-1">-- Không có --</option>
+                                <c:forEach var="cat" items="${categoryList}">
+                                    <option value="${cat.id}">${cat.name}</option>
+                                </c:forEach>
+                            </select>
+                        </td>
+                    </c:if>
+                    <c:if test="${type eq 'shippingMethod'}">
                         <td><input form="addForm" type="number" name="price" placeholder="Enter price" required min="0" step="0.01" /></td>
                         </c:if>
                     <td>

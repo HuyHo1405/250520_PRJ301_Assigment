@@ -95,6 +95,18 @@ public class VariationDAO {
         return false;
     }
     
+    public boolean softDelete(int id) {
+        String sql = "UPDATE " + TABLE_NAME + " SET is_deleted = 1 WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in delete(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
     public List<VariationDTO> getVariationsByProductId(int productId) {
         return retrieve("product_id = ?", productId);
     }
@@ -117,5 +129,10 @@ public class VariationDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public VariationDTO findById(int id){
+        List<VariationDTO> ls = retrieve("id = ?", id);
+        return ls == null || ls.isEmpty()? null: ls.get(0);
     }
 }

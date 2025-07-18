@@ -14,17 +14,29 @@ public class ProductItemDTO {
     private int quantity_in_stock;
     private String item_image_link;
     private double price;
+    private boolean is_active;
 
     public ProductItemDTO() {
     }
 
-    public ProductItemDTO(int id, int product_id, String sku, int quantity_in_stock, String item_image_link, double price) {
+    public ProductItemDTO(int product_id, String sku) {
+        this.id = -1;
+        this.product_id = product_id;
+        this.sku = sku;
+        this.quantity_in_stock = -1;
+        this.item_image_link = null;
+        this.price = -1;
+        this.is_active = false;
+    }
+
+    public ProductItemDTO(int id, int product_id, String sku, int quantity_in_stock, String item_image_link, double price, boolean is_active) {
         this.id = id;
         this.product_id = product_id;
         this.sku = sku;
         this.quantity_in_stock = quantity_in_stock;
         this.item_image_link = item_image_link;
         this.price = price;
+        this.is_active = is_active;
     }
 
     public int getId() {
@@ -75,9 +87,17 @@ public class ProductItemDTO {
         this.price = price;
     }
 
+    public boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(boolean is_active) {
+        this.is_active = is_active;
+    }
+
     @Override
     public String toString() {
-        return "ProductItemDTO{" + "id=" + id + ", product_id=" + product_id + ", sku=" + sku + ", quantity_in_stock=" + quantity_in_stock + ", item_image_link=" + item_image_link + ", price=" + price + '}';
+        return "ProductItemDTO{" + "id=" + id + ", product_id=" + product_id + ", sku=" + sku + ", quantity_in_stock=" + quantity_in_stock + ", item_image_link=" + item_image_link + ", price=" + price + ", is_active=" + is_active + '}';
     }
-    
+
 }

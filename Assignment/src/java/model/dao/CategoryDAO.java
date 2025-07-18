@@ -22,10 +22,10 @@ public class CategoryDAO {
 
     private CategoryDTO mapToCart(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
-        Integer parentCategoryId = rs.getObject("parent_category_id") != null ? rs.getInt("parent_category_id") : null;
+        int parentCategoryId = rs.getObject("parent_category_id") != null ? rs.getInt("parent_category_id") : -1;
         String name = rs.getString("name");
-
-        return new CategoryDTO(id, parentCategoryId, name);
+        boolean is_active = rs.getBoolean("is_active");
+        return new CategoryDTO(id, parentCategoryId, name, is_active);
     }
 
     public List<CategoryDTO> retrieve(String condition, Object... params) {
@@ -54,16 +54,16 @@ public class CategoryDAO {
     }
 
     public boolean create(CategoryDTO cart) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name) VALUES (?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name, is_active) VALUES (?, ?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            if (cart.getParent_category_id() == null) {
+            if (cart.getParent_category_id() == -1) {
                 ps.setNull(1, java.sql.Types.INTEGER);
             } else {
                 ps.setInt(1, cart.getParent_category_id());
             }
             ps.setString(2, cart.getName());
-
+            ps.setBoolean(3, cart.getIs_active());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in create(): " + e.getMessage());
@@ -73,16 +73,17 @@ public class CategoryDAO {
     }
 
     public boolean update(CategoryDTO cart) {
-        String sql = "UPDATE " + TABLE_NAME + " SET parent_category_id = ?, name = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET parent_category_id = ?, name = ?, is_active = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            if (cart.getParent_category_id() == null) {
+            if (cart.getParent_category_id() == -1) {
                 ps.setNull(1, java.sql.Types.INTEGER);
             } else {
                 ps.setInt(1, cart.getParent_category_id());
             }
             ps.setString(2, cart.getName());
-            ps.setInt(3, cart.getId());
+            ps.setBoolean(3, cart.getIs_active());
+            ps.setInt(4, cart.getId());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -149,5 +150,18 @@ public class CategoryDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public boolean toggleIsActive(int id, boolean currStatus) {
+        String sql = "UPDATE " + TABLE_NAME + " SET is_active = ? WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, !currStatus);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in toggle(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 }

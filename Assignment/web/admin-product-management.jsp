@@ -59,8 +59,9 @@
                             <form action="MainController" method="POST">
                                 <input type="hidden" name="productId" value="${product.id}"/>
                                 <input type="hidden" name="keyword" value="${param.keyword}"/>
-                                <button type="submit" name="action" value="toEditProduct">Edit</button>
                                 <button type="submit" name="action" value="viewProductDetail">View</button>
+                                <button type="submit" name="action" value="toAdminProductItemPage">Items Management</button>
+                                <button type="submit" name="action" value="toEditProduct">Edit</button>
                                 <button type="submit" name="action" value="toggleIsActiveProduct">${!product.is_active? 'Activate': 'Deactivate'}</button>
                             </form>
                         </td>

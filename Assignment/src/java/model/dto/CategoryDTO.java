@@ -9,16 +9,25 @@ package model.dto;
  */
 public class CategoryDTO {
     private int id;
-    private Integer parent_category_id;
+    private int parent_category_id;
     private String name;
+    private boolean is_active;
 
     public CategoryDTO() {
     }
 
-    public CategoryDTO(int id, Integer parent_category_id, String name) {
+    public CategoryDTO(int parent_category_id, String name, boolean is_active) {
+        this.id = -1;
+        this.parent_category_id = parent_category_id;
+        this.name = name;
+        this.is_active = is_active;
+    }
+    
+    public CategoryDTO(int id, int parent_category_id, String name, boolean is_active) {
         this.id = id;
         this.parent_category_id = parent_category_id;
         this.name = name;
+        this.is_active = is_active;
     }
 
     public int getId() {
@@ -29,11 +38,11 @@ public class CategoryDTO {
         this.id = id;
     }
 
-    public Integer getParent_category_id() {
+    public int getParent_category_id() {
         return parent_category_id;
     }
 
-    public void setParent_category_id(Integer parent_category_id) {
+    public void setParent_category_id(int parent_category_id) {
         this.parent_category_id = parent_category_id;
     }
 
@@ -45,10 +54,17 @@ public class CategoryDTO {
         this.name = name;
     }
 
+    public boolean getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(boolean is_active) {
+        this.is_active = is_active;
+    }
+
     @Override
     public String toString() {
-        return "CartDTO{" + "id=" + id + ", parent_category_id=" + parent_category_id + ", name=" + name + '}';
+        return "CategoryDTO{" + "id=" + id + ", parent_category_id=" + parent_category_id + ", name=" + name + ", is_active=" + is_active + '}';
     }
-    
-    
+
 }

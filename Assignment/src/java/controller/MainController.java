@@ -7,11 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -112,7 +108,22 @@ public class MainController extends HttpServlet {
             "toggleIsActiveProduct",
             "searchProductsManagement"
     );
-
+    
+    // AdminProductItemController.java
+    public static final List<String> ADMIN_PRODUCT_ITEM_ACTIONS = Arrays.asList(
+            "toAdminProductItemPage", 
+            "updateProductItem", 
+            "toggleIsActiveProductItem", 
+            "addOption",
+            "addVariation",
+            "updateOption",
+            "updateVariation",
+            "removeOption",
+            "removeVariation",
+            "generateProductItemMatrix",
+            "exportProductItemList"
+    );
+    
     // AdminUserController.java
     public static final List<String> ADMIN_USER_ACTIONS = Arrays.asList(
             "toAdminUserPage",
@@ -172,6 +183,9 @@ public class MainController extends HttpServlet {
 
             } else if (ADMIN_PRODUCT_ACTIONS.contains(action)) {
                 url = "/AdminProductController"; // AdminProductController.java
+            
+            } else if (ADMIN_PRODUCT_ITEM_ACTIONS.contains(action)) {
+                url = "/AdminProductItemController"; // AdminProductItemController.java
 
             } else if (ADMIN_USER_ACTIONS.contains(action)) {
                 url = "/AdminUserController"; // AdminUserController.java

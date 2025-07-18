@@ -51,6 +51,14 @@
             <jsp:param name="fieldName" value="country_name" />
         </jsp:include>
         
+        <h2 id="categoryHeader">Categories</h2>
+        <jsp:include page="config-table.jsp">
+            <jsp:param name="listName" value="categoryList" />
+            <jsp:param name="type" value="category" />
+            <jsp:param name="editType" value="${editType}" />
+            <jsp:param name="fieldName" value="name" />
+        </jsp:include>
+
         <hr>
         
         <form action="MainController" method="POST" style="display: inline">
@@ -58,54 +66,6 @@
         </form>
         
         <script>
-//            document.addEventListener('DOMContentLoaded', function() {
-//                // Get the 'editType' and 'addModeType' parameters passed from the server.
-//                const editType = "${editType}";
-//                const addModeType = "${addModeType}";
-//                
-//                // Determine the target section based on which parameter is set.
-//                // 'editType' takes precedence, then 'addModeType'.
-//                let targetType = editType;
-//                if (!targetType) { // If editType is empty, check addModeType
-//                    targetType = addModeType;
-//                }
-//
-//                // If a target type is present, scroll the page to the corresponding header.
-//                if (targetType) {
-//                    const targetId = targetType + 'Header';
-//                    const targetElement = document.getElementById(targetId);
-//                    if (targetElement) {
-//                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-//                    }
-//                }
-//
-//                // --- Original JavaScript logic (kept for completeness) ---
-//                function addAnchorToFormAction(form, currentTableType) {
-//                    if (!form.action.includes('#')) {
-//                        form.action += '#' + currentTableType + 'Header';
-//                    }
-//                }
-//
-//                const allForms = document.querySelectorAll('form');
-//                allForms.forEach(form => {
-//                    const hiddenTypeInput = form.querySelector('input[name="type"]');
-//                    if (hiddenTypeInput) {
-//                        const currentTableType = hiddenTypeInput.value;
-//                        form.addEventListener('submit', function() {
-//                            addAnchorToFormAction(this, currentTableType);
-//                        });
-//                    }
-//                });
-//
-//                const cancelLinks = document.querySelectorAll('a[href*="action=toSystemConfigManagement"]');
-//                cancelLinks.forEach(link => {
-//                    const url = new URL(link.href);
-//                    const type = url.searchParams.get('type');
-//                    if (type && !url.hash) {
-//                        link.href = url.origin + url.pathname + url.search + '#' + type + 'Header';
-//                    }
-//                });
-//            });
             document.addEventListener('DOMContentLoaded', function() {
             // Get the 'editType' and 'addModeType' parameters passed from the server.
             const editType = "${editType}";
