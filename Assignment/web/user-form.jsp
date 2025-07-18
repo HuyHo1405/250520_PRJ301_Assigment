@@ -1,117 +1,93 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="model.dto.UserDTO"%>
-<%@page import="utils.UserUtils"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>User Form</title>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <title>User Form</title>
+    </head>
+    <body>
 
-<%
-    String action = (String) request.getAttribute("actionType");
-    if (action == null) action = "login";
+        <c:set var="action" value="${actionType != null ? actionType : 'login'}" />
+        <c:set var="errorMsg" value="${error != null ? error : ''}" />
+        <c:set var="inputEmail" value="${inputEmail != null ? inputEmail : (user != null ? user.email_address : '')}" />
+        <c:set var="inputPhone" value="${inputPhone != null ? inputPhone : (user != null ? user.phone_number : '')}" />
 
-    String error = (String) request.getAttribute("error");
-    if (error == null) error = "";
+        <h1>
+            <c:choose>
+                <c:when test="${action eq 'login'}">Login Form</c:when>
+                <c:when test="${action eq 'register'}">Register Form</c:when>
+                <c:when test="${action eq 'profile'}">Edit Profile Form</c:when>
+                <c:when test="${action eq 'forgotPassword'}">Forgot Password Form</c:when>
+                <c:when test="${action eq 'resetPassword'}">Reset Password Form</c:when>
+            </c:choose>
+        </h1>
+        
+        <hr>
+        
+        <c:if test="${not empty errorMsg}">
+            <p style="color:red;">${errorMsg}</p>
+        </c:if>
+            
+        <c:if test="${not empty message}">
+            <p style="color:green;">${message}</p>
+        </c:if>
 
-    UserDTO user = UserUtils.getUser(request);
+        <form action="MainController" method="post">
+            <input type="hidden" name="action" value="${action}"/>
 
-    String inputEmail = (String) request.getAttribute("inputEmail");
-    String inputPhone = (String) request.getAttribute("inputPhone");
+            <c:if test="${action eq 'login' or action eq 'register' or action eq 'profile' or action eq 'forgotPassword'}">
+                Email: <input type="email" name="email" value="${param.email}" required><br>
+            </c:if>
 
-    if (inputEmail == null) inputEmail = (user != null) ? user.getEmail_address() : "";
-    if (inputPhone == null) inputPhone = (user != null) ? user.getPhone_number() : "";
+            <c:if test="${action eq 'register' or action eq 'profile'}">
+                Phone: <input type="text" name="phone" value="${param.phone}" required><br>
+            </c:if>
 
-    String heading = "";
-    switch (action) {
-        case "login": heading = "Đăng nhập"; break;
-        case "register": heading = "Đăng ký"; break;
-        case "profile": heading = "Cập nhật thông tin"; break;
-        case "forgotPassword": heading = "Quên mật khẩu"; break;
-        case "changePassword": heading = "Đổi mật khẩu"; break;
-    }
-%>
+            <c:if test="${action eq 'login' or action eq 'register'}">
+                Password: <input type="password" name="password" required><br>
+            </c:if>
 
-<h1><%= heading %></h1>
+            <c:if test="${action eq 'register'}">
+                Confirm Password: <input type="password" name="confirmPassword" required><br>
+            </c:if>
 
-<% if (!error.isEmpty()) { %>
-    <p style="color:red;"><%= error %></p>
-<% } %>
+            <c:if test="${action eq 'resetPassword'}">
+                <input type="hidden" name="token" value="${param.token}"><br>
+                New Password: <input type="password" name="newPassword" required><br>
+                Confirm New Password: <input type="password" name="confirmNewPassword" required><br>
+            </c:if>
 
-<% if (action.equals("login")) { %>
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="login"/>
-        Email: <input type="email" name="email" value="<%= inputEmail %>" required><br>
-        Password: <input type="password" name="password" required><br>
-        <button type="submit">Đăng nhập</button>
-    </form><br>
+            <button type="submit">
+                <c:choose>
+                    <c:when test="${action eq 'login'}">Login</c:when>
+                    <c:when test="${action eq 'register'}">Register</c:when>
+                    <c:when test="${action eq 'profile'}">Submit</c:when>
+                    <c:when test="${action eq 'forgotPassword'}">Submit</c:when>
+                    <c:when test="${action eq 'resetPassword'}">Reset Password</c:when>
+                </c:choose>
+            </button>
+        </form>
 
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toRegister"/>
-        <button type="submit">Đăng ký</button>
-    </form>
+        <br>
+        <c:choose>
+            <c:when test="${action eq 'login'}">
+                <form action="MainController" method="post" style="display: inline">
+                    <button name="action" value="toRegister">Register</button>
+                </form>
+                <form action="MainController" method="post" style="display: inline">
+                    <button name="action" value="toForgotPassword">Forgot Password</button>
+                </form>
+            </c:when>
 
-    <form action="AdminUserController" method="post">
-        <input type="hidden" name="action" value="forgotPassword"/>
-        <button type="submit">Quên mật khẩu</button>
-    </form>
+            <c:otherwise>
+                <form action="MainController" method="post">
+                    <button name="action" value="toLogin">Back</button>
+                </form>
+            </c:otherwise>
+        </c:choose>
 
-<% } else if (action.equals("register")) { %>
-    <form action="UserController" method="post">
-        <input type="hidden" name="action" value="register"/>
-        Email: <input type="email" name="email" value="<%= inputEmail %>" required><br>
-        Phone: <input type="text" name="phone" value="<%= inputPhone %>" required><br>
-        Password: <input type="password" name="password" required><br>
-        Confirm Password: <input type="password" name="confirmPassword" required><br>
-        <button type="submit">Đăng ký</button>
-    </form><br>
-
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toLogin"/>
-        <button type="submit">Đăng nhập</button>
-    </form>
-
-<% } else if (action.equals("profile")) { %>
-    <form action="UserController" method="post">
-        <input type="hidden" name="action" value="update"/>
-        Email: <input type="email" name="email" value="<%= inputEmail %>" required><br>
-        Phone: <input type="text" name="phone" value="<%= inputPhone %>" required><br>
-        <button type="submit">Cập nhật</button>
-    </form><br>
-
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toLogin"/>
-        <button type="submit">Đăng nhập</button>
-    </form>
-
-<% } else if (action.equals("forgotPassword")) { %>
-    <form action="AdminUserController" method="post">
-        <input type="hidden" name="action" value="forgotPassword"/>
-        Email: <input type="email" name="email" required><br>
-        <button type="submit">Gửi yêu cầu khôi phục</button>
-    </form><br>
-
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toLogin"/>
-        <button type="submit">Đăng nhập</button>
-    </form>
-
-<% } else if (action.equals("changePassword")) { %>
-    <form action="AdminUserController" method="post">
-        <input type="hidden" name="action" value="changePassword"/>
-        Old Password: <input type="password" name="oldPassword" required><br>
-        New Password: <input type="password" name="newPassword" required><br>
-        Confirm New Password: <input type="password" name="confirmNewPassword" required><br>
-        <button type="submit">Đổi mật khẩu</button>
-    </form><br>
-
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toLogin"/>
-        <button type="submit">Đăng nhập</button>
-    </form>
-<% } %>
-
-</body>
+    </body>
 </html>

@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import java.util.List;
  * một số tên action để ko bị trùng lặp
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
+@MultipartConfig
 public class MainController extends HttpServlet {
 
     private static final String LOGIN_PAGE = "login.jsp";
@@ -21,6 +23,7 @@ public class MainController extends HttpServlet {
     private static final String WELCOME_PAGE = "welcome.jsp";
 
     public static final List<String> ADDRESS_ACTIONS = Arrays.asList(
+            "toProfile",
             "toAddressManagement",
             "toAddAddress",
             "toEditAddress",
@@ -34,12 +37,15 @@ public class MainController extends HttpServlet {
     public static final List<String> USER_ACTIONS = Arrays.asList(
             "toLogin",
             "toRegister",
+            "toForgotPassword",
+            "toResetPassword",
             "toProfile",
             "register",
             "login",
             "logout",
-            "changePassword",
-            "updateProfile" // Đổi từ "update" → rõ nghĩa hơn
+            "forgotPassword",
+            "resetPassword",
+            "updateProfile"
     );
 
     // ProductController.java (Dành cho người dùng cuối)
@@ -92,37 +98,47 @@ public class MainController extends HttpServlet {
 
     // AdminProductController.java
     public static final List<String> ADMIN_PRODUCT_ACTIONS = Arrays.asList(
-            "listAllProducts",
+            "toAdminProductPage",
+            "toCreateProduct",
+            "toEditProduct",
             "viewProductDetail",
             "createProduct",
             "updateProduct",
-            "disableProduct",
-            "uploadProductImages",
-            "searchProducts"
+//            "uploadProductImages",
+            "toggleIsActiveProduct",
+            "searchProductsManagement"
     );
-
+    
+    // AdminProductItemController.java
+    public static final List<String> ADMIN_PRODUCT_ITEM_ACTIONS = Arrays.asList(
+            "toAdminProductItemPage", 
+            "updateProductItem", 
+            "toggleIsActiveProductItem", 
+            "addOption",
+            "addVariation",
+            "updateOption",
+            "updateVariation",
+            "removeOption",
+            "removeVariation",
+            "generateProductItemMatrix",
+            "exportProductItemList"
+    );
+    
     // AdminUserController.java
     public static final List<String> ADMIN_USER_ACTIONS = Arrays.asList(
-            "listAllUsers",
+            "toAdminUserPage",
             "createUser",
-            "updateUser",
-            "disableUser",
-            "changeUserRole",
-            "toResetPassword",
-            "forgotPassword",
-            "resetPassword",
-            "toForgotPassword"
+            "toggleIsActiveUser",
+            "changeUserRole"
     );
 
     // SystemConfigController.java (Admin)
     public static final List<String> SYSTEM_CONFIG_ACTIONS = Arrays.asList(
             "toSystemConfigManagement",
-            "toSystemConfig",
             "getSystemConfig",
             "addSystemConfig",
             "updateSystemConfig",
-            "removeSystemConfig",
-            "getAppVersion",
+            "toggleIsActiveSystemConfig",
             "clearSystemCache"
     );
 
@@ -140,7 +156,7 @@ public class MainController extends HttpServlet {
 
         try {
             String action = request.getParameter("action");
-
+            System.out.println(action);
             if (action == null || action.trim().isEmpty()) {
                 url = ERROR_PAGE;
 
@@ -167,6 +183,9 @@ public class MainController extends HttpServlet {
 
             } else if (ADMIN_PRODUCT_ACTIONS.contains(action)) {
                 url = "/AdminProductController"; // AdminProductController.java
+            
+            } else if (ADMIN_PRODUCT_ITEM_ACTIONS.contains(action)) {
+                url = "/AdminProductItemController"; // AdminProductItemController.java
 
             } else if (ADMIN_USER_ACTIONS.contains(action)) {
                 url = "/AdminUserController"; // AdminUserController.java
@@ -175,7 +194,6 @@ public class MainController extends HttpServlet {
                 url = "/SystemConfigController"; // SystemConfigController.java
 
             } else if (WELCOME_ACTIONS.contains(action)) {
-                System.out.println("hello?");
                 url = WELCOME_PAGE; // SystemConfigController.java
 
             } else {
@@ -215,7 +233,13 @@ public class MainController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.startsWith("multipart/form-data")) {
+            request.getRequestDispatcher("/AdminProductController").forward(request, response);
+        } else {
+            // Đây là request POST bình thường (ví dụ: application/x-www-form-urlencoded, application/json)
+            processRequest(request, response);
+        }
     }
 
     /**

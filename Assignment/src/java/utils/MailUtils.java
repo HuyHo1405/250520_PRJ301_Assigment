@@ -44,13 +44,13 @@ public class MailUtils {
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(FROM_EMAIL));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
-        message.setSubject("🔐 Đặt lại mật khẩu tài khoản của bạn");
+        message.setSubject("Reset your password");
 
         // HTML nội dung
-        String htmlContent = "<h3>Yêu cầu đặt lại mật khẩu</h3>"
-                + "<p>Bạn đã gửi yêu cầu đặt lại mật khẩu. Nhấn vào liên kết bên dưới để tiếp tục:</p>"
-                + "<p><a href=\"" + resetLink + "\">👉 Đặt lại mật khẩu</a></p>"
-                + "<p><i>Liên kết này sẽ hết hạn sau 10 phút vì lý do bảo mật.</i></p>";
+        String htmlContent = "<h3>Password Reset Request</h3>"
+        + "<p>You have requested to reset your password. Click the link below to proceed:</p>"
+        + "<p><a href=\"" + resetLink + "\">👉 Reset Password</a></p>"
+        + "<p><i>This link will expire in 10 minutes for security reasons.</i></p>";
 
         message.setContent(htmlContent, "text/html; charset=UTF-8");
 

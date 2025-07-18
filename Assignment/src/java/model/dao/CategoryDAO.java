@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import model.dto.CartDTO;
+import model.dto.CategoryDTO;
 import utils.DbUtils;
 
 /**
@@ -16,19 +16,19 @@ import utils.DbUtils;
  * Ngày bắt đầu: 09/06/2025
  * viết crud cho class này
  */
-public class CartDAO {
+public class CategoryDAO {
 
     private static final String TABLE_NAME = "category";
 
-    private CartDTO mapToCart(ResultSet rs) throws SQLException {
+    private CategoryDTO mapToCart(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
-        Integer parentCategoryId = rs.getObject("parent_category_id") != null ? rs.getInt("parent_category_id") : null;
+        int parentCategoryId = rs.getObject("parent_category_id") != null ? rs.getInt("parent_category_id") : -1;
         String name = rs.getString("name");
-
-        return new CartDTO(id, parentCategoryId, name);
+        boolean is_active = rs.getBoolean("is_active");
+        return new CategoryDTO(id, parentCategoryId, name, is_active);
     }
 
-    private List<CartDTO> retrieve(String condition, Object... params) {
+    public List<CategoryDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -38,7 +38,7 @@ public class CartDAO {
             }
 
             ResultSet rs = ps.executeQuery();
-            List<CartDTO> cartList = new ArrayList<>();
+            List<CategoryDTO> cartList = new ArrayList<>();
 
             while (rs.next()) {
                 cartList.add(mapToCart(rs));
@@ -53,17 +53,17 @@ public class CartDAO {
         return null;
     }
 
-    public boolean create(CartDTO cart) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name) VALUES (?, ?)";
+    public boolean create(CategoryDTO cart) {
+        String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name, is_active) VALUES (?, ?, ?)";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            if (cart.getParent_category_id() == null) {
+            if (cart.getParent_category_id() == -1) {
                 ps.setNull(1, java.sql.Types.INTEGER);
             } else {
                 ps.setInt(1, cart.getParent_category_id());
             }
             ps.setString(2, cart.getName());
-
+            ps.setBoolean(3, cart.getIs_active());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in create(): " + e.getMessage());
@@ -72,17 +72,18 @@ public class CartDAO {
         return false;
     }
 
-    public boolean update(CartDTO cart) {
-        String sql = "UPDATE " + TABLE_NAME + " SET parent_category_id = ?, name = ? WHERE id = ?";
+    public boolean update(CategoryDTO cart) {
+        String sql = "UPDATE " + TABLE_NAME + " SET parent_category_id = ?, name = ?, is_active = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            if (cart.getParent_category_id() == null) {
+            if (cart.getParent_category_id() == -1) {
                 ps.setNull(1, java.sql.Types.INTEGER);
             } else {
                 ps.setInt(1, cart.getParent_category_id());
             }
             ps.setString(2, cart.getName());
-            ps.setInt(3, cart.getId());
+            ps.setBoolean(3, cart.getIs_active());
+            ps.setInt(4, cart.getId());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -104,8 +105,8 @@ public class CartDAO {
         return false;
     }
 
-    public CartDTO findById(int id) {
-        List<CartDTO> list = retrieve("id = ?", id);
+    public CategoryDTO findById(int id) {
+        List<CategoryDTO> list = retrieve("id = ?", id);
         return (list == null || list.isEmpty()) ? null : list.get(0);
     }
 
@@ -149,5 +150,18 @@ public class CartDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public boolean toggleIsActive(int id, boolean currStatus) {
+        String sql = "UPDATE " + TABLE_NAME + " SET is_active = ? WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, !currStatus);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in toggle(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 }

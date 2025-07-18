@@ -15,6 +15,12 @@ public class VariationDTO {
     public VariationDTO() {
     }
 
+    public VariationDTO(int product_id, String name) {
+        this.id = -1;
+        this.product_id = product_id;
+        this.name = name;
+    }
+
     public VariationDTO(int id, int product_id, String name) {
         this.id = id;
         this.product_id = product_id;

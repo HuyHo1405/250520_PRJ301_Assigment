@@ -73,11 +73,12 @@ public class ShippingMethodDAO {
     }
 
     public boolean update(ShippingMethodDTO method) {
-        String sql = "UPDATE " + TABLE_NAME + " SET name = ?, price = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET name = ?, price = ?, is_active = ? WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, method.getName());
             ps.setDouble(2, method.getPrice());
-            ps.setInt(3, method.getId());
+            ps.setBoolean(3, method.getIs_active());
+            ps.setInt(4, method.getId());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -99,10 +100,10 @@ public class ShippingMethodDAO {
         return false;
     }
 
-    public boolean disableShippingMethod(int id) {
+    public boolean toggleIsActive(int id, boolean currStatus) {
         String sql = "UPDATE " + TABLE_NAME + " SET is_active = ? WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setBoolean(1, false); // Set is_active to false
+            ps.setBoolean(1, !currStatus);
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {

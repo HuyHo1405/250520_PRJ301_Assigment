@@ -1,310 +1,116 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="model.dto.*"%>
-<%@page import="java.util.List"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Quản lý cấu hình hệ thống</title>
+        <title>System Configuration Management</title>
     </head>
     <body>
-        <h1>Quản lý cấu hình hệ thống</h1>
+        <h1>System Configuration Management - Version ${appVersion}</h1>
 
-        <%
-            String editType = request.getParameter("editType");
-            String editId = request.getParameter("editId");
-        %>
+        <hr>
+        
+        <form action="MainController" method="POST" style="display: inline">
+            <button name="action" value="toAdminUserPage">User Management</button>
+            <button name="action" value="toAdminProductPage">Product Management</button>
+            <button name="action" value="toAdminOrdersPage">Order Management</button>
+        </form>
+        
+         <h2 id="orderStatusHeader">Order Status</h2>
+        <jsp:include page="config-table.jsp">
+            <jsp:param name="listName" value="orderStatusList" />
+            <jsp:param name="type" value="orderStatus" />
+            <jsp:param name="editType" value="${editType}" />
+            <jsp:param name="fieldName" value="status" />
+        </jsp:include>
 
-        <h2>Trạng thái đơn hàng</h2>
-        <table border="1">
-            <tr><th>ID</th><th>Trạng thái</th><th>Hành động</th></tr>
-                    <%
-                        List<OrderStatusDTO> orderStatusList = (List<OrderStatusDTO>) request.getAttribute("orderStatusList");
-                        if (orderStatusList != null) {
-                            for (OrderStatusDTO dto : orderStatusList) {
-                                boolean editable = "orderStatus".equals(editType) && String.valueOf(dto.getId()).equals(editId);
-                    %>
-            <tr>
-                <td><%= dto.getId() %></td>
-                <td>
-                    <form action="SystemConfigController" method="post">
-                        <input type="hidden" name="type" value="orderStatus"/>
-                        <input type="hidden" name="id" value="<%= dto.getId() %>"/>
-                        <%
-                            if (editable) {
-                        %>
-                        <input type="text" name="status" value="<%= dto.getStatus() %>"/>
-                </td>
-                <td>
-                    <input type="hidden" name="action" value="updateSystemConfig"/>
-                    <button type="submit">Cập nhật</button>
-                    </form>
-                    <form action="SystemConfigController" method="post" style="display:inline;">
-                        <input type="hidden" name="type" value="orderStatus"/>
-                        <input type="hidden" name="id" value="<%= dto.getId() %>"/>
-                        <input type="hidden" name="action" value="removeSystemConfig"/>
-                        <button type="submit" onclick="return confirm('Bạn có chắc muốn xoá cấu hình này?')">Xoá</button>
-                    </form>
-                </td>
-                <%
-                    } else {
-                %>
-            <input type="text" name="status" value="<%= dto.getStatus() %>" readonly/>
-        </td>
-        <td>
-            <input type="hidden" name="action" value="getSystemConfig"/>
-            <input type="hidden" name="editType" value="orderStatus"/>
-            <button type="submit" name="editId" value="<%= dto.getId() %>">Chỉnh sửa</button>
-            </form>
-        </td>
-        <%
+        <h2 id="paymentTypeHeader">Payment Types</h2>
+        <jsp:include page="config-table.jsp">
+            <jsp:param name="listName" value="paymentTypeList" />
+            <jsp:param name="type" value="paymentType" />
+            <jsp:param name="editType" value="${editType}" />
+            <jsp:param name="fieldName" value="value" />
+        </jsp:include>
+
+        <h2 id="shippingMethodHeader">Shipping Methods</h2>
+        <jsp:include page="config-table.jsp">
+            <jsp:param name="listName" value="shippingMethodList" />
+            <jsp:param name="type" value="shippingMethod" />
+            <jsp:param name="editType" value="${editType}" />
+            <jsp:param name="fieldName" value="name" />
+        </jsp:include>
+
+        <h2 id="countryHeader">Countries</h2>
+        <jsp:include page="config-table.jsp">
+            <jsp:param name="listName" value="countryList" />
+            <jsp:param name="type" value="country" />
+            <jsp:param name="editType" value="${editType}" />
+            <jsp:param name="fieldName" value="country_name" />
+        </jsp:include>
+        
+        <h2 id="categoryHeader">Categories</h2>
+        <jsp:include page="config-table.jsp">
+            <jsp:param name="listName" value="categoryList" />
+            <jsp:param name="type" value="category" />
+            <jsp:param name="editType" value="${editType}" />
+            <jsp:param name="fieldName" value="name" />
+        </jsp:include>
+
+        <hr>
+        
+        <form action="MainController" method="POST" style="display: inline">
+            <button name="action" value="toWelcome">Back to Home</button>
+        </form>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+            // Get the 'editType' and 'addModeType' parameters passed from the server.
+            const editType = "${editType}";
+            const addModeType = "${addModeType}";
+
+            // Determine the target section based on which parameter is set.
+            // 'editType' takes precedence, then 'addModeType'.
+            let targetType = editType;
+            if (!targetType) { // If editType is empty, check addModeType
+                targetType = addModeType;
             }
-        %>
-    </tr>
-    <%
+
+            // If a target type is present, set the window hash to jump to the corresponding header.
+            // This will make the page load directly at that section.
+            if (targetType) {
+                window.location.hash = targetType + 'Header';
             }
-        } else {
-    %>
-    <tr><td colspan="3">Không có dữ liệu trạng thái đơn hàng.</td></tr>
-    <%
-        }
-    %>
-</table>
-<div id="orderStatusAddRow"></div>
-<button id="orderStatusAddBtn" onclick="addOrderStatusRow()">Thêm trạng thái mới</button>
 
-<h2>Phương thức thanh toán</h2>
-<table border="1">
-    <tr><th>ID</th><th>Giá trị</th><th>Hành động</th></tr>
-            <%
-                List<PaymentTypeDTO> paymentTypeList = (List<PaymentTypeDTO>) request.getAttribute("paymentTypeList");
-                if (paymentTypeList != null) {
-                    for (PaymentTypeDTO dto : paymentTypeList) {
-                        boolean editable = "paymentType".equals(editType) && String.valueOf(dto.getId()).equals(editId);
-            %>
-    <tr>
-        <td><%= dto.getId() %></td>
-        <td>
-            <form action="SystemConfigController" method="post">
-                <input type="hidden" name="type" value="paymentType"/>
-                <input type="hidden" name="id" value="<%= dto.getId() %>"/>
-                <%
-                    if (editable) {
-                %>
-                <input type="text" name="value" value="<%= dto.getValue() %>"/>
-        </td>
-        <td>
-            <input type="hidden" name="action" value="updateSystemConfig"/>
-            <button type="submit">Cập nhật</button>
-            </form>
-            <form action="SystemConfigController" method="post" style="display:inline;">
-                <input type="hidden" name="type" value="paymentType"/>
-                <input type="hidden" name="id" value="<%= dto.getId() %>"/>
-                <input type="hidden" name="action" value="removeSystemConfig"/>
-                <button type="submit" onclick="return confirm('Bạn có chắc muốn xoá cấu hình này?')">Xoá</button>
-            </form>
-        </td>
-        <%
-            } else {
-        %>
-    <input type="text" name="value" value="<%= dto.getValue() %>" readonly/>
-</td>
-<td>
-    <input type="hidden" name="action" value="getSystemConfig"/>
-    <input type="hidden" name="editType" value="paymentType"/>
-    <button type="submit" name="editId" value="<%= dto.getId() %>">Chỉnh sửa</button>
-    </form>
-</td>
-<%
-    }
-%>
-</tr>
-<%
-        }
-    } else {
-%>
-<tr><td colspan="3">Không có dữ liệu phương thức thanh toán.</td></tr>
-<%
-    }
-%>
-</table>
-<div id="paymentTypeAddRow"></div>
-<button id="paymentTypeAddBtn" onclick="addPaymentTypeRow()">Thêm phương thức mới</button>
+            // --- Original JavaScript logic (kept for completeness) ---
+            function addAnchorToFormAction(form, currentTableType) {
+                if (!form.action.includes('#')) {
+                    form.action += '#' + currentTableType + 'Header';
+                }
+            }
 
-<h2>Phương thức giao hàng</h2>
-<table border="1">
-    <tr><th>ID</th><th>Tên</th><th>Giá</th><th>Hành động</th></tr>
-            <%
-                List<ShippingMethodDTO> shippingList = (List<ShippingMethodDTO>) request.getAttribute("shippingMethodList");
-                if (shippingList != null) {
-                    for (ShippingMethodDTO dto : shippingList) {
-                        boolean editable = "shippingMethod".equals(editType) && String.valueOf(dto.getId()).equals(editId);
-            %>
-    <tr>
-        <td><%= dto.getId() %></td>
-        <td colspan="2">
-            <form action="SystemConfigController" method="post">
-                <input type="hidden" name="type" value="shippingMethod"/>
-                <input type="hidden" name="id" value="<%= dto.getId() %>"/>
-                <%
-                    if (editable) {
-                %>
-                Tên: <input type="text" name="name" value="<%= dto.getName() %>"/>
-                Giá: <input type="text" name="price" value="<%= dto.getPrice() %>"/>
-        </td>
-        <td>
-            <input type="hidden" name="action" value="updateSystemConfig"/>
-            <button type="submit">Cập nhật</button>
-            </form>
-            <form action="SystemConfigController" method="post" style="display:inline;">
-                <input type="hidden" name="type" value="shippingMethod"/>
-                <input type="hidden" name="id" value="<%= dto.getId() %>"/>
-                <input type="hidden" name="action" value="removeSystemConfig"/>
-                <button type="submit" onclick="return confirm('Bạn có chắc muốn xoá cấu hình này?')">Xoá</button>
-            </form>
-        </td>
-        <%
-            } else {
-        %>
-        Tên: <input type="text" name="name" value="<%= dto.getName() %>" readonly/>
-    Giá: <input type="text" name="price" value="<%= dto.getPrice() %>" readonly/>
-</td>
-<td>
-    <input type="hidden" name="action" value="getSystemConfig"/>
-    <input type="hidden" name="editType" value="shippingMethod"/>
-    <button type="submit" name="editId" value="<%= dto.getId() %>">Chỉnh sửa</button>
-    </form>
-</td>
-<%
-    }
-%>
-</tr>
-<%
-        }
-    } else {
-%>
-<tr><td colspan="4">Không có dữ liệu phương thức giao hàng.</td></tr>
-<%
-    }
-%>
-</table>
-<div id="shippingMethodAddRow"></div>
-<button id="shippingMethodAddBtn" onclick="addShippingMethodRow()">Thêm phương thức mới</button>
+            const allForms = document.querySelectorAll('form');
+            allForms.forEach(form => {
+                const hiddenTypeInput = form.querySelector('input[name="type"]');
+                if (hiddenTypeInput) {
+                    const currentTableType = hiddenTypeInput.value;
+                    form.addEventListener('submit', function() {
+                        addAnchorToFormAction(this, currentTableType);
+                    });
+                }
+            });
 
-<h2>Quốc gia</h2>
-<table border="1">
-    <tr><th>ID</th><th>Tên</th><th>Hành động</th></tr>
-            <%
-                List<CountryDTO> countryList = (List<CountryDTO>) request.getAttribute("countryList");
-                if (countryList != null) {
-                    for (CountryDTO dto : countryList) {
-                        boolean editable = "country".equals(editType) && String.valueOf(dto.getId()).equals(editId);
-            %>
-    <tr>
-        <td><%= dto.getId() %></td>
-        <td>
-            <form action="SystemConfigController" method="post">
-                <input type="hidden" name="type" value="country"/>
-                <input type="hidden" name="id" value="<%= dto.getId() %>"/>
-                <%
-                    if (editable) {
-                %>
-                <input type="text" name="name" value="<%= dto.getCountry_name() %>"/>
-        </td>
-        <td>
-            <input type="hidden" name="action" value="updateSystemConfig"/>
-            <button type="submit">Cập nhật</button>
-            </form>
-            <form action="SystemConfigController" method="post" style="display:inline;">
-                <input type="hidden" name="type" value="country"/>
-                <input type="hidden" name="id" value="<%= dto.getId() %>"/>
-                <input type="hidden" name="action" value="removeSystemConfig"/>
-                <button type="submit" onclick="return confirm('Bạn có chắc muốn xoá cấu hình này?')">Xoá</button>
-            </form>
-        </td>
-        <%
-            } else {
-        %>
-    <input type="text" name="name" value="<%= dto.getCountry_name() %>" readonly/>
-</td>
-<td>
-    <input type="hidden" name="action" value="getSystemConfig"/>
-    <input type="hidden" name="editType" value="country"/>
-    <button type="submit" name="editId" value="<%= dto.getId() %>">Chỉnh sửa</button>
-    </form>
-</td>
-<%
-    }
-%>
-</tr>
-<%
-        }
-    } else {
-%>
-<tr><td colspan="3">Không có dữ liệu quốc gia.</td></tr>
-<%
-    }
-%>
-</table>
-<div id="countryAddRow"></div>
-<button id="countryAddBtn" onclick="addCountryRow()">Thêm quốc gia mới</button>
-
-<br/><br/>
-<form action="SystemConfigController" method="post">
-    <input type="hidden" name="action" value="toSystemConfig"/>
-    <button type="submit">Trở về trang chính</button>
-</form>
-
-<script>
-    function addOrderStatusRow() {
-        document.getElementById('orderStatusAddRow').innerHTML = `
-            <form action="SystemConfigController" method="post">
-                <input type="hidden" name="action" value="addSystemConfig"/>
-                <input type="hidden" name="type" value="orderStatus"/>
-                <input type="text" name="status" placeholder="Nhập trạng thái đơn hàng mới"/>
-                <button type="submit">Submit</button>
-            </form>
-        `;
-        document.getElementById('orderStatusAddBtn').style.display = 'none';
-    }
-
-    function addPaymentTypeRow() {
-        document.getElementById('paymentTypeAddRow').innerHTML = `
-            <form action="SystemConfigController" method="post">
-                <input type="hidden" name="action" value="addSystemConfig"/>
-                <input type="hidden" name="type" value="paymentType"/>
-                <input type="text" name="value" placeholder="Nhập tên phương thức"/>
-                <button type="submit">Submit</button>
-            </form>
-        `;
-        document.getElementById('paymentTypeAddBtn').style.display = 'none';
-    }
-
-    function addShippingMethodRow() {
-        document.getElementById('shippingMethodAddRow').innerHTML = `
-            <form action="SystemConfigController" method="post">
-                <input type="hidden" name="action" value="addSystemConfig"/>
-                <input type="hidden" name="type" value="shippingMethod"/>
-                Tên: <input type="text" name="name" placeholder="Tên phương thức"/>
-                Giá: <input type="text" name="price" placeholder="Giá"/>
-                <button type="submit">Submit</button>
-            </form>
-        `;
-        document.getElementById('shippingMethodAddBtn').style.display = 'none';
-    }
-
-    function addCountryRow() {
-        document.getElementById('countryAddRow').innerHTML = `
-            <form action="SystemConfigController" method="post">
-                <input type="hidden" name="action" value="addSystemConfig"/>
-                <input type="hidden" name="type" value="country"/>
-                <input type="text" name="name" placeholder="Tên quốc gia"/>
-                <button type="submit">Submit</button>
-            </form>
-        `;
-        document.getElementById('countryAddBtn').style.display = 'none';
-    }
-</script>
-</body>
+            const cancelLinks = document.querySelectorAll('a[href*="action=toSystemConfigManagement"]');
+            cancelLinks.forEach(link => {
+                const url = new URL(link.href);
+                const type = url.searchParams.get('type');
+                if (type && !url.hash) {
+                    link.href = url.origin + url.pathname + url.search + '#' + type + 'Header';
+                }
+            });
+        });
+        </script>
+    </body>
 </html>

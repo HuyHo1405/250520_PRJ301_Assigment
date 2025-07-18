@@ -67,10 +67,11 @@ public class CountryDAO {
     }
 
     public boolean update(CountryDTO country) {
-        String sql = "UPDATE " + TABLE_NAME + " SET country_name = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET country_name = ?, is_active = ? WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, country.getCountry_name());
-            ps.setInt(2, country.getId());
+            ps.setBoolean(2, country.getIs_active());
+            ps.setInt(3, country.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in update(): " + e.getMessage());
@@ -92,14 +93,14 @@ public class CountryDAO {
     }
 
     
-    public boolean disableCountry(int id) {
+    public boolean toggleIsActive(int id, boolean currStatus) {
         String sql = "UPDATE " + TABLE_NAME + " SET is_active = ? WHERE id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setBoolean(1, false); // Set is_active to false
+            ps.setBoolean(1, !currStatus);
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            System.err.println("Error in disableCountry(): " + e.getMessage());
+            System.err.println("Error in toggle(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;

@@ -4,17 +4,25 @@
  */
 package controller.admin;
 
+import utils.ImageUploadUtils;
 import java.io.IOException;
+import jakarta.servlet.http.Part;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.List;
+import model.dao.CategoryDAO;
 import model.dao.ProductDAO;
+import model.dao.VariationDAO;
+import model.dao.VariationOptionDAO;
 import model.dto.ProductDTO;
+import utils.ProductUtils;
 import utils.ValidationUtils;
 
 /**
@@ -27,26 +35,31 @@ public class AdminProductController extends HttpServlet {
 
     private static final String WELCOME_PAGE = "welcome.jsp";
     private static final String ERROR_PAGE = "error.jsp";
-    private static final String PRODUCT_LIST_PAGE = "admin-product-management.jsp";
-    private static final String PRODUCT_DETAIL_PAGE = "product-detail.jsp";
+    private static final String ADMIN_PRODUCT_MANAGEMENT_PAGE = "admin-product-management.jsp";
+    private static final String PRODUCT_FORM = "product-form.jsp";
 
     private final ProductDAO PDAO = new ProductDAO();
+    private final CategoryDAO CDAO = new CategoryDAO();
+    private final VariationDAO VDAO = new VariationDAO();
+    private final VariationOptionDAO VODAO = new VariationOptionDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        String url = WELCOME_PAGE;
+        String url = "";
 
         try {
             String action = request.getParameter("action");
 
             switch (action) {
-                case "listAllProducts":
-                    url = handleListAllProducts(request, response);
+                case "toAdminProductPage":
+                    url = handleSearchProducts(request, response);
                     break;
+                case "toCreateProduct":
+                case "toEditProduct":
                 case "viewProductDetail":
-                    url = handleViewProductDetail(request, response);
+                    url = handleToProductForm(request, action);
                     break;
                 case "createProduct":
                     url = handleCreateProduct(request, response);
@@ -54,13 +67,10 @@ public class AdminProductController extends HttpServlet {
                 case "updateProduct":
                     url = handleUpdateProduct(request, response);
                     break;
-                case "disableProduct":
-                    url = handleDisableProduct(request, response);
+                case "toggleIsActiveProduct":
+                    url = handleToggleIsActive(request, response);
                     break;
-                case "uploadProductImages":
-                    url = handleUploadProductImages(request, response);
-                    break;
-                case "searchProducts":
+                case "searchProductsManagement":
                     url = handleSearchProducts(request, response);
                     break;
                 default:
@@ -102,7 +112,42 @@ public class AdminProductController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String contentType = request.getContentType();
+
+        if (contentType != null && contentType.startsWith("multipart/form-data")) {
+            // Since this controller is receiving the multipart request,
+            // we will parse the parts here to get the 'action' and file.
+            String action = null;
+            // No need to store the specific file Part here if handleUploadProductImages
+            // is going to get it itself using request.getPart("imageFile").
+            // However, to get the 'action' from multipart, you still need to iterate parts.
+            try {
+                Collection<Part> parts = request.getParts(); // This line parses the entire multipart request
+                for (Part part : parts) {
+                    if ("action".equals(part.getName())) {
+                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(part.getInputStream()))) {
+                            action = reader.readLine();
+                            break; // Found action, no need to read other parts for it
+                        }
+                    }
+                }
+            } catch (ServletException e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error parsing multipart data: " + e.getMessage());
+                return;
+            }
+
+            if ("uploadProductImages".equals(action)) {
+                // Call your provided method
+                handleUploadProductImages(request, response);
+            } else {
+                // Handle other multipart actions here, or send an error if action is not supported
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unsupported multipart action: " + (action != null ? action : "null"));
+            }
+
+        } else {
+            // Handle regular POST requests here (if AdminProductController also handles them directly)
+            processRequest(request, response);
+        }
     }
 
     /**
@@ -115,152 +160,145 @@ public class AdminProductController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private String handleListAllProducts(HttpServletRequest request, HttpServletResponse response) {
+    private String handleSearchProducts(HttpServletRequest request, HttpServletResponse response) {
         String keyword = request.getParameter("keyword");
+        keyword = keyword == null ? "" : keyword;
+        int categoryId = toInt(request.getParameter("searchCategoryId"));
         List<ProductDTO> list;
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            list = PDAO.getProductsByName(keyword); // hàm tìm kiếm sản phẩm
+        if (categoryId != -1) {
+            list = PDAO.retrieve("name LIKE ? AND category_id = ? ORDER BY is_active DESC, category_id ASC", "%" + keyword + "%", categoryId); // hàm tìm kiếm sản phẩm
         } else {
-            list = PDAO.retrieve("is_active = 1"); // lấy tất cả sản phẩm
+            list = PDAO.retrieve("name LIKE ? ORDER BY is_active DESC, category_id ASC", "%" + keyword + "%");
         }
 
         request.setAttribute("productList", list);
-
-        String editId = request.getParameter("editId");
-        if (editId != null && !editId.trim().isEmpty()) {
-            request.setAttribute("editId", editId);
-        }
-
-        return PRODUCT_LIST_PAGE;
+        request.setAttribute("categoryMap", ProductUtils.getCategoryMap(CDAO.retrieve("1=1")));
+        return ADMIN_PRODUCT_MANAGEMENT_PAGE;
     }
 
-    private String handleViewProductDetail(HttpServletRequest request, HttpServletResponse response) {
-        int id = toInt(request.getParameter("productId"));
-        if (ValidationUtils.isInvalidId(id)) {
-            return error(request, "ID sản phẩm không hợp lệ.");
+    private String handleToProductForm(HttpServletRequest request, String action) {
+        ProductDTO product = null;
+        if (!"toCreateProduct".equals(action)) {
+            int id = toInt(request.getParameter("productId"));
+            if (ValidationUtils.isInvalidId(id)) {
+                return error(request, "Invalid Id.");
+            }
+
+            product = PDAO.findById(id);
+            if (product == null) {
+                return error(request, "Product Not Found");
+            }
         }
 
-        ProductDTO product = PDAO.findById(id);
-        if (product == null) {
-            return error(request, "Không tìm thấy sản phẩm.");
-        }
-
-        request.setAttribute("product", product);
-        return PRODUCT_DETAIL_PAGE;
+        prepareProductForm(request, product, action);
+        return PRODUCT_FORM;
     }
 
     private String handleCreateProduct(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            int categoryId = toInt(request.getParameter("categoryId"));
-            String name = request.getParameter("name");
-            String description = request.getParameter("description");
-            String coverImageLink = request.getParameter("coverImageLink");
+        int categoryId = toInt(request.getParameter("categoryId"));
+        String name = request.getParameter("name");
+        String description = request.getParameter("description");
+        String coverImageLink = request.getParameter("coverImageLink");
 
-            ProductDTO product = new ProductDTO(categoryId, name, description, coverImageLink);
-            boolean success = PDAO.create(product);
+        ProductDTO product = new ProductDTO(categoryId, name, description, coverImageLink);
+        boolean success = PDAO.create(product);
 
-            request.setAttribute(success ? "message" : "errorMsg",
-                    success ? "Tạo sản phẩm thành công." : "Tạo sản phẩm thất bại.");
+        request.setAttribute(success ? "message" : "errorMsg",
+                success ? "Tạo sản phẩm thành công." : "Tạo sản phẩm thất bại.");
 
-            if (success) {
-                // Lấy sản phẩm vừa tạo bằng tên (ưu tiên chính xác nếu tên duy nhất)
-                List<ProductDTO> createdList = PDAO.getProductsByName(name);
-                ProductDTO created = (createdList != null && !createdList.isEmpty()) ? createdList.get(0) : null;
-
-                if (created != null) {
-                    List<ProductDTO> showOnlyCreated = new java.util.ArrayList<>();
-                    showOnlyCreated.add(created);
-                    request.setAttribute("productList", showOnlyCreated);
-                } else {
-                    request.setAttribute("productList", new java.util.ArrayList<>()); // danh sách rỗng nếu không tìm thấy
-                }
-
-                return PRODUCT_LIST_PAGE;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMsg", "Lỗi xử lý tạo sản phẩm.");
-        }
-
-        return handleListAllProducts(request, response);
+        return handleSearchProducts(request, response);
     }
 
     private String handleUpdateProduct(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            int productId = toInt(request.getParameter("productId"));
+        int productId = toInt(request.getParameter("productId"));
 
-            if (productId <= 0) {
-                request.setAttribute("errorMsg", "ID sản phẩm không hợp lệ.");
-                return handleListAllProducts(request, response);
-            }
-
-            ProductDTO existing = PDAO.findById(productId);
-            if (existing == null) {
-                request.setAttribute("errorMsg", "Sản phẩm không tồn tại.");
-                return handleListAllProducts(request, response);
-            }
-
-            int categoryId = toInt(request.getParameter("categoryId"));
-            String name = request.getParameter("name");
-            String description = request.getParameter("description");
-            String imageLink = request.getParameter("coverImageLink"); // lấy từ input
-
-            // Cập nhật dữ liệu
-            existing.setName(name);
-            existing.setDescription(description);
-            existing.setCategory_id(categoryId);
-            existing.setCover_image_link(imageLink); // gán link ảnh mới
-
-            boolean success = PDAO.update(existing);
-
-            request.setAttribute(success ? "message" : "errorMsg",
-                    success ? "Cập nhật sản phẩm thành công." : "Cập nhật sản phẩm thất bại.");
-
-            List<ProductDTO> list = Arrays.asList(PDAO.findById(productId));
-            request.setAttribute("productList", list);
-            request.setAttribute("editId", String.valueOf(productId)); // giữ chế độ chỉnh sửa
-
-            return PRODUCT_LIST_PAGE;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMsg", "Lỗi xử lý khi cập nhật sản phẩm.");
-            return handleListAllProducts(request, response);
+        if (productId <= 0) {
+            request.setAttribute("errorMsg", "ID sản phẩm không hợp lệ.");
+            return handleSearchProducts(request, response);
         }
-    }
 
-    private String handleDisableProduct(HttpServletRequest request, HttpServletResponse response) {
-        int id = toInt(request.getParameter("productId"));
-        boolean success = PDAO.disable(id);
+        ProductDTO existing = PDAO.findById(productId);
+        if (existing == null) {
+            request.setAttribute("errorMsg", "Sản phẩm không tồn tại.");
+            return handleSearchProducts(request, response);
+        }
+
+        int categoryId = toInt(request.getParameter("categoryId"));
+        String name = request.getParameter("name");
+        String description = request.getParameter("description");
+        String imageLink = request.getParameter("coverImageLink"); // lấy từ input
+
+        // Cập nhật dữ liệu
+        existing.setName(name);
+        existing.setDescription(description);
+        existing.setCategory_id(categoryId);
+        existing.setCover_image_link(imageLink); // gán link ảnh mới
+
+        boolean success = PDAO.update(existing);
 
         request.setAttribute(success ? "message" : "errorMsg",
-                success ? "Đã xóa sản phẩm." : "Xóa sản phẩm thất bại.");
-        return handleListAllProducts(request, response);
+                success ? "Cập nhật sản phẩm thành công." : "Cập nhật sản phẩm thất bại.");
+
+        return handleSearchProducts(request, response);
     }
 
-    private String handleUploadProductImages(HttpServletRequest request, HttpServletResponse response) {
-        // Upload xử lý riêng qua multipart hoặc file handler
-        request.setAttribute("message", "Chức năng đang phát triển.");
-        return "";
+    private String handleToggleIsActive(HttpServletRequest request, HttpServletResponse response) {
+        int id = toInt(request.getParameter("productId"));
+        
+        System.out.println(id);
+        
+        if(ValidationUtils.isInvalidId(id)){
+            request.setAttribute("errorMsg", "Invalid Id");
+            return ERROR_PAGE;
+        }
+        
+        ProductDTO product = PDAO.findById(id);
+        
+        if(product == null){
+            request.setAttribute("errorMsg", "Product Not Found");
+            return ERROR_PAGE;
+        }
+        
+        product.setIs_active(!product.getIs_active());
+        if(PDAO.update(product)){
+            request.setAttribute("message", "Action Success");
+            return handleSearchProducts(request, response);
+        }else{
+            request.setAttribute("errorMsg", "Product Not Found");
+            return ERROR_PAGE;
+        }
     }
 
-    private String handleSearchProducts(HttpServletRequest request, HttpServletResponse response) {
-        String keyword = request.getParameter("keyword");
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return handleListAllProducts(request, response);
-        }
-        List<ProductDTO> list = PDAO.getProductsByName(keyword);
-        request.setAttribute("productList", list);
+    private void handleUploadProductImages(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/plain");
 
-        // Giữ lại editId nếu có
-        String editId = request.getParameter("editId");
-        if (editId != null) {
-            request.setAttribute("editId", editId);
-        }
+        try {
+            System.out.println("[DEBUG] Nhận request upload ảnh...");
 
-        return PRODUCT_LIST_PAGE;
+            Part filePart = request.getPart("imageFile");
+            if (filePart == null || filePart.getSize() == 0) {
+                System.out.println("[DEBUG] Không có file nào được gửi lên.");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("Không có file nào được gửi lên.");
+                return;
+            }
+
+            System.out.println("[DEBUG] Tên file: " + filePart.getSubmittedFileName());
+            System.out.println("[DEBUG] Kích thước file: " + filePart.getSize());
+            System.out.println("[DEBUG] Kiểu MIME: " + filePart.getContentType());
+
+            String imageUrl = ImageUploadUtils.uploadFile(filePart);
+
+            System.out.println("[DEBUG] Upload thành công. URL: " + imageUrl);
+            response.getWriter().write(imageUrl);
+
+        } catch (Exception e) {
+            System.out.println("[ERROR] Lỗi upload ảnh:");
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("Lỗi upload ảnh: " + e.getMessage());
+        }
     }
 
     // Utility methods
@@ -269,6 +307,17 @@ public class AdminProductController extends HttpServlet {
             return Integer.parseInt(val.trim());
         } catch (Exception e) {
             return -1;
+        }
+    }
+
+    private void prepareProductForm(HttpServletRequest request, ProductDTO product, String action) {
+        request.setAttribute("categoryMap", ProductUtils.getCategoryMap(CDAO.retrieve("1=1")));
+        request.setAttribute("actionType", "createProduct");
+        if ("viewProductDetail".equals(action) || "toEditProduct".equals(action)) {
+                request.setAttribute("actionType", action.equals("toEditProduct")? "updateProduct": "viewProductDetail");
+                request.setAttribute("product", product);
+                request.setAttribute("variation", VDAO.retrieve("product_id = ?", product.getId()));
+                request.setAttribute("variationOption", VODAO.getOptionsByProductId(product.getId()));
         }
     }
 

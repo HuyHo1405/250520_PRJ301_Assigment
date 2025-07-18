@@ -69,15 +69,15 @@ public class ProductDAO {
     }
 
     public boolean update(ProductDTO product) {
-        String sql = "UPDATE " + TABLE_NAME + " SET category_id = ?, name = ?, description = ?, cover_image_link = ?,  WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET category_id = ?, name = ?, description = ?, cover_image_link = ?, is_active = ?  WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, product.getCategory_id());
             ps.setString(2, product.getName());
             ps.setString(3, product.getDescription());
             ps.setString(4, product.getCover_image_link());
-            ps.setInt(5, product.getId());
             ps.setBoolean(5, product.getIs_active());
+            ps.setInt(6, product.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in update(): " + e.getMessage());

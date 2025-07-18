@@ -305,7 +305,8 @@ public class AddressController extends HttpServlet {
     }
 
     private void prepareAddressManagementView(HttpServletRequest request, int userId) {
-        request.setAttribute("defaultAddressId", getDefaultAddress(userId).getId());
+        AddressDTO defAddress = getDefaultAddress(userId);
+        request.setAttribute("defaultAddressId", defAddress != null? defAddress.getId(): null);
         request.setAttribute("addressList", getUserAddress("1=1", userId));
     }
 

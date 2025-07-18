@@ -84,6 +84,21 @@ public class ProductConfigDAO {
         return retrieve("option_id = ?", optionId);
     }
 
+    public boolean deleteByProductId(int productId){
+        String sql = "DELETE pc\n"
+                + "FROM product_configuration pc\n"
+                + "JOIN product_item pi ON pc.item_id = pi.id\n"
+                + "WHERE pi.product_id = ?;";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in delete(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
     public boolean existsById(int itemId, int optionId) {
         String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE item_id = ? AND option_id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {

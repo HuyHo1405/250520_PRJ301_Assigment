@@ -6,11 +6,23 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import model.dto.OrderStatusDTO;
 
 public class OrderUtils {
 
     private static final String PREFIX = "ORD-";
 
+    public static Map<Integer, String> getMap(List<OrderStatusDTO> list){
+        Map<Integer, String> map = new HashMap<>();
+        for (OrderStatusDTO category : list) {
+            map.put(category.getId(), category.getStatus());
+        }
+        return map;
+    }
+    
     public static String generateOrderCode(int id, int status, Timestamp createdAt) {
         LocalDateTime createdTime = createdAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 

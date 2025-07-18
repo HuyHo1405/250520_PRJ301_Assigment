@@ -6,27 +6,13 @@
     <meta charset="UTF-8">
     <title>Order Management</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 8px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .error {
-            color: red;
-            margin-bottom: 10px;
-        }
+        
     </style>
 </head>
 <body>
 
 <h1>Order Management</h1>
+<hr>
 
 <c:if test="${not empty errorMsg}">
     <div class="error">${errorMsg}</div>
@@ -39,14 +25,14 @@
     <a href="AdminOrderController?action=exportOrders" style="margin-left: 20px;">📥 Export CSV</a>
 </form>
 
-<table>
+<table border="1" style="border-collapse:collapse;">
     <thead>
         <tr>
             <th>ID</th>
             <th>Order Code</th>
             <th>Order Date</th>
             <th>Total</th>
-            <th>Status ID</th>
+            <th>Status</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -59,7 +45,7 @@
                         <td>${order.order_code}</td>
                         <td>${order.orderDate}</td>
                         <td>${order.orderTotal}</td>
-                        <td>${order.orderStatusId}</td>
+                        <td>${statusMap[order.orderStatusId]}</td>
                         <td>
                             <form action="MainController" method="get" style="display:inline;">
                                 <input type="hidden" name="action" value="viewOrderDetail" />
@@ -86,9 +72,9 @@
     </tbody>
 </table>
 
+    <hr>
 <form action="MainController" method="post">
-    <input type="hidden" name="action" value="toWelcome"/>
-    <button type="submit">Back to Profile</button>
+    <button name="action" value="toSystemConfigManagement">Back</button>
 </form>
 
 </body>

@@ -26,10 +26,16 @@ public class CountryDTO {
         this.is_active = true;
     }
 
+    public CountryDTO(String country_name, boolean is_active) {
+        this.id = -1;
+        this.country_name = country_name;
+        this.is_active = is_active;
+    }
+    
     public CountryDTO(int id, String country_name, boolean is_active) {
         this.id = id;
         this.country_name = country_name;
-        this.is_active = this.is_active;
+        this.is_active = is_active;
     }
 
     public boolean getIs_active() {

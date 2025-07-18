@@ -11,6 +11,8 @@ import java.util.List;
 import model.dao.UserDAO;
 import model.dto.UserDTO;
 import utils.HashUtils;
+import utils.MailUtils;
+import utils.ResetTokenManager;
 import utils.UserUtils;
 import utils.ValidationUtils;
 
@@ -51,6 +53,10 @@ public class UserController extends HttpServlet {
                     request.setAttribute("actionType", "forgotPassword");
                     url = USER_FORM_PAGE;
                     break;
+                case "toResetPassword":
+                    request.setAttribute("actionType", "resetPassword");
+                    url = USER_FORM_PAGE;
+                    break;
                 case "login":
                     url = handleLogin(request, response);
                     break;
@@ -60,8 +66,11 @@ public class UserController extends HttpServlet {
                 case "register":
                     url = handleRegister(request, response);
                     break;
-                case "changePassword":
-                    url = handleChangePassword(request, response);
+                case "forgotPassword":
+                    url = handleForgotPassword(request, response);
+                    break;
+                case "resetPassword":
+                    url = handleResetPassword(request, response);
                     break;
                 case "update":
                     url = handleUpdate(request, response);
@@ -248,25 +257,84 @@ public class UserController extends HttpServlet {
         return USER_FORM_PAGE;
     }
 
-    public String handleChangePassword(HttpServletRequest request, HttpServletResponse response){
-        String password = request.getParameter("password");
-        String confirmPassword = request.getParameter("confirmPassword");
+//    public String handleChangePassword(HttpServletRequest request, HttpServletResponse response){
+//        String password = request.getParameter("password");
+//        String confirmPassword = request.getParameter("confirmPassword");
+//        
+//        if (!password.equals(confirmPassword)) {
+//            request.setAttribute("error", "Mật khẩu xác nhận không khớp.");
+//            return USER_FORM_PAGE;
+//        }
+//        
+//        String hashedPassword = HashUtils.hashPassword(password);
+//        UserDTO user = UserUtils.getUser(request);
+//        user.setHashed_password(hashedPassword);
+//        
+//        UDAO.update(user);
+//        request.getSession().invalidate();
+//        request.setAttribute("actionType", "login");
+//        return USER_FORM_PAGE;
+//    }
+    
+    private String handleForgotPassword(HttpServletRequest request, HttpServletResponse response) {
+        String email = request.getParameter("email");
         
-        if (!password.equals(confirmPassword)) {
-            request.setAttribute("error", "Mật khẩu xác nhận không khớp.");
-            return USER_FORM_PAGE;
+        UserDTO user = UDAO.findByEmail(email);
+
+        if (user == null) {
+            request.setAttribute("errorMsg", "Email không tồn tại.");
+            return "forgot-password.jsp";
         }
-        
-        String hashedPassword = HashUtils.hashPassword(password);
-        UserDTO user = UserUtils.getUser(request);
-        user.setHashed_password(hashedPassword);
-        
-        UDAO.update(user);
-        request.getSession().invalidate();
-        request.setAttribute("actionType", "login");
+
+        // Tạo link reset có token (hết hạn sau 10 phút)
+        String token = ResetTokenManager.generateToken(email); // ← tạo token an toàn
+        String baseURL = request.getRequestURL().toString().replace(request.getRequestURI(), request.getContextPath());
+        String resetLink = baseURL + "/MainController?action=toResetPassword&token=" + token;
+
+        try {
+            MailUtils.sendResetPasswordEmail(email, resetLink); // ← gửi mail tới chính email user
+            request.setAttribute("message", "📩 Đã gửi liên kết đặt lại mật khẩu đến email của bạn.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMsg", "Gửi email thất bại: " + e.getMessage());
+        }
+
+        request.setAttribute("actionType", "forgotPassword");
         return USER_FORM_PAGE;
     }
     
+    private String handleResetPassword(HttpServletRequest request, HttpServletResponse response) {
+        String token = request.getParameter("token");
+        String emailFromToken = ResetTokenManager.getEmailIfValid(token);
+        String newPassword = request.getParameter("newPassword");
+        String confirmPassword = request.getParameter("confirmNewPassword");
+
+        if (newPassword == null || confirmPassword == null || !newPassword.equals(confirmPassword)) {
+            request.setAttribute("errorMsg", "Mật khẩu xác nhận không khớp.");
+            request.setAttribute("email", emailFromToken); // giữ lại email để điền lại form
+            request.setAttribute("actionType", "resetPassword");
+            return USER_FORM_PAGE;
+        }
+
+        UserDAO dao = new UserDAO();
+        UserDTO user = dao.findByEmail(emailFromToken);
+
+        if (user == null) {
+            request.setAttribute("errorMsg", "Không tìm thấy tài khoản.");
+            request.setAttribute("actionType", "resetPassword");
+            return USER_FORM_PAGE;
+        }
+
+        String hashedPassword = HashUtils.hashPassword(newPassword);
+        user.setHashed_password(hashedPassword);
+        boolean success = dao.update(user);
+
+        if (!success) {
+            request.setAttribute("errorMsg", "Đặt lại mật khẩu thất bại.");
+            request.setAttribute("actionType", "resetPassword");
+        }
+        return USER_FORM_PAGE;
+    }
     //some useful methods
     private boolean isExistedEmail(String email){
         return !UDAO.retrieve("email_address = ?", email).isEmpty();

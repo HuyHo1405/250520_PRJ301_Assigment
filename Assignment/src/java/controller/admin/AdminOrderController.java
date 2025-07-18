@@ -27,6 +27,7 @@ import model.dto.PaymentTypeDTO;
 import model.dto.ShippingMethodDTO;
 import model.dto.ShoppingOrderDTO;
 import model.dto.UserDTO;
+import utils.OrderUtils;
 import utils.ValidationUtils;
 
 /**
@@ -65,7 +66,8 @@ public class AdminOrderController extends HttpServlet {
 
             switch (action) {
                 case "toAdminOrdersPage":
-                    request.setAttribute("orderList", SODAO.retrieve("1 = 1"));
+                    request.setAttribute("orderList", SODAO.retrieve("1 = 1 ORDER BY order_date DESC, order_status_id ASC"));
+                    request.setAttribute("statusMap", OrderUtils.getMap(OSDAO.retrieve("1=1")));
                     url = ADMIN_ORDER_MANAGEMENT_PAGE;
                     break;
                 case "viewOrderDetail":
@@ -233,12 +235,14 @@ public class AdminOrderController extends HttpServlet {
         SODAO.update(order);
 
         request.setAttribute("orderList", SODAO.retrieve("1 = 1"));
+        request.setAttribute("statusMap", OrderUtils.getMap(OSDAO.retrieve("1=1")));
         return ADMIN_ORDER_MANAGEMENT_PAGE;
     }
 
     private String handleSearchOrder(HttpServletRequest request, HttpServletResponse response) {
         String keyword = request.getParameter("strKeyword");
         request.setAttribute("orderList", SODAO.retrieve("order_code LIKE ?", "%" + keyword + "%"));
+        request.setAttribute("statusMap", OrderUtils.getMap(OSDAO.retrieve("1=1")));
         return ADMIN_ORDER_MANAGEMENT_PAGE;
     }
 

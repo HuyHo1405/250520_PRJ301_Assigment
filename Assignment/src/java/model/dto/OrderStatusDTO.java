@@ -26,6 +26,12 @@ public class OrderStatusDTO {
         this.is_active = true;
     }
     
+    public OrderStatusDTO(String status, boolean is_active) {
+        this.id = -1;
+        this.status = status;
+        this.is_active = is_active;
+    }
+    
     public OrderStatusDTO(int id, String status, boolean is_active) {
         this.id = id;
         this.status = status;
