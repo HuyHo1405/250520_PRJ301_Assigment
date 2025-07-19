@@ -24,15 +24,15 @@ import java.util.List;
  */
 @WebFilter(filterName = "AuthFilter", urlPatterns = {"/*"})
 public class AuthenticationFilter implements Filter {
-    
+
     public AuthenticationFilter() {
-    }    
-    
+    }
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {
-        
+
 //        HttpServletRequest req = (HttpServletRequest) request;
 //        HttpServletResponse res = (HttpServletResponse) response;
 //
@@ -59,11 +59,11 @@ public class AuthenticationFilter implements Filter {
     }
 
     @Override
-    public void destroy() {        
+    public void destroy() {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) {        
+    public void init(FilterConfig filterConfig) {
     }
-    
+
 }

@@ -1,0 +1,54 @@
+.container {
+    width: 100%;
+    min-width: 250px;
+    height: auto;
+    background-color: #1f1f1f;
+    color: white;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container .heading h4 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    border-bottom: 2px solid #444;
+    padding-bottom: 10px;
+}
+
+.container > div:not(.heading) {
+    transition: background 0.3s ease;
+}
+
+.container form {
+    margin: 0;
+}
+
+.container button {
+    width: 100%;
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    padding: 12px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease, padding-left 0.2s ease;
+}
+
+.container button:hover {
+    background-color: #333;
+    padding-left: 15px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        height: auto;
+    }
+}
+
