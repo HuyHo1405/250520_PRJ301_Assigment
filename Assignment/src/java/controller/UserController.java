@@ -15,10 +15,8 @@ import utils.UserUtils;
 import utils.ValidationUtils;
 
 /**
- * Status: Đã hoàn thành 
- * Người thực hiện: Huy 
- * Ngày bắt đầu: 13/06/2025 
- * viết các hàm handle cho các feature của user
+ * Status: Đã hoàn thành Người thực hiện: Huy Ngày bắt đầu: 13/06/2025 viết các
+ * hàm handle cho các feature của user
  */
 @WebServlet(name = "UserController", urlPatterns = {"/UserController"})
 public class UserController extends HttpServlet {
@@ -28,7 +26,7 @@ public class UserController extends HttpServlet {
     private static final String USER_FORM_PAGE = "user-form.jsp";
     private static final String ERROR_PAGE = "error.jsp";
     private final UserDAO UDAO = new UserDAO();
-    
+
     //process
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -124,11 +122,11 @@ public class UserController extends HttpServlet {
 
         boolean checkEmpty = email == null || password == null || email.isEmpty() || password.isEmpty();
         boolean validateEmail = !ValidationUtils.isValidEmail(email);
-        
+
         String error = "";
-        if(checkEmpty){
+        if (checkEmpty) {
             error = "Email và mật khẩu không được để trống.";
-        }else if(validateEmail){
+        } else if (validateEmail) {
             error = "Email không hợp lệ.";
         }
 
@@ -137,10 +135,10 @@ public class UserController extends HttpServlet {
             request.setAttribute("inputEmail", email);
             return USER_FORM_PAGE;
         }
-        
+
         String hashedPassword = HashUtils.hashPassword(password);
         List<UserDTO> ls = UDAO.retrieve("email_address = ? AND hashed_password = ?", email, hashedPassword);
-        
+
         if (!ls.isEmpty()) {
             HttpSession session = request.getSession();
             session.setAttribute("user", ls.get(0));
@@ -167,26 +165,26 @@ public class UserController extends HttpServlet {
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
 
-        boolean checkEmpty = email == null || phone == null || password == null || confirmPassword == null ||
-                email.isEmpty() || phone.isEmpty() || password.isEmpty() || confirmPassword.isEmpty();
+        boolean checkEmpty = email == null || phone == null || password == null || confirmPassword == null
+                || email.isEmpty() || phone.isEmpty() || password.isEmpty() || confirmPassword.isEmpty();
         boolean validateEmail = !ValidationUtils.isValidEmail(email);
         boolean validatePhone = !ValidationUtils.isValidPhone(phone);
         boolean checkConfirmPassword = !password.equals(confirmPassword);
         boolean checkExistedEmail = isExistedEmail(email);
-        
+
         String error = "";
-        if(checkEmpty){
+        if (checkEmpty) {
             error = "Vui lòng điền đầy đủ thông tin.";
-        }else if(validateEmail){
+        } else if (validateEmail) {
             error = "Email không hợp lệ.";
-        }else if(validatePhone){
+        } else if (validatePhone) {
             error = "Số điện thoại không hợp lệ.";
-        }else if(checkConfirmPassword){
+        } else if (checkConfirmPassword) {
             error = "Mật khẩu xác nhận không khớp.";
-        }else if(checkExistedEmail){
+        } else if (checkExistedEmail) {
             error = "Email đã được đăng ký.";
         }
-        
+
         if (checkEmpty || validateEmail || validatePhone || checkConfirmPassword || checkExistedEmail) {
             request.setAttribute("error", error);
             request.setAttribute("inputEmail", email);
@@ -212,16 +210,16 @@ public class UserController extends HttpServlet {
         boolean checkEmpty = newEmail == null || newPhone == null || newEmail.isEmpty() || newPhone.isEmpty();
         boolean validateEmail = !ValidationUtils.isValidEmail(newEmail);
         boolean validatePhone = !ValidationUtils.isValidPhone(newPhone);
-        
+
         String error = "";
-        if(checkEmpty){
+        if (checkEmpty) {
             error = "Vui lòng điền đầy đủ thông tin.";
-        }else if(validateEmail){
+        } else if (validateEmail) {
             error = "Email không hợp lệ.";
-        }else if(validatePhone){
+        } else if (validatePhone) {
             error = "Số điện thoại không hợp lệ.";
         }
-        
+
         if (checkEmpty || validateEmail || validatePhone) {
             request.setAttribute("error", error);
             request.setAttribute("actionType", "profile");
@@ -248,27 +246,27 @@ public class UserController extends HttpServlet {
         return USER_FORM_PAGE;
     }
 
-    public String handleChangePassword(HttpServletRequest request, HttpServletResponse response){
+    public String handleChangePassword(HttpServletRequest request, HttpServletResponse response) {
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
-        
+
         if (!password.equals(confirmPassword)) {
             request.setAttribute("error", "Mật khẩu xác nhận không khớp.");
             return USER_FORM_PAGE;
         }
-        
+
         String hashedPassword = HashUtils.hashPassword(password);
         UserDTO user = UserUtils.getUser(request);
         user.setHashed_password(hashedPassword);
-        
+
         UDAO.update(user);
         request.getSession().invalidate();
         request.setAttribute("actionType", "login");
         return USER_FORM_PAGE;
     }
-    
+
     //some useful methods
-    private boolean isExistedEmail(String email){
+    private boolean isExistedEmail(String email) {
         return !UDAO.retrieve("email_address = ?", email).isEmpty();
     }
 }

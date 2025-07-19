@@ -6,22 +6,109 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import model.dao.ReviewDAO;
+import model.dto.ReviewDTO;
 
 /**
- * Status: Chờ thực hiện
- * Người thực hiện: [...........]
- * Ngày bắt đầu: [...........]
- * viết servlet cho Review Controller
+ * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
+ * [...........] viết servlet cho Review Controller
  */
 @WebServlet(name = "ReviewController", urlPatterns = {"/ReviewController"})
 public class ReviewController extends HttpServlet {
 
+    private ReviewDAO rdao = new ReviewDAO();
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        //TODO
-        
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "";
+        }
+
+        switch (action) {
+            case "listReviewsByProduct":
+                listReviewsByProduct(request, response);
+                break;
+            case "submitReview":
+                submitReview(request, response);
+                break;
+            case "updateReview":
+                updateReview(request, response);
+                break;
+            case "deleteReview":
+                deleteReview(request, response);
+                break;
+            case "viewReview":
+                viewReview(request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private void listReviewsByProduct(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int productId = Integer.parseInt(request.getParameter("orderedProductId"));
+        List<ReviewDTO> reviews = rdao.getByOrderedProductId(productId);
+        request.setAttribute("reviews", reviews);
+        request.getRequestDispatcher("reviews.jsp").forward(request, response);
+    }
+
+    private void submitReview(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int userId = Integer.parseInt(request.getParameter("userId"));
+        int orderedProductId = Integer.parseInt(request.getParameter("orderedProductId"));
+        int rating = Integer.parseInt(request.getParameter("rating"));
+        String comment = request.getParameter("comment");
+
+        ReviewDTO review = new ReviewDTO(0, userId, orderedProductId, rating, comment);
+        boolean success = rdao.create(review);
+
+        if (success) {
+            response.sendRedirect("MainController?action=listReviewsByProduct&orderedProductId=" + orderedProductId);
+        } else {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to submit review.");
+        }
+    }
+
+    private void updateReview(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        int userId = Integer.parseInt(request.getParameter("userId"));
+        int orderedProductId = Integer.parseInt(request.getParameter("orderedProductId"));
+        int rating = Integer.parseInt(request.getParameter("rating"));
+        String comment = request.getParameter("comment");
+
+        ReviewDTO review = new ReviewDTO(id, userId, orderedProductId, rating, comment);
+        boolean success = rdao.update(review);
+
+        if (success) {
+            response.sendRedirect("MainController?action=listReviewsByProduct&orderedProductId=" + orderedProductId);
+        } else {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update review.");
+        }
+    }
+
+    private void deleteReview(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        boolean success = rdao.delete(id);
+
+        if (success) {
+            response.sendRedirect("MainController?action=listReviewsByProduct&orderedProductId=" + request.getParameter("orderedProductId"));
+        } else {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to delete review.");
+        }
+    }
+
+    private void viewReview(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        ReviewDTO review = rdao.findById(id);
+        request.setAttribute("review", review);
+        request.getRequestDispatcher("review_detail.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

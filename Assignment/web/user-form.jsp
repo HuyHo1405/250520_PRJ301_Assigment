@@ -3,115 +3,138 @@
 <%@page import="utils.UserUtils"%>
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>User Form</title>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <title>User Form</title>
+        <link rel="stylesheet" href="assets/css/user-form.css"/>
+    </head>
+    <body>
 
-<%
-    String action = (String) request.getAttribute("actionType");
-    if (action == null) action = "login";
+        <%
+            String action = (String) request.getAttribute("actionType");
+            if (action == null) action = "login";
 
-    String error = (String) request.getAttribute("error");
-    if (error == null) error = "";
+            String error = (String) request.getAttribute("error");
+            if (error == null) error = "";
 
-    UserDTO user = UserUtils.getUser(request);
+            UserDTO user = UserUtils.getUser(request);
 
-    String inputEmail = (String) request.getAttribute("inputEmail");
-    String inputPhone = (String) request.getAttribute("inputPhone");
+            String inputEmail = (String) request.getAttribute("inputEmail");
+            String inputPhone = (String) request.getAttribute("inputPhone");
 
-    if (inputEmail == null) inputEmail = (user != null) ? user.getEmail_address() : "";
-    if (inputPhone == null) inputPhone = (user != null) ? user.getPhone_number() : "";
+            if (inputEmail == null) inputEmail = (user != null) ? user.getEmail_address() : "";
+            if (inputPhone == null) inputPhone = (user != null) ? user.getPhone_number() : "";
 
-    String heading = "";
-    switch (action) {
-        case "login": heading = "Đăng nhập"; break;
-        case "register": heading = "Đăng ký"; break;
-        case "profile": heading = "Cập nhật thông tin"; break;
-        case "forgotPassword": heading = "Quên mật khẩu"; break;
-        case "changePassword": heading = "Đổi mật khẩu"; break;
-    }
-%>
+            String heading = "";
+            switch (action) {
+                case "login": heading = "Đăng nhập"; break;
+                case "register": heading = "Đăng ký"; break;
+                case "profile": heading = "Cập nhật thông tin"; break;
+                case "forgotPassword": heading = "Quên mật khẩu"; break;
+                case "changePassword": heading = "Đổi mật khẩu"; break;
+            }
+        %>
+        <div class="container">
 
-<h1><%= heading %></h1>
+            <div class="left-banner">
+                <img src="assets/images/hashtag-mua-sam-tha-ga-khong-lo-ve-gia.jpg" alt="ShopHub Banner">
+            </div>
 
-<% if (!error.isEmpty()) { %>
-    <p style="color:red;"><%= error %></p>
-<% } %>
+            <div class="form-box">
+                <div class="heading">
+                    <h1><%= heading %></h1>
+                </div>
 
-<% if (action.equals("login")) { %>
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="login"/>
-        Email: <input type="email" name="email" value="<%= inputEmail %>" required><br>
-        Password: <input type="password" name="password" required><br>
-        <button type="submit">Đăng nhập</button>
-    </form><br>
+                <% if (!error.isEmpty()) { %>
+                <div class="error">
+                    <p style="color:red;"><%= error %></p>
+                </div>          
+                <% } %>
 
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toRegister"/>
-        <button type="submit">Đăng ký</button>
-    </form>
+                <% if (action.equals("login")) { %>
+                <div class="login">
+                    <form action="MainController" method="post">
+                        <input type="hidden" name="action" value="login"/>
+                        Email: <input type="email" name="email" value="<%= inputEmail %>" required><br>
+                        Password: <input type="password" name="password" required><br>
+                        <button type="submit">Đăng nhập</button>
+                    </form><br>
 
-    <form action="AdminUserController" method="post">
-        <input type="hidden" name="action" value="forgotPassword"/>
-        <button type="submit">Quên mật khẩu</button>
-    </form>
+                    <form action="MainController" method="post">
+                        <input type="hidden" name="action" value="toRegister"/>
+                        <button type="submit">Đăng ký</button>
+                    </form>
 
-<% } else if (action.equals("register")) { %>
-    <form action="UserController" method="post">
-        <input type="hidden" name="action" value="register"/>
-        Email: <input type="email" name="email" value="<%= inputEmail %>" required><br>
-        Phone: <input type="text" name="phone" value="<%= inputPhone %>" required><br>
-        Password: <input type="password" name="password" required><br>
-        Confirm Password: <input type="password" name="confirmPassword" required><br>
-        <button type="submit">Đăng ký</button>
-    </form><br>
+                    <form action="AdminUserController" method="post">
+                        <input type="hidden" name="action" value="forgotPassword"/>
+                        <button type="submit">Quên mật khẩu</button>
+                    </form>
+                </div>
 
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toLogin"/>
-        <button type="submit">Đăng nhập</button>
-    </form>
+                <% } else if (action.equals("register")) { %>
+                <div class="register">
+                    <form action="UserController" method="post">
+                        <input type="hidden" name="action" value="register"/>
+                        Email: <input type="email" name="email" value="<%= inputEmail %>" required><br>
+                        Phone: <input type="text" name="phone" value="<%= inputPhone %>" required><br>
+                        Password: <input type="password" name="password" required><br>
+                        Confirm Password: <input type="password" name="confirmPassword" required><br>
+                        <button type="submit">Đăng ký</button>
+                    </form><br>
 
-<% } else if (action.equals("profile")) { %>
-    <form action="UserController" method="post">
-        <input type="hidden" name="action" value="update"/>
-        Email: <input type="email" name="email" value="<%= inputEmail %>" required><br>
-        Phone: <input type="text" name="phone" value="<%= inputPhone %>" required><br>
-        <button type="submit">Cập nhật</button>
-    </form><br>
+                    <form action="MainController" method="post">
+                        <input type="hidden" name="action" value="toLogin"/>
+                        <button type="submit">Đăng nhập</button>
+                    </form>
+                </div>
 
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toLogin"/>
-        <button type="submit">Đăng nhập</button>
-    </form>
+                <% } else if (action.equals("profile")) { %>
+                <div class="profile">
+                    <form action="UserController" method="post">
+                        <input type="hidden" name="action" value="update"/>
+                        Email: <input type="email" name="email" value="<%= inputEmail %>" required><br>
+                        Phone: <input type="text" name="phone" value="<%= inputPhone %>" required><br>
+                        <button type="submit">Cập nhật</button>
+                    </form><br>
 
-<% } else if (action.equals("forgotPassword")) { %>
-    <form action="AdminUserController" method="post">
-        <input type="hidden" name="action" value="forgotPassword"/>
-        Email: <input type="email" name="email" required><br>
-        <button type="submit">Gửi yêu cầu khôi phục</button>
-    </form><br>
+                    <form action="MainController" method="post">
+                        <input type="hidden" name="action" value="toLogin"/>
+                        <button type="submit">Đăng nhập</button>
+                    </form>  
+                </div>
 
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toLogin"/>
-        <button type="submit">Đăng nhập</button>
-    </form>
+                <% } else if (action.equals("forgotPassword")) { %>
+                <div class="forgot">
+                    <form action="AdminUserController" method="post">
+                        <input type="hidden" name="action" value="forgotPassword"/>
+                        Email: <input type="email" name="email" required><br>
+                        <button type="submit">Gửi yêu cầu khôi phục</button>
+                    </form><br>
 
-<% } else if (action.equals("changePassword")) { %>
-    <form action="AdminUserController" method="post">
-        <input type="hidden" name="action" value="changePassword"/>
-        Old Password: <input type="password" name="oldPassword" required><br>
-        New Password: <input type="password" name="newPassword" required><br>
-        Confirm New Password: <input type="password" name="confirmNewPassword" required><br>
-        <button type="submit">Đổi mật khẩu</button>
-    </form><br>
+                    <form action="MainController" method="post">
+                        <input type="hidden" name="action" value="toLogin"/>
+                        <button type="submit">Đăng nhập</button>
+                    </form>
+                </div>
 
-    <form action="MainController" method="post">
-        <input type="hidden" name="action" value="toLogin"/>
-        <button type="submit">Đăng nhập</button>
-    </form>
-<% } %>
 
-</body>
+                <% } else if (action.equals("changePassword")) { %>
+                <div class="change">
+                    <form action="AdminUserController" method="post">
+                        <input type="hidden" name="action" value="changePassword"/>
+                        Old Password: <input type="password" name="oldPassword" required><br>
+                        New Password: <input type="password" name="newPassword" required><br>
+                        Confirm New Password: <input type="password" name="confirmNewPassword" required><br>
+                        <button type="submit">Đổi mật khẩu</button>
+                    </form><br>
+
+                    <form action="MainController" method="post">
+                        <input type="hidden" name="action" value="toLogin"/>
+                        <button type="submit">Đăng nhập</button>
+                    </form>
+                </div>    
+                <% } %>
+            </div>
+        </div>
+    </body>
 </html>

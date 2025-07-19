@@ -24,26 +24,34 @@ import java.util.List;
  */
 @WebFilter(filterName = "AuthFilter", urlPatterns = {"/*"})
 public class AuthenticationFilter implements Filter {
-    
+
     public AuthenticationFilter() {
-    }    
-    
+    }
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {
-        
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+        String uri = req.getRequestURI();
 
+        // Bỏ quả các file tĩnh trong assets
+        if (uri.contains("/assets/")) {
+            chain.doFilter(request, response);
+            return;
+        }
         String action = req.getParameter("action");
-        if (action == null) action = "";
+        if (action == null) {
+            action = "";
+        }
 
         List<String> ignoreActions = Arrays.asList(
-            "toLogin", "login",
-            "toRegister", "register",
-            "toForgotPassword", "forgotPassword",
-            "toResetPassword", "resetPassword"
+                "toLogin", "login",
+                "toRegister", "register",
+                "toForgotPassword", "forgotPassword",
+                "toResetPassword", "resetPassword"
         );
 
         // Bỏ qua kiểm tra đăng nhập cho các action cho phép
@@ -59,11 +67,11 @@ public class AuthenticationFilter implements Filter {
     }
 
     @Override
-    public void destroy() {        
+    public void destroy() {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) {        
+    public void init(FilterConfig filterConfig) {
     }
-    
+
 }
