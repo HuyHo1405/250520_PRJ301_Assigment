@@ -53,7 +53,7 @@ public class AddressController extends HttpServlet {
                     break;
                 case "toEditAddress":
                     request.setAttribute("countries", CDAO.retrieve("1 = 1"));
-                    request.setAttribute("actionType", "editAddress");
+                    request.setAttribute("actionType", "updateAddress");
                     url = ADDRESS_FORM_PAGE;
                     break;
                 case "toAddressManagement":
@@ -145,7 +145,10 @@ public class AddressController extends HttpServlet {
         String keyword = request.getParameter("strKeyword");
         int userId = UserUtils.getUserId(request);
         
-        request.setAttribute("defaultAddressId", getDefaultAddress(userId).getId());
+        if(getDefaultAddress(userId) != null){
+            request.setAttribute("defaultAddressId", getDefaultAddress(userId).getId());
+        }
+        
         request.setAttribute("addressList", getUserAddress("full_address LIKE ?", userId, "%" + keyword + "%"));
         return ADDRESS_MANAGEMENT_PAGE;
     }
@@ -167,26 +170,32 @@ public class AddressController extends HttpServlet {
 
     private String handleUpdateDefaultAddress(HttpServletRequest request, HttpServletResponse response) {
         int addressId = toInt(request.getParameter("addressId"));
+
         if (ValidationUtils.isInvalidId(addressId)) {
-            request.setAttribute("error", "Không tìm thấy địa chỉ");
+            request.setAttribute("errorMsg", "Không tìm thấy địa chỉ");
             return ADDRESS_MANAGEMENT_PAGE;
         }
 
         int userId = UserUtils.getUserId(request);
+
         AddressDTO currentDefault = getDefaultAddress(userId);
         if (currentDefault != null) {
             UADAO.update(new UserAddressDTO(userId, currentDefault.getId(), false));
+        } else {
         }
 
         UADAO.update(new UserAddressDTO(userId, addressId, true));
+
         prepareAddressManagementView(request, userId);
+
         return ADDRESS_MANAGEMENT_PAGE;
     }
+
 
     private String handleDeleteAddress(HttpServletRequest request, HttpServletResponse response) {
         int addressId = toInt(request.getParameter("addressId"));
         if (ValidationUtils.isInvalidId(addressId)) {
-            request.setAttribute("error", "Không tìm thấy địa chỉ");
+            request.setAttribute("errorMsg", "Không tìm thấy địa chỉ");
             return ADDRESS_MANAGEMENT_PAGE;
         }
 

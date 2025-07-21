@@ -24,6 +24,7 @@ public class MainController extends HttpServlet {
             "toAddAddress",
             "toEditAddress",
             "addAddress",
+            "searchAddress",
             "updateAddress",
             "updateDefaultAddress",
             "removeAddress"

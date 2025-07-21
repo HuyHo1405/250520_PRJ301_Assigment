@@ -23,7 +23,8 @@ public class AddressDAO {
                 rs.getString("address_line1"),
                 rs.getString("address_line2"),
                 rs.getString("city"),
-                rs.getString("region")
+                rs.getString("region"),
+                rs.getString("full_address")
         );
     }
 
@@ -49,7 +50,7 @@ public class AddressDAO {
     }
 
     public boolean create(AddressDTO address) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (country_id, unit_number, street_number, address_line1, address_line2, city, region) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME + " (country_id, unit_number, street_number, address_line1, address_line2, city, region, full_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, address.getCountryId());
             ps.setString(2, address.getUnitNumber());
@@ -58,6 +59,7 @@ public class AddressDAO {
             ps.setString(5, address.getAddressLine2());
             ps.setString(6, address.getCity());
             ps.setString(7, address.getRegion());
+            ps.setString(8, address.getFullAddress());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -68,7 +70,7 @@ public class AddressDAO {
     }
 
     public Integer createAndReturnId(AddressDTO address) {
-        String sql = "INSERT INTO " + TABLE_NAME + " (country_id, unit_number, street_number, address_line1, address_line2, city, region) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME + " (country_id, unit_number, street_number, address_line1, address_line2, city, region, full_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, address.getCountryId());
@@ -78,6 +80,7 @@ public class AddressDAO {
             ps.setString(5, address.getAddressLine2());
             ps.setString(6, address.getCity());
             ps.setString(7, address.getRegion());
+            ps.setString(8, address.getFullAddress());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows == 0) {

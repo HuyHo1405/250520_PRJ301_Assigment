@@ -18,7 +18,15 @@ public class AddressDTO {
     }
 
     public AddressDTO(int countryId, String unitNumber, String streetNumber, String addressLine1, String addressLine2, String city, String region) {
-        this(-1, countryId, unitNumber, streetNumber, addressLine1, addressLine2, city, region);
+        this.id = -1;
+        this.countryId = countryId;
+        this.unitNumber = unitNumber;
+        this.streetNumber = streetNumber;
+        this.addressLine1 = addressLine1;
+        this.addressLine2 = addressLine2;
+        this.city = city;
+        this.region = region;
+        this.fullAddress = generateFullAddress();
     }
 
     public AddressDTO(int id, int countryId, String unitNumber, String streetNumber, String addressLine1, String addressLine2, String city, String region) {
@@ -31,6 +39,17 @@ public class AddressDTO {
         this.city = city;
         this.region = region;
         this.fullAddress = generateFullAddress();
+    }
+    public AddressDTO(int id, int countryId, String unitNumber, String streetNumber, String addressLine1, String addressLine2, String city, String region, String fullAddress) {
+        this.id = id;
+        this.countryId = countryId;
+        this.unitNumber = unitNumber;
+        this.streetNumber = streetNumber;
+        this.addressLine1 = addressLine1;
+        this.addressLine2 = addressLine2;
+        this.city = city;
+        this.region = region;
+        this.fullAddress = fullAddress;
     }
 
     public int getId() {

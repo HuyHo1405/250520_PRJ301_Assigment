@@ -11,7 +11,7 @@
 <body>
 
 <div class="form-container">
-    <h1>${formTitle != null ? formTitle : 'Address Form'}</h1>
+    <h1>${actionType != null ? 'Address Edit Form' : 'Address Add Form'}</h1>
     <hr>
 
     <c:if test="${not empty error}">
@@ -19,7 +19,7 @@
     </c:if>
 
     <form action="MainController" method="post">
-        <input type="hidden" name="action" value="${action}" />
+        <input type="hidden" name="action" value="${actionType}" />
 
         <c:if test="${not empty param.addressId}">
             <input type="hidden" name="addressId" value="${param.addressId}" />
@@ -56,7 +56,7 @@
 
         <button type="submit">
             <c:choose>
-                <c:when test="${action eq 'updateAddress'}">Update</c:when>
+                <c:when test="${actionType eq 'updateAddress'}">Update</c:when>
                 <c:otherwise>Add New</c:otherwise>
             </c:choose>
         </button>

@@ -58,9 +58,9 @@ public class UserAddressDAO {
     public boolean update(UserAddressDTO userAddress) {
         String sql = "UPDATE " + TABLE_NAME + " SET is_default = ? WHERE user_id = ? AND address_id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userAddress.getUser_id());
-            ps.setInt(2, userAddress.getAddress_id());
-            ps.setBoolean(3, userAddress.isIs_default());
+            ps.setBoolean(1, userAddress.isIs_default());
+            ps.setInt(2, userAddress.getUser_id());
+            ps.setInt(3, userAddress.getAddress_id());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("Error in update(): " + e.getMessage());
@@ -115,5 +115,10 @@ public class UserAddressDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public static void main(String[] args) {
+        UserAddressDAO dao = new UserAddressDAO();
+        System.out.println(dao.create(new UserAddressDTO(12, 11)));
     }
 }

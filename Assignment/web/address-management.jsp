@@ -51,9 +51,17 @@
                         <form action="MainController" method="post">
                             <input type="hidden" name="action" value="toEditAddress"/>
                             <input type="hidden" name="addressId" value="${addr.id}"/>
+                            <input type="hidden" name="countryId" value="${addr.countryId}"/>
+                            <input type="hidden" name="unitNumber" value="${addr.unitNumber}"/>
+                            <input type="hidden" name="streetNumber" value="${addr.streetNumber}"/>
+                            <input type="hidden" name="addressLine1" value="${addr.addressLine1}"/>
+                            <input type="hidden" name="addressLine2" value="${addr.addressLine2}"/>
+                            <input type="hidden" name="city" value="${addr.city}"/>
+                            <input type="hidden" name="region" value="${addr.region}"/>
+                            <input type="hidden" name="fullAddress" value="${addr.fullAddress}"/>
+
                             <button type="submit">Edit</button>
                         </form>
-
                         <c:if test="${addr.id != defaultAddressId}">
                             <form action="MainController" method="post">
                                 <input type="hidden" name="action" value="updateDefaultAddress"/>
