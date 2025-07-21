@@ -8,7 +8,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
-        <link rel="stylesheet" href="assets/css/welcome.css">
+        <link rel="stylesheet" href="assets/css/review.css">
     </head>
     <body>
         <%
@@ -30,98 +30,105 @@
                 </div>
 
                 <div id="main-wrapper">
-                    <button class="toggle-btn" onclick="toggleMenu()">Show Menu</button>
-                    <h2>Danh sách đánh giá sản phẩm</h2>
+                    <button id="toggle-btn" class="toggle-btn" onclick="toggleMenu()">Show Menu</button>
+                    <div class="review-section">
+                        <h2>Đánh giá sản phẩm</h2>
 
-                    <table border="1" cellpadding="5">
-                        <thead>
-                            <tr>
-                                <th>Người đánh giá</th>
-                                <th>Điểm</th>
-                                <th>Bình luận</th>
-                                <th>Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                        <div class="review-list">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Người đánh giá</th>
+                                        <th>Điểm</th>
+                                        <th>Bình luận</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <%
+                                        if (reviews == null || reviews.isEmpty()) {
+                                    %>
+                                    <tr>
+                                        <td colspan="4">Chưa có đánh giá nào cho sản phẩm này.</td>
+                                    </tr>
+                                    <%
+                                        } else {
+                                            for (ReviewDTO r : reviews) {
+                                                UserDTO user = udao.findById(r.getUser_id());
+                                    %>
+                                    <tr>
+                                        <td><%= user != null ? user.getEmail_address() : "Ẩn danh" %></td>
+                                        <td><%= r.getRating_value() %> / 5</td>
+                                        <td><%= r.getComment() %></td>
+                                        <td>
+                                            <% if (userId != null && userId == r.getUser_id()) { %>
+                                            <div class="review-actions">
+                                                <!-- Form chỉnh sửa -->
+                                                <form action="ReviewController" method="post" class="inline-form">
+                                                    <input type="hidden" name="action" value="updateReview" />
+                                                    <input type="hidden" name="id" value="<%= r.getId() %>" />
+                                                    <input type="hidden" name="userId" value="<%= r.getUser_id() %>" />
+                                                    <input type="hidden" name="orderedProductId" value="<%= r.getOrdered_product_id() %>" />
+
+                                                    <input type="number" name="rating" min="1" max="5" value="<%= r.getRating_value() %>" required />
+                                                    <input type="text" name="comment" value="<%= r.getComment() %>" required />
+                                                    <input type="submit" value="Cập nhật" />
+                                                </form>
+
+                                                <!-- Form xóa -->
+                                                <form action="ReviewController" method="post" onsubmit="return confirm('Xác nhận xóa?');" class="inline-form">
+                                                    <input type="hidden" name="action" value="deleteReview" />
+                                                    <input type="hidden" name="id" value="<%= r.getId() %>" />
+                                                    <input type="hidden" name="orderedProductId" value="<%= r.getOrdered_product_id() %>" />
+                                                    <input type="submit" value="Xóa" />
+                                                </form>
+                                            </div>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                    <%
+                                            }
+                                        }
+                                    %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="review-form-section">
+                            <h3>Thêm đánh giá mới</h3>
                             <%
-                                if (reviews == null || reviews.isEmpty()) {
+                                if (userId != null) {
                             %>
-                            <tr>
-                                <td colspan="4">Chưa có đánh giá nào cho sản phẩm này.</td>
-                            </tr>
+                            <form action="ReviewController" method="post" class="review-form">
+                                <input type="hidden" name="action" value="submitReview" />
+                                <input type="hidden" name="userId" value="<%= userId %>" />
+                                <input type="hidden" name="orderedProductId" value="<%= orderedProductId %>" />
+
+                                <label>Điểm (1-5):</label>
+                                <input type="number" name="rating" min="1" max="5" required />
+
+                                <label>Bình luận:</label>
+                                <input type="text" name="comment" required />
+
+                                <input type="submit" value="Gửi đánh giá" />
+                            </form>
                             <%
                                 } else {
-                                    for (ReviewDTO r : reviews) {
-                                        UserDTO user = udao.findById(r.getUser_id());
                             %>
-                            <tr>
-                                <td><%= user != null ? user.getEmail_address() : "Ẩn danh" %></td>
-                                <td><%= r.getRating_value() %> / 5</td>
-                                <td><%= r.getComment() %></td>
-                                <td>
-                                    <!-- View -->
-                                    <form action="ReviewController" method="get" style="display:inline;">
-                                        <input type="hidden" name="action" value="viewReview" />
-                                        <input type="hidden" name="id" value="<%= r.getId() %>" />
-                                        <input type="submit" value="Xem" />
-                                    </form>
-
-                                    <!-- Edit -->
-                                    <% if (userId != null && userId == r.getUser_id()) { %>
-                                    <form action="ReviewController" method="post" style="display:inline;">
-                                        <input type="hidden" name="action" value="updateReview" />
-                                        <input type="hidden" name="id" value="<%= r.getId() %>" />
-                                        <input type="hidden" name="userId" value="<%= r.getUser_id() %>" />
-                                        <input type="hidden" name="orderedProductId" value="<%= r.getOrdered_product_id() %>" />
-                                        Điểm: <input type="number" name="rating" min="1" max="5" value="<%= r.getRating_value() %>" required />
-                                        Bình luận: <input type="text" name="comment" value="<%= r.getComment() %>" required />
-                                        <input type="submit" value="Cập nhật" />
-                                    </form>
-
-                                    <!-- Delete -->
-                                    <form action="ReviewController" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận xóa?');">
-                                        <input type="hidden" name="action" value="deleteReview" />
-                                        <input type="hidden" name="id" value="<%= r.getId() %>" />
-                                        <input type="hidden" name="orderedProductId" value="<%= r.getOrdered_product_id() %>" />
-                                        <input type="submit" value="Xóa" />
-                                    </form>
-                                    <% } %>
-                                </td>
-                            </tr>
+                            <p><a href="login.jsp">Đăng nhập</a> để gửi đánh giá.</p>
                             <%
-                                    }
                                 }
                             %>
-                        </tbody>
-                    </table>
+                        </div>
 
-                    <hr/>
-
-                    <h3>Thêm đánh giá mới</h3>
-                    <%
-                        if (userId != null) {
-                    %>
-                    <form action="ReviewController" method="post">
-                        <input type="hidden" name="action" value="submitReview" />
-                        <input type="hidden" name="userId" value="<%= userId %>" />
-                        <input type="hidden" name="orderedProductId" value="<%= orderedProductId %>" />
-                        <label>Điểm (1-5):</label>
-                        <input type="number" name="rating" min="1" max="5" required /><br/>
-                        <label>Bình luận:</label>
-                        <input type="text" name="comment" required /><br/>
-                        <input type="submit" value="Gửi đánh giá" />
-                    </form>
-                    <%
-                        } else {
-                    %>
-                    <p><a href="login.jsp">Đăng nhập</a> để gửi đánh giá.</p>
-                    <%
-                        }
-                    %>
+                        <div class="back-link">
+                            <a href="welcome.jsp">Back</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <script src="assets/js/welcome.js"></script>
+        <script src="assets/js/menu.js"></script>
     </body>
 </html>
