@@ -64,7 +64,7 @@ public class UserController extends HttpServlet {
                 case "resetPassword":
                     url = handleResetPassword(request, response);
                     break;
-                case "update":
+                case "updateProfile":
                     url = handleUpdate(request, response);
                     break;
                 default:

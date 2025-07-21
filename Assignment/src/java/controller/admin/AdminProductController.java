@@ -303,12 +303,12 @@ public class AdminProductController extends HttpServlet {
     }
 
     private void prepareProductForm(HttpServletRequest request, ProductDTO product, String action) {
-        request.setAttribute("categoryMap", ProductUtils.getCategoryMap(CDAO.retrieve("1=1")));
+        request.setAttribute("categoryMap", ProductUtils.getCategoryMap(CDAO.retrieve("is_active = 1")));
         request.setAttribute("actionType", "createProduct");
         if ("viewProductDetail".equals(action) || "toEditProduct".equals(action)) {
                 request.setAttribute("actionType", action.equals("toEditProduct")? "updateProduct": "viewProductDetail");
                 request.setAttribute("product", product);
-                request.setAttribute("variation", VDAO.retrieve("product_id = ?", product.getId()));
+                request.setAttribute("variation", VDAO.retrieve("product_id = ? and is_deleted = 0", product.getId()));
                 request.setAttribute("variationOption", VODAO.getOptionsByProductId(product.getId()));
         }
     }

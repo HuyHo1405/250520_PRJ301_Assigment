@@ -6,111 +6,111 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <link rel="stylesheet" href="assets/css/system-config.css"/>
         <title>System Configuration Management</title>
     </head>
     <body>
-        <h1>System Configuration Management - Version ${appVersion}</h1>
+            <h1>System Configuration Management - Version ${appVersion}</h1>
 
-        <hr>
-        
-        <form action="MainController" method="POST" style="display: inline">
-            <button name="action" value="toAdminUserPage">User Management</button>
-            <button name="action" value="toAdminProductPage">Product Management</button>
-            <button name="action" value="toAdminOrdersPage">Order Management</button>
-        </form>
-        
-         <h2 id="orderStatusHeader">Order Status</h2>
-        <jsp:include page="config-table.jsp">
-            <jsp:param name="listName" value="orderStatusList" />
-            <jsp:param name="type" value="orderStatus" />
-            <jsp:param name="editType" value="${editType}" />
-            <jsp:param name="fieldName" value="status" />
-        </jsp:include>
+            <hr>
+            <div class="config-section">
+            <h2 id="orderStatusHeader">Order Status</h2>
+            <jsp:include page="config-table.jsp">
+                <jsp:param name="listName" value="orderStatusList" />
+                <jsp:param name="type" value="orderStatus" />
+                <jsp:param name="editType" value="${editType}" />
+                <jsp:param name="fieldName" value="status" />
+            </jsp:include>
+            </div>
+            <div class="config-section">
+            <h2 id="paymentTypeHeader">Payment Types</h2>
+            <jsp:include page="config-table.jsp">
+                <jsp:param name="listName" value="paymentTypeList" />
+                <jsp:param name="type" value="paymentType" />
+                <jsp:param name="editType" value="${editType}" />
+                <jsp:param name="fieldName" value="value" />
+            </jsp:include>
+            </div>
+            <div class="config-section">
+            <h2 id="shippingMethodHeader">Shipping Methods</h2>
+            <jsp:include page="config-table.jsp">
+                <jsp:param name="listName" value="shippingMethodList" />
+                <jsp:param name="type" value="shippingMethod" />
+                <jsp:param name="editType" value="${editType}" />
+                <jsp:param name="fieldName" value="name" />
+            </jsp:include>
+            </div>
+            <div class="config-section">
+            <h2 id="countryHeader">Countries</h2>
+            <jsp:include page="config-table.jsp">
+                <jsp:param name="listName" value="countryList" />
+                <jsp:param name="type" value="country" />
+                <jsp:param name="editType" value="${editType}" />
+                <jsp:param name="fieldName" value="country_name" />
+            </jsp:include>
+           </div>
+           
+            <div class="config-section">
+            <h2 id="categoryHeader">Categories</h2>
+            <jsp:include page="config-table.jsp">
+                <jsp:param name="listName" value="categoryList" />
+                <jsp:param name="type" value="category" />
+                <jsp:param name="editType" value="${editType}" />
+                <jsp:param name="fieldName" value="name" />
+            </jsp:include>
+            </div>
+            <hr>
 
-        <h2 id="paymentTypeHeader">Payment Types</h2>
-        <jsp:include page="config-table.jsp">
-            <jsp:param name="listName" value="paymentTypeList" />
-            <jsp:param name="type" value="paymentType" />
-            <jsp:param name="editType" value="${editType}" />
-            <jsp:param name="fieldName" value="value" />
-        </jsp:include>
+            <form action="MainController" method="POST" style="display: inline">
+                <button name="action" value="toWelcome">Back to Home</button>
+            </form>
 
-        <h2 id="shippingMethodHeader">Shipping Methods</h2>
-        <jsp:include page="config-table.jsp">
-            <jsp:param name="listName" value="shippingMethodList" />
-            <jsp:param name="type" value="shippingMethod" />
-            <jsp:param name="editType" value="${editType}" />
-            <jsp:param name="fieldName" value="name" />
-        </jsp:include>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                // Get the 'editType' and 'addModeType' parameters passed from the server.
+                const editType = "${editType}";
+                const addModeType = "${addModeType}";
 
-        <h2 id="countryHeader">Countries</h2>
-        <jsp:include page="config-table.jsp">
-            <jsp:param name="listName" value="countryList" />
-            <jsp:param name="type" value="country" />
-            <jsp:param name="editType" value="${editType}" />
-            <jsp:param name="fieldName" value="country_name" />
-        </jsp:include>
-        
-        <h2 id="categoryHeader">Categories</h2>
-        <jsp:include page="config-table.jsp">
-            <jsp:param name="listName" value="categoryList" />
-            <jsp:param name="type" value="category" />
-            <jsp:param name="editType" value="${editType}" />
-            <jsp:param name="fieldName" value="name" />
-        </jsp:include>
-
-        <hr>
-        
-        <form action="MainController" method="POST" style="display: inline">
-            <button name="action" value="toWelcome">Back to Home</button>
-        </form>
-        
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-            // Get the 'editType' and 'addModeType' parameters passed from the server.
-            const editType = "${editType}";
-            const addModeType = "${addModeType}";
-
-            // Determine the target section based on which parameter is set.
-            // 'editType' takes precedence, then 'addModeType'.
-            let targetType = editType;
-            if (!targetType) { // If editType is empty, check addModeType
-                targetType = addModeType;
-            }
-
-            // If a target type is present, set the window hash to jump to the corresponding header.
-            // This will make the page load directly at that section.
-            if (targetType) {
-                window.location.hash = targetType + 'Header';
-            }
-
-            // --- Original JavaScript logic (kept for completeness) ---
-            function addAnchorToFormAction(form, currentTableType) {
-                if (!form.action.includes('#')) {
-                    form.action += '#' + currentTableType + 'Header';
+                // Determine the target section based on which parameter is set.
+                // 'editType' takes precedence, then 'addModeType'.
+                let targetType = editType;
+                if (!targetType) { // If editType is empty, check addModeType
+                    targetType = addModeType;
                 }
-            }
 
-            const allForms = document.querySelectorAll('form');
-            allForms.forEach(form => {
-                const hiddenTypeInput = form.querySelector('input[name="type"]');
-                if (hiddenTypeInput) {
-                    const currentTableType = hiddenTypeInput.value;
-                    form.addEventListener('submit', function() {
-                        addAnchorToFormAction(this, currentTableType);
-                    });
+                // If a target type is present, set the window hash to jump to the corresponding header.
+                // This will make the page load directly at that section.
+                if (targetType) {
+                    window.location.hash = targetType + 'Header';
                 }
-            });
 
-            const cancelLinks = document.querySelectorAll('a[href*="action=toSystemConfigManagement"]');
-            cancelLinks.forEach(link => {
-                const url = new URL(link.href);
-                const type = url.searchParams.get('type');
-                if (type && !url.hash) {
-                    link.href = url.origin + url.pathname + url.search + '#' + type + 'Header';
+                // --- Original JavaScript logic (kept for completeness) ---
+                function addAnchorToFormAction(form, currentTableType) {
+                    if (!form.action.includes('#')) {
+                        form.action += '#' + currentTableType + 'Header';
+                    }
                 }
-            });
-        });
-        </script>
+
+                const allForms = document.querySelectorAll('form');
+                allForms.forEach(form => {
+                    const hiddenTypeInput = form.querySelector('input[name="type"]');
+                    if (hiddenTypeInput) {
+                        const currentTableType = hiddenTypeInput.value;
+                        form.addEventListener('submit', function() {
+                            addAnchorToFormAction(this, currentTableType);
+                        });
+                    }
+                });
+
+                const cancelLinks = document.querySelectorAll('a[href*="action=toSystemConfigManagement"]');
+                cancelLinks.forEach(link => {
+                    const url = new URL(link.href);
+                    const type = url.searchParams.get('type');
+                    if (type && !url.hash) {
+                        link.href = url.origin + url.pathname + url.search + '#' + type + 'Header';
+                    }
+                });
+                });
+            </script>
     </body>
 </html>

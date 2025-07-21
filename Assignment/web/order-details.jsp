@@ -14,7 +14,7 @@
 
 <h2>Order Information</h2>
 <c:choose>
-    <c:when test="${isAdmin}">
+    <c:when test="${sessionScope.user.role eq 'admin'}">
         <form action="MainController" method="post">
             <input type="hidden" name="action" value="updateOrderStatus"/>
             <input type="hidden" name="orderId" value="${order.id}"/>
@@ -57,13 +57,13 @@
 </c:choose>
 
 <h2>Shipping Address</h2>
-<p>${shippingAddress.fullAddress}</p>
+<p>${defaultAdress.fullAddress}</p>
 
-<c:if test="${isAdmin}">
+<c:if test="${sessionScope.user.role eq 'admin'}">
     <h2>Payment Information</h2>
     <ul>
-        <li><strong>Payment Method:</strong> ${paymentMethod.name}</li>
-        <li><strong>Payment Type:</strong> ${paymentType.value}</li>
+        <li><strong>Provider:</strong> ${paymentType.value}</li>
+        <li><strong>Payment Method:</strong> ${paymentMethod.provider}</li>
     </ul>
 
     <h2>Shipping Method</h2>
@@ -79,32 +79,32 @@
 <h2>Order Items</h2>
 <table border="1" cellpadding="5" cellspacing="0">
     <tr>
-        <th>Product Name</th>
+        <th>ID</th>
         <th>Unit Price</th>
         <th>Quantity</th>
         <th>Total</th>
     </tr>
     <c:set var="grandTotal" value="0" />
-    <c:forEach var="line" items="${orderLines}">
+    <c:forEach var="line" items="${orderItemList}">
         <c:set var="product" value="${productsMap[line.item_id]}" />
         <c:set var="lineTotal" value="${line.price * line.quantity}" />
         <tr>
-            <td>${product != null ? product.name : 'Unknown Product'}</td>
-            <td>$${fn:formatNumber(line.price, '##0.00')}</td>
+            <td>${line.id}</td>
+            <td>${line.item_id}</td>
             <td>${line.quantity}</td>
-            <td>$${fn:formatNumber(lineTotal, '##0.00')}</td>
+            <td>${line.price}</td>
         </tr>
         <c:set var="grandTotal" value="${grandTotal + lineTotal}" />
     </c:forEach>
     <tr>
         <td colspan="3" style="text-align:right"><strong>Grand Total:</strong></td>
-        <td>$${fn:formatNumber(grandTotal, '##0.00')}</td>
+        <td>${grandTotal}</td>
     </tr>
 </table>
 
 <hr>
-<form action="${isAdmin ? 'MainController' : 'OrderController'}" method="post">
-    <input type="hidden" name="action" value="${isAdmin ? 'toAdminOrdersPage' : 'listMyOrders'}"/>
+<form action="MainController" method="post">
+    <input type="hidden" name="action" value="${sessionScope.user.role eq 'admin' ? 'toAdminOrdersPage' : 'listMyOrders'}"/>
     <input type="submit" value="Back to Order List"/>
 </form>
 

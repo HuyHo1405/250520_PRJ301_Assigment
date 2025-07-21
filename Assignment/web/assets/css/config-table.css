@@ -1,0 +1,147 @@
+/* Các kiểu tùy chỉnh để dễ đọc và đẹp mắt hơn */
+            body {
+                font-family: "Inter", sans-serif;
+                background-color: #f3f4f6; /* Nền màu xám nhạt */
+                min-height: 100vh;
+                padding: 2rem;
+                box-sizing: border-box;
+            }
+            .container {
+                background-color: #ffffff; /* Nền trắng cho vùng chứa bảng */
+                padding: 2rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Bóng mờ */
+                /* max-width: 960px; /* Chiều rộng tối đa cho màn hình lớn hơn - Đã bỏ */ 
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 1.5rem; /* Khoảng trống bên dưới bảng */
+            }
+            th, td {
+                padding: 1rem;
+                text-align: left;
+                border-bottom: 1px solid #e5e7eb; /* Đường viền xám nhạt cho các hàng */
+            }
+            th {
+                background-color: #f9fafb; /* Nền tiêu đề hơi tối hơn */
+                font-weight: 600; /* Chữ tiêu đề đậm vừa */
+                color: #374151; /* Màu chữ tối hơn */
+                text-transform: uppercase;
+                font-size: 0.875rem; /* Cỡ chữ nhỏ hơn cho tiêu đề */
+            }
+            tr:last-child td {
+                border-bottom: none; /* Không có đường viền cho hàng cuối cùng */
+            }
+            input[type="text"],
+            input[type="number"],
+            select {
+                width: 100%;
+                padding: 0.75rem;
+                border: 1px solid #d1d5db; /* Đường viền xám nhạt */
+                outline: none;
+                transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            }
+            input[type="text"]:focus,
+            input[type="number"]:focus,
+            select:focus {
+                border-color: #3b82f6; /* Đường viền màu xanh khi focus */
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* Bóng màu xanh nhạt khi focus */
+            }
+            button {
+                padding: 0.75rem 1.25rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                margin-right: 0.5rem; /* Khoảng trống giữa các nút */
+                white-space: nowrap; /* Ngăn không cho văn bản nút bị xuống dòng */
+            }
+            button[type="submit"] {
+                background-color: #2563eb; /* Màu xanh cho nút gửi/lưu */
+                color: #ffffff;
+                border: none;
+            }
+            button[type="submit"]:hover {
+                background-color: #1d4ed8; /* Màu xanh đậm hơn khi di chuột */
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            button[name="action"][value="toSystemConfigManagement"] {
+                background-color: #6b7280; /* Màu xám cho nút hủy */
+                color: #ffffff;
+                border: none;
+            }
+            button[name="action"][value="toSystemConfigManagement"]:hover {
+                background-color: #4b5563; /* Màu xám đậm hơn khi di chuột */
+            }
+            button[name="editId"] {
+                background-color: #000000; /* Màu đen cho nút chỉnh sửa */
+                color: #ffffff;
+                border: none;
+            }
+            button[name="editId"]:hover {
+                background-color: #333333; /* Màu đen đậm hơn khi di chuột */
+            }
+            button[name="action"][value="toggleIsActiveSystemConfig"] {
+                background-color: #ef4444; /* Màu đỏ cho nút hủy kích hoạt */
+                color: #ffffff;
+                border: none;
+            }
+            button[name="action"][value="toggleIsActiveSystemConfig"]:hover {
+                background-color: #dc2626; /* Màu đỏ đậm hơn khi di chuột */
+            }
+            /* Kiểu cho nút "Thêm Mới" bên ngoài bảng */
+            .add-new-button-container {
+                display: flex;
+                justify-content: flex-start; /* Căn chỉnh sang trái */
+                margin-top: 1.5rem;
+            }
+            .add-new-button-container button {
+                background-color: #10b981; /* Màu xanh lá cây cho nút thêm mới */
+                color: #ffffff;
+                border: none;
+            }
+            .add-new-button-container button:hover {
+                background-color: #059669; /* Màu xanh lá cây đậm hơn khi di chuột */
+            }
+            
+/*            .btn-red-full {
+                background-color: #ff4d4f;
+                color: white;
+            }
+
+            .btn-red-full:hover {
+                background-color: #ff4d4f;
+            }
+
+            .btn-red-outline {
+                background-color: white;
+                border: 1px solid #ff4d4f;
+                color: #ff4d4f;
+            }
+
+            .btn-red-outline:hover {
+                background-color: #ffeaea;
+            }*/
+
+            /* Điều chỉnh responsive */
+            @media (max-width: 768px) {
+                .container {
+                    padding: 1rem;
+                }
+                th, td {
+                    padding: 0.75rem;
+                    font-size: 0.875rem;
+                }
+                button {
+                    padding: 0.6rem 1rem;
+                    font-size: 0.875rem;
+                    margin-right: 0.25rem;
+                }
+                /* Xếp chồng các nút trên màn hình nhỏ hơn nếu cần, hoặc điều chỉnh khoảng cách */
+                td form {
+                    display: block; /* Đặt các form thành khối để xếp chồng nút */
+                    margin-bottom: 0.5rem; /* Thêm khoảng trống giữa các nút xếp chồng */
+                }
+                td form:last-child {
+                    margin-bottom: 0;
+                }
+            }

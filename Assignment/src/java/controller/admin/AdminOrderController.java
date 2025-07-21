@@ -190,8 +190,8 @@ public class AdminOrderController extends HttpServlet {
         request.setAttribute("shippingMethod", shippingMethod);
         request.setAttribute("defaultAdress", address);
         request.setAttribute("user", user);
-        request.setAttribute("OrderItemList", orderItems);
-        request.setAttribute("OrderStatusList", OSDAO.retrieve("1=1"));
+        request.setAttribute("orderItemList", orderItems);
+        request.setAttribute("orderStatusList", OSDAO.retrieve("1=1"));
         
         System.out.println("All data loaded successfully. Forwarding to ORDER_DETAILS.");
         return ORDER_DETAILS;

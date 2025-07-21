@@ -32,7 +32,7 @@
                         <label for="phone">Phone:</label>
                         <input type="text" id="phone" name="phone" value="${sessionScope.user.phone_number}" required><br>
                         
-                        <button name="action" value="Update Profile">Update</button>
+                        <button name="action" value="updateProfile">Update</button>
                     </form>
                 </div>
 
@@ -77,6 +77,9 @@
                     <h2>Admin Action</h2>
                     <form action="MainController" method="post">
                         <button name="action" value="toSystemConfigManagement">System Configuration Management</button>
+                        <button name="action" value="toAdminUserPage">Admin User Management</button>
+                        <button name="action" value="toAdminProductPage">Admin Product Management</button>
+                        <button name="action" value="toAdminOrderPage">Admin Order Management</button>
                     </form>
             </c:if>
                 </div>

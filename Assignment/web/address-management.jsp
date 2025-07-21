@@ -79,10 +79,10 @@
                 </tr>
             </c:forEach>
         </tbody>
+    
     </table>
 
     <hr>
-
     <div class="back-button-container">
         <form action="MainController" method="post">
             <input type="hidden" name="action" value="toWelcome"/>
