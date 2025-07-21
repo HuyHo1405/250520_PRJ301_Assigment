@@ -9,10 +9,6 @@ import java.util.List;
 import model.dto.CountryDTO;
 import utils.DbUtils;
 
-/**
- * Status: đã hoàn thành Người thực hiện: Thịnh Ngày bắt đầu: 09/06/2025 viết
- * crud cho class này
- */
 public class CountryDAO {
 
     private static final String TABLE_NAME = "country";
@@ -49,8 +45,8 @@ public class CountryDAO {
 
         return null;
     }
-    
-    public List<CountryDTO> getAllCountries(){
+
+    public List<CountryDTO> getAllCountries() {
         return retrieve("1 = 1");
     }
 
@@ -92,10 +88,9 @@ public class CountryDAO {
         return false;
     }
 
-    
     public boolean toggleIsActive(int id, boolean currStatus) {
         String sql = "UPDATE " + TABLE_NAME + " SET is_active = ? WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setBoolean(1, !currStatus);
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;

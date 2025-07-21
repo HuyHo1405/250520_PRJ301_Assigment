@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import java.io.IOException;
@@ -24,20 +20,14 @@ import utils.DbUtils;
 import utils.UserUtils;
 import utils.ValidationUtils;
 
-/**
- *
- * @author ho huy
- */
 @WebServlet(name = "AddressController", urlPatterns = {"/AddressController"})
 public class AddressController extends HttpServlet {
 
-    //static fields
     private static final String WELCOME_PAGE = "welcome.jsp";
     private static final String PROFILE_PAGE = "profile.jsp";
     private static final String ADDRESS_FORM_PAGE = "address-form.jsp";
     private static final String ADDRESS_MANAGEMENT_PAGE = "address-management.jsp";
     private static final String ERROR_PAGE = "error.jsp";
-    
     private final CountryDAO CDAO = new CountryDAO();
     private final AddressDAO ADAO = new AddressDAO();
     private final UserAddressDAO UADAO = new UserAddressDAO();
@@ -96,7 +86,6 @@ public class AddressController extends HttpServlet {
         }
     }
 
-    //doGet & doPost
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -136,7 +125,6 @@ public class AddressController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    //handle methods
     private String handleAddAddress(HttpServletRequest request, HttpServletResponse response) {
         AddressDTO address = extractAddressFromRequest(request, -1);
         String error = validateAddressFields(address);
@@ -208,7 +196,6 @@ public class AddressController extends HttpServlet {
         return ADDRESS_MANAGEMENT_PAGE;
     }
 
-    //
     private AddressDTO getDefaultAddress(int userId) {
         String sql = "SELECT a.* FROM address a " +
                      "JOIN user_address ua ON a.id = ua.address_id " +

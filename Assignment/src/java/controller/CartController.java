@@ -29,7 +29,7 @@ public class CartController extends HttpServlet {
     private final ShoppingOrderDAO SODAO = new ShoppingOrderDAO();
     private final OrderLineDAO OLDAO = new OrderLineDAO();
     private final ProductItemDAO PIDAO = new ProductItemDAO();
-
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -109,35 +109,35 @@ public class CartController extends HttpServlet {
         int userId = toInt(request.getParameter("userId"));
         int itemId = toInt(request.getParameter("itemId"));
         int quantity = toInt(request.getParameter("itemId"));
-
-        if (userId == -1) {
+        
+        if(userId == -1){
             return "error.jsp";
         }
-
-        if (itemId == -1 || quantity == -1 || quantity < 1) {
+        
+        if(itemId == -1 || quantity == -1 || quantity < 1){
             request.setAttribute("errorMsg", "Invalid input parameter");
             return "product-detail.jsp";
         }
-
+        
         int cartId = SCDAO.createOrGetUserCartId(userId);
-        if (!SCIDAO.create(new ShoppingCartItemDTO(cartId, itemId, quantity))) {
+        if(!SCIDAO.create(new ShoppingCartItemDTO(cartId, itemId, quantity))){
             request.setAttribute("errorMsg", "Internal Error");
             return "error.jsp";
         }
-
+        
         request.setAttribute("msg", "Add item to cart successfully!");
         return ""; // trang bấm product detail để thêm dô cart
     }
 
     private String handleUpdateCart(String action, HttpServletRequest request, HttpServletResponse response) {
         int id = toInt(request.getParameter("id"));
-
-        if (ValidationUtils.isInvalidId(id)) {
+        
+        if(ValidationUtils.isInvalidId(id)){
             request.setAttribute("errorMsg", "Item not found");
             return ""; // trang quản lý cart
         }
-
-        if ("updateCart".equals(action)) {
+        
+        if("updateCart".equals(action)){
             int userId = toInt(request.getParameter("userId"));
             int itemId = toInt(request.getParameter("itemId"));
             int cartId = toInt(request.getParameter("cartId"));
@@ -145,7 +145,7 @@ public class CartController extends HttpServlet {
             if (userId == -1) {
                 return "error.jsp";
             }
-
+            
             if (quantity == -1 || quantity < 1
                     || ValidationUtils.isInvalidId(id)
                     || ValidationUtils.isInvalidId(itemId)
@@ -153,22 +153,22 @@ public class CartController extends HttpServlet {
                 request.setAttribute("errorMsg", "Invalid input parameter");
                 return ""; // trang quản lý cart
             }
-
-            if (!SCIDAO.update(new ShoppingCartItemDTO(id, cartId, itemId, quantity))) {
+            
+            if(!SCIDAO.update(new ShoppingCartItemDTO(id, cartId, itemId, quantity))){
                 request.setAttribute("errorMsg", "Internal Error");
                 return "error.jsp";
             }
             request.setAttribute("msg", "Update item successfully!");
             return ""; // trang quản lý cart
-
-        } else if ("removeFromCart".equals(action)) {
-            if (!SCIDAO.softDelete(id)) {
+            
+        }else if("removeFromCart".equals(action)){
+            if(!SCIDAO.softDelete(id)){
                 request.setAttribute("errorMsg", "Internal Error");
                 return "error.jsp";
             }
             request.setAttribute("msg", "Remove item successfully!");
             return ""; // trang quản lý cart
-        } else {
+        }else{
             return "error.jsp";
         }
     }
@@ -218,23 +218,23 @@ public class CartController extends HttpServlet {
         );
 
         int orderId = SODAO.createReturnId(order);
-        if (ValidationUtils.isInvalidId(orderId)) {
+        if(ValidationUtils.isInvalidId(orderId)){
             request.setAttribute("errorMsg", "Internal Error.");
             return "checkout.jsp";
         }
-
+        
         List<ShoppingCartItemDTO> cartItems = SCIDAO.retrieve("cart_id = ? AND is_deleted = 0", cartId);
         for (ShoppingCartItemDTO ci : cartItems) {
             double price = PIDAO.getPrice(ci.getItem_id());
-            OrderLineDTO line = new OrderLineDTO(
-                    orderId,
-                    ci.getItem_id(),
-                    ci.getQuantity(),
+            OrderLineDTO line =  new OrderLineDTO(
+                    orderId, 
+                    ci.getItem_id(), 
+                    ci.getQuantity(), 
                     price
             );
             OLDAO.create(line);
         }
-
+        
         SCIDAO.softDeleteCartItem(cartId);
         request.setAttribute("successMsg", "Đặt hàng thành công!");
         return ""; // order detail or order management

@@ -1,12 +1,5 @@
-
 package model.dto;
 
-/**
- * Status: Đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết set up các field cho class này
- */
 public class ShoppingCartItemDTO {
     private int id;
     private int cart_id;
@@ -16,11 +9,17 @@ public class ShoppingCartItemDTO {
     public ShoppingCartItemDTO() {
     }
 
+    public ShoppingCartItemDTO(int cart_id, int item_id, int quantity) {
+        this.cart_id = cart_id;
+        this.item_id = item_id;
+        this.quantity = quantity;
+    }
+
     public ShoppingCartItemDTO(int id, int cart_id, int item_id, int quantity) {
         this.id = id;
         this.cart_id = cart_id;
         this.item_id = item_id;
-        this.quantity = quantity;
+        this.quantity = quantity;   
     }
 
     public int getId() {

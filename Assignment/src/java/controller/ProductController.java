@@ -12,10 +12,6 @@ import model.dao.ProductItemDAO;
 import model.dto.ProductDTO;
 import model.dto.ProductItemDTO;
 
-/**
- * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
- * [...........] viết servlet cho Product Controller
- */
 @WebServlet(name = "ProductController", urlPatterns = {"/ProductController"})
 public class ProductController extends HttpServlet {
 

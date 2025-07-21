@@ -1,12 +1,5 @@
-
 package model.dto;
 
-/**
- * Status: Đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết set up các field cho class này
- */
 public class OrderLineDTO {
     private int id;
     private int order_id;
@@ -15,6 +8,13 @@ public class OrderLineDTO {
     private double price;
 
     public OrderLineDTO() {
+    }
+
+    public OrderLineDTO(int order_id, int item_id, int quantity, double price) {
+        this.order_id = order_id;
+        this.item_id = item_id;
+        this.quantity = quantity;
+        this.price = price;
     }
 
     public OrderLineDTO(int id, int order_id, int item_id, int quantity, double price) {

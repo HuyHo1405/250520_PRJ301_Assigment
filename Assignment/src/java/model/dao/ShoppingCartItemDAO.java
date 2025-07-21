@@ -1,4 +1,3 @@
-
 package model.dao;
 
 import java.sql.Connection;
@@ -10,12 +9,6 @@ import java.util.List;
 import model.dto.ShoppingCartItemDTO;
 import utils.DbUtils;
 
-/**
- * Status: đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết crud cho class này
- */
 public class ShoppingCartItemDAO {
     private static final String TABLE_NAME = "shopping_cart_item";
 
@@ -92,6 +85,30 @@ public class ShoppingCartItemDAO {
         return false;
     }
     
+    public boolean softDelete(int id){
+        String sql = "UPDATE " + TABLE_NAME + " SET is_deleted = 1 WHERE id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in delete(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public boolean softDeleteCartItem(int cartId){
+        String sql = "UPDATE " + TABLE_NAME + " SET is_deleted = 1 WHERE cart_id = ?";
+        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, cartId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error in delete(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
     public List<ShoppingCartItemDTO> findByCartId(int cartId) {
         return retrieve("cart_id = ?", cartId);
     }
@@ -114,31 +131,22 @@ public class ShoppingCartItemDAO {
         }
         return false;
     }
-
-    public boolean deleteByCartId(int cartId) {
-        String sql = "DELETE FROM " + TABLE_NAME + " WHERE cart_id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, cartId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            System.err.println("Error in deleteByCartId(): " + e.getMessage());
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public int countItemsInCart(int cartId) {
-        String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME + " WHERE cart_id = ?";
+    
+    public double calculateTotal(int cartId){
+        String sql = "SELECT SUM(sci.quantity * pi.price)\n"
+                + "FROM shopping_cart_item sci\n"
+                + "JOIN product_item pi ON pi.id = sci.item_id\n"
+                + "WHERE pi.is_deleted = 0 and sci.cart_id = ?";
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, cartId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getInt("total");
+                return rs.getDouble(1);
             }
         } catch (Exception e) {
-            System.err.println("Error in countItemsInCart(): " + e.getMessage());
             e.printStackTrace();
         }
         return 0;
     }
+    
 }

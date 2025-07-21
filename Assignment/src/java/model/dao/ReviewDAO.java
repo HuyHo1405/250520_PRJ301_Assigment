@@ -1,4 +1,3 @@
-
 package model.dao;
 
 import java.sql.Connection;
@@ -11,12 +10,6 @@ import java.util.List;
 import model.dto.ReviewDTO;
 import utils.DbUtils;
 
-/**
- * Status: đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết crud cho class này
- */
 public class ReviewDAO {
     private static final String TABLE_NAME = "review";
 

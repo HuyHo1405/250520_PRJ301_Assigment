@@ -9,10 +9,6 @@ import java.util.List;
 import model.dto.ProductDTO;
 import utils.DbUtils;
 
-/**
- * Status: đã hoàn thành Người thực hiện: Thịnh Ngày bắt đầu: 09/06/2025 viết
- * crud cho class này
- */
 public class ProductDAO {
 
     private static final String TABLE_NAME = "product";

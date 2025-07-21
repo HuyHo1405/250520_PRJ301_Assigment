@@ -1,4 +1,3 @@
-
 package model.dao;
 
 import java.sql.Connection;
@@ -10,12 +9,6 @@ import java.util.List;
 import model.dto.CategoryDTO;
 import utils.DbUtils;
 
-/**
- * Status: đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết crud cho class này
- */
 public class CategoryDAO {
 
     private static final String TABLE_NAME = "category";
@@ -31,7 +24,7 @@ public class CategoryDAO {
     public List<CategoryDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
 
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
@@ -55,7 +48,7 @@ public class CategoryDAO {
 
     public boolean create(CategoryDTO cart) {
         String sql = "INSERT INTO " + TABLE_NAME + " (parent_category_id, name, is_active) VALUES (?, ?, ?)";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             if (cart.getParent_category_id() == -1) {
                 ps.setNull(1, java.sql.Types.INTEGER);
@@ -74,7 +67,7 @@ public class CategoryDAO {
 
     public boolean update(CategoryDTO cart) {
         String sql = "UPDATE " + TABLE_NAME + " SET parent_category_id = ?, name = ?, is_active = ? WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             if (cart.getParent_category_id() == -1) {
                 ps.setNull(1, java.sql.Types.INTEGER);
@@ -95,7 +88,7 @@ public class CategoryDAO {
 
     public boolean delete(int id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -112,7 +105,7 @@ public class CategoryDAO {
 
     public boolean existsById(int id) {
         String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             return rs.next();
@@ -125,7 +118,7 @@ public class CategoryDAO {
 
     public int count() {
         String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("total");
@@ -139,7 +132,7 @@ public class CategoryDAO {
 
     public int countByParentId(int parentId) {
         String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME + " WHERE parent_category_id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, parentId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -154,7 +147,7 @@ public class CategoryDAO {
 
     public boolean toggleIsActive(int id, boolean currStatus) {
         String sql = "UPDATE " + TABLE_NAME + " SET is_active = ? WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setBoolean(1, !currStatus);
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;

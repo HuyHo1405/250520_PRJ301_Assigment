@@ -1,4 +1,3 @@
-
 package controller.admin;
 
 import java.io.IOException;
@@ -30,12 +29,6 @@ import model.dto.UserDTO;
 import utils.OrderUtils;
 import utils.ValidationUtils;
 
-/**
- * Status: Đang thực hiện
- * Người thực hiện: Huy
- * Ngày bắt đầu: 18/06/2025
- * viết servlet cho Admin Order Controller
- */
 @WebServlet(name = "AdminOrderController", urlPatterns = {"/AdminOrderController"})
 public class AdminOrderController extends HttpServlet {
 

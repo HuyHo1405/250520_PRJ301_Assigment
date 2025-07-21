@@ -16,20 +16,14 @@ import utils.ResetTokenManager;
 import utils.UserUtils;
 import utils.ValidationUtils;
 
-/**
- * Status: Đã hoàn thành Người thực hiện: Huy Ngày bắt đầu: 13/06/2025 viết các
- * hàm handle cho các feature của user
- */
 @WebServlet(name = "UserController", urlPatterns = {"/UserController"})
 public class UserController extends HttpServlet {
 
-    //static fields
     private static final String WELCOME_PAGE = "welcome.jsp";
     private static final String USER_FORM_PAGE = "user-form.jsp";
     private static final String ERROR_PAGE = "error.jsp";
     private final UserDAO UDAO = new UserDAO();
 
-    //process
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -84,7 +78,6 @@ public class UserController extends HttpServlet {
         }
     }
 
-    //doGet & doPost
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -124,7 +117,6 @@ public class UserController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    //handle methods
     public String handleLogin(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -335,7 +327,6 @@ public class UserController extends HttpServlet {
         return USER_FORM_PAGE;
     }
 
-    //some useful methods
     private boolean isExistedEmail(String email) {
         return !UDAO.retrieve("email_address = ?", email).isEmpty();
     }

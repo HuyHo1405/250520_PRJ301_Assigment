@@ -10,10 +10,6 @@ import java.util.List;
 import model.dao.ReviewDAO;
 import model.dto.ReviewDTO;
 
-/**
- * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
- * [...........] viết servlet cho Review Controller
- */
 @WebServlet(name = "ReviewController", urlPatterns = {"/ReviewController"})
 public class ReviewController extends HttpServlet {
 

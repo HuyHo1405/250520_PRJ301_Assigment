@@ -20,17 +20,6 @@
             // Code từ nhánh 'assignment'
             ProductDAO pdao = new ProductDAO();
         %>
-
-        <%-- Phần này kết hợp từ HEAD và assignment --%>
-        <h1>Hello ${user.email_address}!</h1> <%-- Từ HEAD --%>
-
-        <hr> <%-- Từ HEAD --%>
-
-        <form action="MainController" method="post" style="display:inline;">
-            <button name="action" value="toProfile">Edit Profile</button>
-            <button name="action" value="logout">Logout</button>
-        </form>
-
         <div id="layout">
             <div id="sidebar"></div>
             <div id="content">

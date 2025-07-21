@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller.admin;
 
 import java.io.IOException;
@@ -24,10 +20,6 @@ import model.dto.ShippingMethodDTO;
 import utils.CacheManager;
 import utils.ValidationUtils;
 
-/**
- * Status: Chờ thực hiện Người thực hiện: [...........] gày bắt
- * đầu:[...........] viết servlet cho System Config Controller
- */
 @WebServlet(name = "SystemConfigController", urlPatterns = {"/SystemConfigController"})
 public class SystemConfigController extends HttpServlet {
 
@@ -122,7 +114,6 @@ public class SystemConfigController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    //some useful methods
     private int toInt(String n) {
         try {
             return Integer.parseInt(n);
@@ -139,7 +130,6 @@ public class SystemConfigController extends HttpServlet {
         }
     }
 
-    // Hàm tổng hợp, gọi cả 4 hàm trên
     private String prepareManagementView(HttpServletRequest request) {
         List<OrderStatusDTO> orderStatusList = OSDAO.retrieve("1 = 1 ORDER BY is_active DESC");
         List<PaymentTypeDTO> paymentTypeList = PTDAO.retrieve("1 = 1 ORDER BY is_active DESC");

@@ -10,10 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Status: Hoàn thành Người thực hiện: Huy Ngày hoàn thành: 19/06/2025 Sửa lại
- * một số tên action để ko bị trùng lặp
- */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 @MultipartConfig
 public class MainController extends HttpServlet {
@@ -33,7 +29,6 @@ public class MainController extends HttpServlet {
             "removeAddress"
     );
 
-    // UserController.java (Dành cho người dùng cuối)
     public static final List<String> USER_ACTIONS = Arrays.asList(
             "toLogin",
             "toRegister",
@@ -48,7 +43,6 @@ public class MainController extends HttpServlet {
             "updateProfile"
     );
 
-    // ProductController.java (Dành cho người dùng cuối)
     public static final List<String> PRODUCT_ACTIONS = Arrays.asList(
             "listProducts",
             "viewProduct",
@@ -58,7 +52,6 @@ public class MainController extends HttpServlet {
             "newArrivals"
     );
 
-    // CartController.java
     public static final List<String> CART_ACTIONS = Arrays.asList(
             "getCart",
             "addToCart",
@@ -68,7 +61,6 @@ public class MainController extends HttpServlet {
             "checkoutCart"
     );
 
-    // OrderController.java (Dành cho người dùng cuối)
     public static final List<String> ORDER_ACTIONS = Arrays.asList(
             "listMyOrders",
             "viewMyOrder",
@@ -77,7 +69,6 @@ public class MainController extends HttpServlet {
             "trackOrder"
     );
 
-    // ReviewController.java
     public static final List<String> REVIEW_ACTIONS = Arrays.asList(
             "listReviewsByProduct",
             "submitReview",
@@ -86,17 +77,15 @@ public class MainController extends HttpServlet {
             "viewReview"
     );
 
-    // AdminOrderController.java
     public static final List<String> ADMIN_ORDER_ACTIONS = Arrays.asList(
             "toAdminOrdersPage",
             "viewOrderDetail",
             "updateOrderStatus",
-            "disableOrder", // Thay delete → rõ nghĩa hơn (soft delete)
+            "disableOrder",
             "searchOrders",
             "exportOrders"
     );
 
-    // AdminProductController.java
     public static final List<String> ADMIN_PRODUCT_ACTIONS = Arrays.asList(
             "toAdminProductPage",
             "toCreateProduct",
@@ -109,7 +98,6 @@ public class MainController extends HttpServlet {
             "searchProductsManagement"
     );
     
-    // AdminProductItemController.java
     public static final List<String> ADMIN_PRODUCT_ITEM_ACTIONS = Arrays.asList(
             "toAdminProductItemPage", 
             "updateProductItem", 
@@ -124,7 +112,6 @@ public class MainController extends HttpServlet {
             "exportProductItemList"
     );
     
-    // AdminUserController.java
     public static final List<String> ADMIN_USER_ACTIONS = Arrays.asList(
             "toAdminUserPage",
             "createUser",
@@ -132,7 +119,6 @@ public class MainController extends HttpServlet {
             "changeUserRole"
     );
 
-    // SystemConfigController.java (Admin)
     public static final List<String> SYSTEM_CONFIG_ACTIONS = Arrays.asList(
             "toSystemConfigManagement",
             "getSystemConfig",
@@ -142,7 +128,6 @@ public class MainController extends HttpServlet {
             "clearSystemCache"
     );
 
-    //
     public static final List<String> WELCOME_ACTIONS = Arrays.asList(
             "toWelcome",
             ""
@@ -159,47 +144,33 @@ public class MainController extends HttpServlet {
             System.out.println(action);
             if (action == null || action.trim().isEmpty()) {
                 url = ERROR_PAGE;
-
             } else if (ADDRESS_ACTIONS.contains(action)) {
-                url = "/AddressController"; // AddressController.java
-
+                url = "/AddressController";
             } else if (USER_ACTIONS.contains(action)) {
-                url = "/UserController"; // UserController.java
-
+                url = "/UserController";
             } else if (PRODUCT_ACTIONS.contains(action)) {
-                url = "/ProductController"; // ProductController.java
-
+                url = "/ProductController";
             } else if (CART_ACTIONS.contains(action)) {
-                url = "/CartController"; // CartController.java
-
+                url = "/CartController";
             } else if (ORDER_ACTIONS.contains(action)) {
-                url = "/OrderController"; // OrderController.java
-
+                url = "/OrderController";
             } else if (REVIEW_ACTIONS.contains(action)) {
-                url = "/ReviewController"; // ReviewController.java
-
+                url = "/ReviewController";
             } else if (ADMIN_ORDER_ACTIONS.contains(action)) {
-                url = "/AdminOrderController"; // AdminOrderController.java
-
+                url = "/AdminOrderController";
             } else if (ADMIN_PRODUCT_ACTIONS.contains(action)) {
-                url = "/AdminProductController"; // AdminProductController.java
-            
+                url = "/AdminProductController";
             } else if (ADMIN_PRODUCT_ITEM_ACTIONS.contains(action)) {
-                url = "/AdminProductItemController"; // AdminProductItemController.java
-
+                url = "/AdminProductItemController";
             } else if (ADMIN_USER_ACTIONS.contains(action)) {
-                url = "/AdminUserController"; // AdminUserController.java
-
+                url = "/AdminUserController";
             } else if (SYSTEM_CONFIG_ACTIONS.contains(action)) {
-                url = "/SystemConfigController"; // SystemConfigController.java
-
+                url = "/SystemConfigController";
             } else if (WELCOME_ACTIONS.contains(action)) {
-                url = WELCOME_PAGE; // SystemConfigController.java
-
+                url = WELCOME_PAGE;
             } else {
                 url = ERROR_PAGE;
             }
-
         } catch (Exception e) {
         } finally {
             request.getRequestDispatcher(url).forward(request, response);

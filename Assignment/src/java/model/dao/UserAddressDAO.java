@@ -10,12 +10,6 @@ import java.util.List;
 import model.dto.UserAddressDTO;
 import utils.DbUtils;
 
-/**
- * Status: đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết crud cho class này
- */
 public class UserAddressDAO {
     private static final String TABLE_NAME = "user_address";
 

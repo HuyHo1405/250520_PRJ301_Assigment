@@ -10,30 +10,26 @@ import java.util.List;
 import model.dto.AddressDTO;
 import utils.DbUtils;
 
-/**
- * Status: Đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- */
 public class AddressDAO {
+
     private static final String TABLE_NAME = "address";
 
     private AddressDTO mapToAddress(ResultSet rs) throws SQLException {
         return new AddressDTO(
-            rs.getInt("id"),
-            rs.getInt("country_id"),
-            rs.getString("unit_number"),
-            rs.getString("street_number"),
-            rs.getString("address_line1"),
-            rs.getString("address_line2"),
-            rs.getString("city"),
-            rs.getString("region")
+                rs.getInt("id"),
+                rs.getInt("country_id"),
+                rs.getString("unit_number"),
+                rs.getString("street_number"),
+                rs.getString("address_line1"),
+                rs.getString("address_line2"),
+                rs.getString("city"),
+                rs.getString("region")
         );
     }
 
     public List<AddressDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
@@ -54,7 +50,7 @@ public class AddressDAO {
 
     public boolean create(AddressDTO address) {
         String sql = "INSERT INTO " + TABLE_NAME + " (country_id, unit_number, street_number, address_line1, address_line2, city, region) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, address.getCountryId());
             ps.setString(2, address.getUnitNumber());
             ps.setString(3, address.getStreetNumber());
@@ -73,8 +69,7 @@ public class AddressDAO {
 
     public Integer createAndReturnId(AddressDTO address) {
         String sql = "INSERT INTO " + TABLE_NAME + " (country_id, unit_number, street_number, address_line1, address_line2, city, region) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DbUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, address.getCountryId());
             ps.setString(2, address.getUnitNumber());
@@ -89,7 +84,7 @@ public class AddressDAO {
                 throw new SQLException("Creating address failed, no rows affected.");
             }
 
-            try (ResultSet rs = ps.getGeneratedKeys()) {
+            try ( ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     return rs.getInt(1);
                 } else {
@@ -105,7 +100,7 @@ public class AddressDAO {
 
     public boolean update(AddressDTO address) {
         String sql = "UPDATE " + TABLE_NAME + " SET country_id = ?, unit_number = ?, street_number = ?, address_line1 = ?, address_line2 = ?, city = ?, region = ? WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, address.getCountryId());
             ps.setString(2, address.getUnitNumber());
             ps.setString(3, address.getStreetNumber());
@@ -125,7 +120,7 @@ public class AddressDAO {
 
     public boolean delete(int id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -143,10 +138,10 @@ public class AddressDAO {
     public boolean existsById(int id) {
         return !retrieve("id = ?", id).isEmpty();
     }
-
+    
     public int countByCountryId(int countryId) {
         String sql = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE country_id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, countryId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {

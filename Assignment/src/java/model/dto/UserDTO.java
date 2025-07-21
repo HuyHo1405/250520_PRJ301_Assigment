@@ -1,12 +1,5 @@
-
 package model.dto;
 
-/**
- * Status: Đã hoàn thành
- * Người thực hiện: Huy
- * Ngày bắt đầu: 13/06/2025
- * thêm role cho user
- */
 public class UserDTO {
     private int id;
     private String email_address;
