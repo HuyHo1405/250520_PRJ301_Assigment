@@ -1,0 +1,296 @@
+/* General Body and Container Styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1f1f1f; /* Màu nền tối mặc định cho phần dưới */
+            color: white; /* Chữ trắng */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            position: relative; /* Cần thiết cho việc định vị pseudo-element */
+            overflow-x: hidden; /* Ngăn thanh cuộn ngang nếu pseudo-element tràn nhẹ */
+        }
+
+        /* Pseudo-element for the light top background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 400px; /* Chiều cao của phần nền trắng nhạt ở trên. Có thể điều chỉnh */
+            background-color: #f8f8f8; /* Màu trắng nhạt cho phần trên */
+            z-index: -1; /* Đặt phía sau nội dung body */
+        }
+
+        .main-container {
+            background-color: #ffffff; /* Nền trắng cho container chính */
+            color: #333333; /* Chữ tối trong container trắng */
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 1000px; /* Chiều rộng tối đa cho container */
+            margin: 40px 20px; /* Margin trên và hai bên */
+            flex-grow: 1; /* Cho phép container giãn nở */
+        }
+
+        /* Header Styling */
+        h1 {
+            color: #333333; /* Black text for header */
+            text-align: left; /* Align to left */
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 3em;
+            font-weight: 900; /* Bolder */
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e0e0e0; /* Light gray horizontal rule */
+            margin: 30px 0;
+        }
+
+        /* Top Actions Section */
+        .top-actions {
+            display: flex;
+            justify-content: space-between; /* Space between child forms */
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px; /* Gap between forms */
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+
+        .top-actions form {
+            flex-grow: 1; /* Allow form to grow */
+            display: flex;
+            gap: 10px; /* Gap between input and button in form */
+            flex-wrap: wrap;
+        }
+
+        .top-actions input[type="text"] {
+            flex-grow: 1; /* Input grows */
+            padding: 12px;
+            border: 1px solid #ced4da;
+            background-color: #f8f9fa;
+            color: #333333;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        .top-actions button {
+            background-color: #333333; /* Black button */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            white-space: nowrap; /* Prevent button from wrapping */
+        }
+
+        .top-actions button:hover {
+            background-color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .top-actions button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Error Message */
+        p.error {
+            color: #ff4d4f; /* Red-orange for error */
+            background-color: #ffe0e0;
+            border: 1px solid #ff4d4f;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #ffffff; /* White background for table */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            border: 1px solid #e0e0e0; /* Light gray table border */
+            padding: 12px 15px;
+            text-align: left;
+            color: #333333; /* Dark text */
+        }
+
+        th {
+            background-color: #f0f0f0; /* Light gray background for table header */
+            font-weight: 700;
+            color: #555555;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9; /* Alternate row background color */
+        }
+
+        /* Action buttons in table */
+        td form {
+            display: inline-block; /* Allow button forms to be in line */
+            margin-right: 10px; /* Space between buttons */
+        }
+
+        td button {
+            background-color: #333333; /* Black button */
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        td button:hover {
+            background-color: #000000;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Specific styling for 'Set as Default' and 'Delete' buttons */
+        td button[name="action"][value="updateDefaultAddress"] {
+            background-color: #333333; /* Changed to black */
+        }
+        td button[name="action"][value="updateDefaultAddress"]:hover {
+            background-color: #000000; /* Changed to black */
+        }
+
+        td button[name="action"][value="removeAddress"] {
+            background-color: #333333; /* Changed to black */
+        }
+        td button[name="action"][value="removeAddress"]:hover {
+            background-color: #000000; /* Changed to black */
+        }
+
+        /* Default address row styling */
+        tr.default-address {
+            font-weight: bold;
+            background-color: #e6f7ff; /* Light blue background for default address */
+            color: #0056b3; /* Dark blue text */
+        }
+        tr.default-address td {
+            color: #0056b3; /* Ensure text in td is also dark blue */
+        }
+
+        /* Back to Profile Button */
+        .back-button-container {
+            width: 100%;
+            max-width: 1000px; /* Match max width of main container */
+            margin: 30px 20px 40px 20px; /* Top, side, bottom margins */
+            box-sizing: border-box;
+            text-align: left; /* Align button to the left */
+        }
+
+        .back-button-container form {
+            display: inline-block; /* Allow form to shrink to button size */
+        }
+
+        .back-button-container button {
+            background-color: #333333; /* Black button */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button-container button:hover {
+            background-color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 20px 10px;
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+                text-align: center; /* Center on small screens */
+            }
+            .top-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .top-actions form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .top-actions input[type="text"],
+            .top-actions button {
+                width: 100%;
+            }
+            table, thead, tbody, th, td, tr {
+                display: block; /* Convert table to blocks on small screens */
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #e0e0e0;
+                margin-bottom: 15px;
+            }
+            td {
+                border: none;
+                border-bottom: 1px solid #e0e0e0;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+            td:before {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #555555;
+            }
+            /* Label the data */
+            td:nth-of-type(1):before { content: "Address:"; }
+            td:nth-of-type(2):before { content: "City:"; }
+            td:nth-of-type(3):before { content: "Region:"; }
+            td:nth-of-type(4):before { content: "Action:"; }
+
+            td form {
+                display: block;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            td button {
+                width: 100%;
+            }
+            .back-button-container {
+                margin: 20px 10px 20px 10px;
+                text-align: center; /* Center button on small screens */
+            }
+        }

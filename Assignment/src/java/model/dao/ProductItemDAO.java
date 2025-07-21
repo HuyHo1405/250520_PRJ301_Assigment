@@ -1,4 +1,3 @@
-
 package model.dao;
 
 import java.sql.Connection;
@@ -11,12 +10,6 @@ import java.util.List;
 import model.dto.ProductItemDTO;
 import utils.DbUtils;
 
-/**
- * Status: đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết crud cho class này
- */
 public class ProductItemDAO {
     private static final String TABLE_NAME = "product_item";
 
@@ -216,5 +209,11 @@ public class ProductItemDAO {
         }
     }
     
-    
+    public double getPrice(int itemId){
+        List<ProductItemDTO> ls = retrieve("id = ?", itemId);
+        if(!ls.isEmpty()){
+            return ls.get(0).getPrice();
+        }
+        return -1;
+    }
 }

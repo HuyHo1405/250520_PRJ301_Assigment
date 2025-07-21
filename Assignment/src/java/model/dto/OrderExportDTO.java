@@ -1,4 +1,3 @@
-
 package model.dto;
 
 import java.sql.Timestamp;

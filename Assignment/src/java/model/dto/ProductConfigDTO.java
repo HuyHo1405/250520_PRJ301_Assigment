@@ -1,12 +1,5 @@
-
 package model.dto;
 
-/**
- * Status: Đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- * viết set up các field cho class này
- */
 public class ProductConfigDTO {
     private int item_id;
     private int option_id;

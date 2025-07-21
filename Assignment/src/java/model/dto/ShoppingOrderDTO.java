@@ -3,12 +3,6 @@ package model.dto;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-/**
- * Status: Đã hoàn thành
- * Người thực hiện: Huy
- * Ngày bắt đầu: 19/06/2025
- * Chuyển các trường Date thành Timestamp để chuẩn hóa với JDBC
- */
 public class ShoppingOrderDTO {
 
     private int id;

@@ -6,7 +6,7 @@
 
 .container {
     width: 100%;
-    background-color: #ffffff;
+    /*background-color: #ffffff;*/
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     border-bottom: 1px solid #e0e0e0;
 }

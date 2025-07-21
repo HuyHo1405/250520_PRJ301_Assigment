@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller.admin;
 
 import java.io.IOException;
@@ -14,23 +10,13 @@ import java.util.List;
 import model.dao.UserDAO;
 import model.dto.UserDTO;
 import utils.HashUtils;
-import utils.MailUtils;
-import utils.ResetTokenManager;
 import utils.ValidationUtils;
 
-/**
- * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
- * [...........] viết servlet cho Admin User Controller
- */
 @WebServlet(name = "AdminUserController", urlPatterns = {"/AdminUserController"})
 public class AdminUserController extends HttpServlet {
-
     private static final String ERROR_PAGE = "error.jsp";
     private static final String ADMIN_USER_MANAGEMENT_PAGE = "admin-user-management.jsp";
-    private static final String USER_DETAIL_PAGE = "user-detail.jsp";
-
     private final UserDAO UDAO = new UserDAO();
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -69,8 +55,7 @@ public class AdminUserController extends HttpServlet {
         }
 
     }
-
-    // Methods
+    
     private String handleListAllUsers(HttpServletRequest request, HttpServletResponse response) {
         List<UserDTO> list = UDAO.retrieve("1 = 1 ORDER BY is_active DESC, role ASC");
         request.setAttribute("userList", list);
@@ -85,13 +70,6 @@ public class AdminUserController extends HttpServlet {
         String role = request.getParameter("role");
         String isActive = request.getParameter("isActive");
 
-        System.out.println(email);
-        System.out.println(phone);
-        System.out.println(password);
-        System.out.println(hashedPassword);
-        System.out.println(role);
-        System.out.println(isActive);
-        
         UserDTO user = new UserDTO(email, phone, hashedPassword);
         user.setRole(role);
         user.setIs_active(Boolean.parseBoolean(isActive));
@@ -134,7 +112,6 @@ public class AdminUserController extends HttpServlet {
         return handleListAllUsers(request, response);
     }
 
-    //some useful methods
     private boolean isExistedEmail(String email) {
         return !UDAO.retrieve("email_address = ?", email).isEmpty();
     }

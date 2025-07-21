@@ -2,11 +2,6 @@ package model.dto;
 
 import java.util.Objects;
 
-/**
- * Status: Đã hoàn thành
- * Người thực hiện: Thịnh
- * Ngày bắt đầu: 09/06/2025
- */
 public class AddressDTO {
     private int id;
     private int countryId;

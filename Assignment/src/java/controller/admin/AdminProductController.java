@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller.admin;
 
 import utils.ImageUploadUtils;
@@ -25,10 +21,6 @@ import model.dto.ProductDTO;
 import utils.ProductUtils;
 import utils.ValidationUtils;
 
-/**
- * Status: Chờ thực hiện Người thực hiện: [...........] Ngày bắt đầu:
- * [...........] viết servlet cho Admin Product Controller
- */
 @WebServlet(name = "AdminProductController", urlPatterns = {"/AdminProductController"})
 @MultipartConfig
 public class AdminProductController extends HttpServlet {

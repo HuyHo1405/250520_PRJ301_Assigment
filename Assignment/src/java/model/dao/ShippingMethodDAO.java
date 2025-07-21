@@ -9,10 +9,6 @@ import java.util.List;
 import model.dto.ShippingMethodDTO;
 import utils.DbUtils;
 
-/**
- * Status: đã hoàn thành Người thực hiện: Thịnh Ngày bắt đầu: 09/06/2025 viết
- * crud cho class này
- */
 public class ShippingMethodDAO {
 
     private static final String TABLE_NAME = "shipping_method";

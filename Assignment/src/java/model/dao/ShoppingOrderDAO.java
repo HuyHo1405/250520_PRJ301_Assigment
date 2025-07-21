@@ -6,34 +6,29 @@ import java.util.List;
 import model.dto.ShoppingOrderDTO;
 import utils.DbUtils;
 
-/**
- * Status: đã hoàn thành 
- * Người thực hiện: Huy
- * Ngày bắt đầu: 19/06/2025
- * Thêm order code để nhanh tìm kiếm sản phẩm
- */
 public class ShoppingOrderDAO {
+
     private static final String TABLE_NAME = "shopping_order";
 
     private ShoppingOrderDTO mapToShoppingOrder(ResultSet rs) throws SQLException {
         return new ShoppingOrderDTO(
-            rs.getInt("id"),
-            rs.getTimestamp("order_date"),
-            rs.getDouble("order_total"),
-            rs.getInt("order_status_id"),
-            rs.getInt("payment_method_id"),
-            rs.getInt("shipping_method_id"),
-            rs.getInt("address_id"),
-            rs.getInt("user_id"),
-            rs.getTimestamp("created_at"),
-            rs.getTimestamp("updated_at"),
-            rs.getString("order_code")
+                rs.getInt("id"),
+                rs.getTimestamp("order_date"),
+                rs.getDouble("order_total"),
+                rs.getInt("order_status_id"),
+                rs.getInt("payment_method_id"),
+                rs.getInt("shipping_method_id"),
+                rs.getInt("address_id"),
+                rs.getInt("user_id"),
+                rs.getTimestamp("created_at"),
+                rs.getTimestamp("updated_at"),
+                rs.getString("order_code")
         );
     }
 
     public List<ShoppingOrderDTO> retrieve(String condition, Object... params) {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
@@ -50,11 +45,11 @@ public class ShoppingOrderDAO {
         return null;
     }
 
-    public boolean create(ShoppingOrderDTO order) {
-        String sql = "INSERT INTO " + TABLE_NAME +
-            " (order_date, order_total, order_status_id, payment_method_id, shipping_method_id, address_id, user_id, created_at, updated_at, order_code) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    public int createReturnId(ShoppingOrderDTO order) {
+        String sql = "INSERT INTO " + TABLE_NAME
+                + " (order_date, order_total, order_status_id, payment_method_id, shipping_method_id, address_id, user_id, created_at, updated_at, order_code) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setTimestamp(1, order.getOrderDate());
             ps.setDouble(2, order.getOrderTotal());
             ps.setInt(3, order.getOrderStatusId());
@@ -67,25 +62,29 @@ public class ShoppingOrderDAO {
             ps.setString(10, order.getOrder_code());
 
             int affectedRows = ps.executeUpdate();
-            if (affectedRows == 0) return false;
-
-            ResultSet generatedKeys = ps.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                order.setId(generatedKeys.getInt(1));
+            if (affectedRows == 0) {
+                return -1;
             }
-            return true;
+
+            try ( ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1);
+                    order.setId(generatedId);
+                    return generatedId;
+                }
+            }
         } catch (Exception e) {
             System.err.println("Error in create(): " + e.getMessage());
             e.printStackTrace();
         }
-        return false;
+        return -1;
     }
 
     public boolean update(ShoppingOrderDTO order) {
-        String sql = "UPDATE " + TABLE_NAME +
-            " SET order_date = ?, order_total = ?, order_status_id = ?, payment_method_id = ?, shipping_method_id = ?, " +
-            "address_id = ?, user_id = ?, created_at = ?, updated_at = ?, order_code = ? WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "UPDATE " + TABLE_NAME
+                + " SET order_date = ?, order_total = ?, order_status_id = ?, payment_method_id = ?, shipping_method_id = ?, "
+                + "address_id = ?, user_id = ?, created_at = ?, updated_at = ?, order_code = ? WHERE id = ?";
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setTimestamp(1, order.getOrderDate());
             ps.setDouble(2, order.getOrderTotal());
             ps.setInt(3, order.getOrderStatusId());
@@ -108,7 +107,7 @@ public class ShoppingOrderDAO {
 
     public boolean delete(int id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -117,12 +116,12 @@ public class ShoppingOrderDAO {
         }
         return false;
     }
-    
-    public ShoppingOrderDTO findById(int id){
+
+    public ShoppingOrderDTO findById(int id) {
         List<ShoppingOrderDTO> list = retrieve("id = ?", id);
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
-    
+
     public ShoppingOrderDTO findByOrderCode(String orderCode) {
         List<ShoppingOrderDTO> list = retrieve("order_code = ?", orderCode);
         return list != null && !list.isEmpty() ? list.get(0) : null;
@@ -138,7 +137,7 @@ public class ShoppingOrderDAO {
 
     public boolean existsById(int id) {
         String sql = "SELECT 1 FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             return rs.next();
@@ -151,7 +150,7 @@ public class ShoppingOrderDAO {
 
     public int countAll() {
         String sql = "SELECT COUNT(*) AS total FROM " + TABLE_NAME;
-        try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("total");
@@ -162,7 +161,7 @@ public class ShoppingOrderDAO {
         }
         return 0;
     }
-    
+
     public static void main(String[] args) {
         ShoppingOrderDAO sodao = new ShoppingOrderDAO();
         List ls = sodao.retrieve("order_code LIKE ?", "%" + "ord-1" + "%");
