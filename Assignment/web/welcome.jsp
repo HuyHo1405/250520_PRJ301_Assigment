@@ -32,7 +32,7 @@
                 </div>
 
                 <div id="main-wrapper">
-                    <button class="toggle-btn" onclick="toggleMenu()">Show Menu</button>
+                    <button id="toggle-btn" class="toggle-btn" onclick="toggleMenu()">Show Menu</button>
                     <form action="MainController" method="post">
                         <input type="hidden" name="action" value="listProducts"/>
                         <input type="submit" value="View all <%=pdao.count()%> products available"/>
@@ -79,6 +79,6 @@
             </div>
         </div>
 
-        <script src="assets/js/welcome.js"></script>
+        <script src="assets/js/menu.js"></script>
     </body>
 </html>

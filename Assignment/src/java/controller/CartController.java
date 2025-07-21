@@ -1,21 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
-import model.dao.CartDAO;
-import model.dto.CartDTO;
+import model.dao.OrderLineDAO;
+import model.dao.ProductItemDAO;
+import model.dao.ShoppingCartDAO;
+import model.dao.ShoppingCartItemDAO;
+import model.dao.ShoppingOrderDAO;
+import model.dto.OrderLineDTO;
+import model.dto.ShoppingCartItemDTO;
+import model.dto.ShoppingOrderDTO;
+import utils.ValidationUtils;
 
 /**
  *
@@ -23,120 +23,47 @@ import model.dto.CartDTO;
  */
 @WebServlet(name = "CartController", urlPatterns = {"/CartController"})
 public class CartController extends HttpServlet {
-private final CartDAO cdao = new CartDAO();
+
+    private final ShoppingCartDAO SCDAO = new ShoppingCartDAO();
+    private final ShoppingCartItemDAO SCIDAO = new ShoppingCartItemDAO();
+    private final ShoppingOrderDAO SODAO = new ShoppingOrderDAO();
+    private final OrderLineDAO OLDAO = new OrderLineDAO();
+    private final ProductItemDAO PIDAO = new ProductItemDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
-        String action = request.getParameter("action");
-        if (action == null) {
-            response.sendRedirect("error.jsp");
-            return;
-        }
-
-        switch (action) {
-            case "getCart":
-                handleGetCart(request, response);
-                break;
-
-            case "addToCart":
-                handleAddToCart(request, response);
-                break;
-
-            case "updateCart":
-                handleUpdateCart(request, response);
-                break;
-
-            case "removeFromCart":
-                handleRemoveFromCart(request, response);
-                break;
-
-            case "clearCart":
-                handleClearCart(request, response);
-                break;
-
-            case "checkoutCart":
-                handleCheckoutCart(request, response);
-                break;
-
-            default:
+        String url = "";
+        try {
+            String action = request.getParameter("action");
+            if (action == null) {
                 response.sendRedirect("error.jsp");
-        }
-    }
+                return;
+            }
 
-    private void handleGetCart(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        List<CartDTO> cart = (List<CartDTO>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new ArrayList<>();
-        }
-        request.setAttribute("cart", cart);
-        request.getRequestDispatcher("cart.jsp").forward(request, response);
-    }
-
-    private void handleAddToCart(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        CartDTO item = cdao.findById(id);
-        if (item == null) {
-            response.sendRedirect("productNotFound.jsp");
-            return;
-        }
-
-        HttpSession session = request.getSession();
-        List<CartDTO> cart = (List<CartDTO>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new ArrayList<>();
+            switch (action) {
+                case "addToCart":
+                    url = handleAddToCart(request, response);
+                    break;
+                case "updateCart":
+                case "removeFromCart":
+                    url = handleUpdateCart(action, request, response);
+                    break;
+                case "clearCart":
+                    url = handleClearCart(request, response);
+                    break;
+                case "checkoutCart":
+                    url = handleCheckoutCart(request, response);
+                    break;
+                default:
+                    response.sendRedirect("error.jsp");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            request.getRequestDispatcher(url).forward(request, response);
         }
 
-        cart.add(item);
-        session.setAttribute("cart", cart);
-
-        response.sendRedirect("CartController?action=getCart");
-    }
-
-    private void handleUpdateCart(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.sendRedirect("CartController?action=getCart");
-    }
-
-    private void handleRemoveFromCart(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-
-        HttpSession session = request.getSession();
-        List<CartDTO> cart = (List<CartDTO>) session.getAttribute("cart");
-
-        if (cart != null) {
-            cart.removeIf(item -> item.getId() == id);
-            session.setAttribute("cart", cart);
-        }
-
-        response.sendRedirect("CartController?action=getCart");
-    }
-
-    private void handleClearCart(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        session.removeAttribute("cart");
-        response.sendRedirect("CartController?action=getCart");
-    }
-
-    private void handleCheckoutCart(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        List<CartDTO> cart = (List<CartDTO>) session.getAttribute("cart");
-
-        if (cart != null && !cart.isEmpty()) {
-            session.removeAttribute("cart");
-            request.setAttribute("message", "Thanh toán thành công!");
-        } else {
-            request.setAttribute("message", "Giỏ hàng trống.");
-        }
-
-        request.getRequestDispatcher("checkout.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -178,4 +105,146 @@ private final CartDAO cdao = new CartDAO();
         return "Short description";
     }// </editor-fold>
 
+    private String handleAddToCart(HttpServletRequest request, HttpServletResponse response) {
+        int userId = toInt(request.getParameter("userId"));
+        int itemId = toInt(request.getParameter("itemId"));
+        int quantity = toInt(request.getParameter("itemId"));
+
+        if (userId == -1) {
+            return "error.jsp";
+        }
+
+        if (itemId == -1 || quantity == -1 || quantity < 1) {
+            request.setAttribute("errorMsg", "Invalid input parameter");
+            return "product-detail.jsp";
+        }
+
+        int cartId = SCDAO.createOrGetUserCartId(userId);
+        if (!SCIDAO.create(new ShoppingCartItemDTO(cartId, itemId, quantity))) {
+            request.setAttribute("errorMsg", "Internal Error");
+            return "error.jsp";
+        }
+
+        request.setAttribute("msg", "Add item to cart successfully!");
+        return ""; // trang bấm product detail để thêm dô cart
+    }
+
+    private String handleUpdateCart(String action, HttpServletRequest request, HttpServletResponse response) {
+        int id = toInt(request.getParameter("id"));
+
+        if (ValidationUtils.isInvalidId(id)) {
+            request.setAttribute("errorMsg", "Item not found");
+            return ""; // trang quản lý cart
+        }
+
+        if ("updateCart".equals(action)) {
+            int userId = toInt(request.getParameter("userId"));
+            int itemId = toInt(request.getParameter("itemId"));
+            int cartId = toInt(request.getParameter("cartId"));
+            int quantity = toInt(request.getParameter("quantity"));
+            if (userId == -1) {
+                return "error.jsp";
+            }
+
+            if (quantity == -1 || quantity < 1
+                    || ValidationUtils.isInvalidId(id)
+                    || ValidationUtils.isInvalidId(itemId)
+                    || ValidationUtils.isInvalidId(cartId)) {
+                request.setAttribute("errorMsg", "Invalid input parameter");
+                return ""; // trang quản lý cart
+            }
+
+            if (!SCIDAO.update(new ShoppingCartItemDTO(id, cartId, itemId, quantity))) {
+                request.setAttribute("errorMsg", "Internal Error");
+                return "error.jsp";
+            }
+            request.setAttribute("msg", "Update item successfully!");
+            return ""; // trang quản lý cart
+
+        } else if ("removeFromCart".equals(action)) {
+            if (!SCIDAO.softDelete(id)) {
+                request.setAttribute("errorMsg", "Internal Error");
+                return "error.jsp";
+            }
+            request.setAttribute("msg", "Remove item successfully!");
+            return ""; // trang quản lý cart
+        } else {
+            return "error.jsp";
+        }
+    }
+
+    private String handleClearCart(HttpServletRequest request, HttpServletResponse response) {
+        int userId = toInt(request.getParameter("userId"));
+        if (userId == -1) {
+            return "error.jsp";
+        }
+
+        int cartId = SCDAO.createOrGetUserCartId(userId);
+        boolean success = SCIDAO.softDeleteCartItem(cartId);
+
+        if (!success) {
+            request.setAttribute("errorMsg", "Failed to clear cart.");
+            return "error.jsp";
+        }
+
+        request.setAttribute("msg", "Cart cleared successfully!");
+        return ""; // cart.jsp
+    }
+
+    private String handleCheckoutCart(HttpServletRequest request, HttpServletResponse response) {
+        int userId = toInt(request.getParameter("userId"));
+        int addressId = toInt(request.getParameter("addressId"));
+        int paymentMethodId = toInt(request.getParameter("paymentMethodId"));
+        int shippingMethodId = toInt(request.getParameter("shippingMethodId"));
+
+        if (ValidationUtils.isInvalidId(userId)
+                || ValidationUtils.isInvalidId(addressId)
+                || ValidationUtils.isInvalidId(paymentMethodId)
+                || ValidationUtils.isInvalidId(shippingMethodId)) {
+            request.setAttribute("errorMsg", "Thông tin không hợp lệ.");
+            return "checkout.jsp";
+        }
+
+        int cartId = SCDAO.createOrGetUserCartId(userId);
+        double orderTotal = SCIDAO.calculateTotal(cartId);
+
+        ShoppingOrderDTO order = new ShoppingOrderDTO(
+                orderTotal,
+                1, // orderStatusId: e.g. 1 = "Placed"
+                paymentMethodId,
+                shippingMethodId,
+                addressId,
+                userId
+        );
+
+        int orderId = SODAO.createReturnId(order);
+        if (ValidationUtils.isInvalidId(orderId)) {
+            request.setAttribute("errorMsg", "Internal Error.");
+            return "checkout.jsp";
+        }
+
+        List<ShoppingCartItemDTO> cartItems = SCIDAO.retrieve("cart_id = ? AND is_deleted = 0", cartId);
+        for (ShoppingCartItemDTO ci : cartItems) {
+            double price = PIDAO.getPrice(ci.getItem_id());
+            OrderLineDTO line = new OrderLineDTO(
+                    orderId,
+                    ci.getItem_id(),
+                    ci.getQuantity(),
+                    price
+            );
+            OLDAO.create(line);
+        }
+
+        SCIDAO.softDeleteCartItem(cartId);
+        request.setAttribute("successMsg", "Đặt hàng thành công!");
+        return ""; // order detail or order management
+    }
+
+    private int toInt(String str) {
+        try {
+            return Integer.parseInt(str.trim());
+        } catch (Exception e) {
+            return -1;
+        }
+    }
 }

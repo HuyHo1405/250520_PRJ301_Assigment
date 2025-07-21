@@ -7,7 +7,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
-        <link rel="stylesheet" href="assets/css/welcome.css">
+        <link rel="stylesheet" href="assets/css/product_detail.css">
     </head>
     <body>
         <%
@@ -24,7 +24,7 @@
                 </div>
 
                 <div id="main-wrapper">
-                    <button class="toggle-btn" onclick="toggleMenu()">Show Menu</button>
+                    <button id="toggle-btn" class="toggle-btn" onclick="toggleMenu()">Show Menu</button>
                     <div class="product-container">
                         <h1><%= product.getName() %></h1>
                         <img src="<%= product.getCover_image_link() %>" alt="Ảnh sản phẩm"/>
@@ -62,7 +62,7 @@
                                         <form action="MainController" method="post">
                                             <input type="hidden" name="action" value="addToCart" />
                                             <input type="hidden" name="itemId" value="<%= item.getId() %>" />
-                                            <input type="number" name="quantity" value="1" min="1" style="width: 50px;" />
+                                            <input type="number" name="quantity" value="1" min="1"/>
                                             <input type="submit" value="Thêm" />
                                         </form>
                                     </td>
@@ -73,11 +73,14 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="back-link">
+                        <a href="welcome.jsp">Back</a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <script src="assets/js/welcome.js"></script>
+        <script src="assets/js/menu.js"></script>
 
     </body>
 </html>
