@@ -1,0 +1,193 @@
+/* General Body and Layout */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5; /* Light grey background */
+    color: #333; /* Dark grey text */
+    display: flex; /* Use flexbox for layout */
+    min-height: 100vh; /* Ensure body takes full viewport height */
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+#layout {
+    display: flex; /* Establishes a flex container for sidebar and main content */
+    width: 100%;
+}
+
+/* Sidebar Placeholder (assuming sidebar.jsp provides its own styles or this file contributes) */
+/* You might want to define shared sidebar styles in a global stylesheet or in assets/components/sidebar.css */
+#sidebar {
+    width: 250px; /* Example fixed width for sidebar */
+    background-color: #2c3e50; /* Darker blue-grey */
+    color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    /* For a fixed sidebar, uncomment these: */
+    /* position: fixed;
+    height: 100%;
+    overflow-y: auto; */
+    transition: width 0.3s ease-in-out; /* Smooth transition for responsive sidebar */
+}
+
+/* Main Content Container */
+.container {
+    flex-grow: 1; /* Allows the container to take up remaining space */
+    background-color: #ffffff; /* White background for the main content area */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Soft shadow for depth */
+    max-width: 600px; /* Limit width for better readability on large screens */
+    margin: 40px auto; /* Center the container horizontally */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+/* Heading */
+h2 {
+    color: #2c3e50; /* Darker blue-grey heading */
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 2em;
+    text-align: center;
+    border-bottom: 2px solid #e0e0e0; /* Subtle bottom border */
+    padding-bottom: 15px;
+}
+
+/* Messages (Error/Success) */
+p[style="color:red"], p[style="color:green"] { /* Targeting inline styles for now, better to use classes */
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid; /* Add a border */
+}
+
+p[style="color:red"] {
+    background-color: #ffe0e0; /* Light red background */
+    color: #cc0000; /* Dark red text */
+    border-color: #ff9999; /* Red border */
+}
+
+p[style="color:green"] {
+    background-color: #e0ffe0; /* Light green background */
+    color: #008000; /* Dark green text */
+    border-color: #99ff99; /* Green border */
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between form elements */
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+    display: block; /* Ensure label takes full width */
+}
+
+select {
+    width: 100%; /* Full width */
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+    background-color: #fdfdfd;
+    appearance: none; /* Remove default arrow in select */
+    -webkit-appearance: none; /* For Chrome/Safari */
+    -moz-appearance: none; /* For Firefox */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2C197.6l-132.8%2C132.8c-3.1%2C3.1-8.2%2C3.1-11.3%2C0c-3.1-3.1-3.1-8.2%2C0-11.3l127.1-127.1c3.1-3.1%2C8.2-3.1%2C11.3%2C0C290.1%2C189.4%2C290.1%2C194.5%2C287%2C197.6z%22%2F%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M5.4%2C101.6l132.8-132.8c3.1-3.1%2C8.2-3.1%2C11.3%2C0c3.1%2C3.1%2C3.1%2C8.2%2C0%2C11.3l-127.1%2C127.1c-3.1%2C3.1-8.2%2C3.1-11.3%2C0C2.3%2C109.8%2C2.3%2C104.7%2C5.4%2C101.6z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px auto;
+}
+
+select:focus {
+    border-color: #007bff; /* Highlight on focus */
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Submit Button */
+button[type="submit"] {
+    background-color: #28a745; /* Green color */
+    color: white;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%; /* Full width button */
+    box-sizing: border-box;
+}
+
+button[type="submit"]:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+button[type="submit"]:active {
+    transform: translateY(0); /* Reset on click */
+}
+
+/* Back Link */
+.container > a { /* Target the link directly within the container */
+    display: block; /* Make it a block element to control margin/padding */
+    text-align: center;
+    margin-top: 30px;
+    color: #007bff; /* Blue link color */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.container > a:hover {
+    color: #0056b3; /* Darker blue on hover */
+    text-decoration: underline;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    #sidebar {
+        width: 0; /* Collapse sidebar on smaller screens */
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .container {
+        margin: 20px auto; /* Adjust margin for smaller screens */
+        padding: 20px;
+        max-width: 90%; /* Allow container to take more width */
+    }
+
+    h2 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+    select, button[type="submit"] {
+        padding: 10px;
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        margin: 15px auto;
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 1.5em;
+        padding-bottom: 10px;
+    }
+
+    /* Adjust select arrow for very small screens if needed */
+    select {
+        background-position: right 8px top 50%;
+        background-size: 10px auto;
+    }
+}

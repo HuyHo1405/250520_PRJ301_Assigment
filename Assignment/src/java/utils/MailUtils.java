@@ -66,4 +66,29 @@ public class MailUtils {
             e.printStackTrace();
         }
     }
+    
+    public static void sendHtmlEmail(String toEmail, String subject, String htmlContent) throws MessagingException {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(FROM_EMAIL, PASSWORD);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(FROM_EMAIL));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+        message.setSubject(subject);
+        message.setContent(htmlContent, "text/html; charset=UTF-8");
+
+        Transport.send(message);
+        System.out.println("📩 Email sent to: " + toEmail);
+    }
+
 }

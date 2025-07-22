@@ -15,16 +15,12 @@
                 List<ProductItemDTO> items = (List<ProductItemDTO>) request.getAttribute("productItems");
         %>
         <div id="layout">
-
-            <div id="sidebar"></div>
+            <jsp:include page="assets/components/sidebar.jsp" />
 
             <div id="content">
-                <div id="header-wrapper">
-                    <jsp:include page="assets/components/header.jsp" />
-                </div>
+                
 
                 <div id="main-wrapper">
-                    <button id="toggle-btn" class="toggle-btn" onclick="toggleMenu()">Show Menu</button>
                     <div class="product-container">
                         <h1><%= product.getName() %></h1>
                         <img src="<%= product.getCover_image_link() %>" alt="Ảnh sản phẩm"/>
@@ -34,7 +30,7 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Mã phiên bản</th>
+                                    <th>SKU</th>
                                     <th>Số lượng</th>
                                     <th>Hình ảnh</th>
                                     <th>Giá</th>
@@ -45,6 +41,7 @@
                             <tbody>
                                 <%
                                     for (ProductItemDTO item : items) {
+                                    if (!item.getIs_active()) continue;
                                 %>
                                 <tr>
                                     <td><%= item.getSku() %></td>
@@ -61,6 +58,7 @@
                                     <td>
                                         <form action="MainController" method="post">
                                             <input type="hidden" name="action" value="addToCart" />
+                                            <input type="hidden" name="userId" value="${sessionScope.user.id}" />
                                             <input type="hidden" name="itemId" value="<%= item.getId() %>" />
                                             <input type="number" name="quantity" value="1" min="1"/>
                                             <input type="submit" value="Thêm" />
@@ -74,13 +72,14 @@
                         </table>
                     </div>
                     <div class="back-link">
-                        <a href="welcome.jsp">Back</a>
+                        <form action="MainController">
+                            <button name="action" value="toWelcome">Back</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-
-        <script src="assets/js/menu.js"></script>
+        <!--<script src="assets/js/menu.js"></script>-->
 
     </body>
 </html>

@@ -20,7 +20,7 @@ public class ShoppingCartDAO {
     }
 
     public List<ShoppingCartDTO> retrieve(String condition, Object... params) {
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + condition;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE is_deleted = 0 AND " + condition;
         try (Connection conn = DbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
@@ -83,7 +83,7 @@ public class ShoppingCartDAO {
     }
 
     public int findCartIdByUserId(int userId) {
-        List<ShoppingCartDTO> list = retrieve("user_id = ?", userId);
+        List<ShoppingCartDTO> list = retrieve("user_id = ? and is_deleted = 0", userId);
         return list != null && !list.isEmpty() ? list.get(0).getId() : -1;
     }
 
@@ -113,4 +113,5 @@ public class ShoppingCartDAO {
         }
         return 0;
     }
+    
 }

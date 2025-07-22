@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import model.dao.CategoryDAO;
 import model.dao.ProductDAO;
 import model.dao.ProductItemDAO;
 import model.dto.ProductDTO;
@@ -17,7 +18,8 @@ public class ProductController extends HttpServlet {
 
     private ProductDAO pdao = new ProductDAO();
     private ProductItemDAO pidao = new ProductItemDAO();
-
+    private CategoryDAO CDAO = new CategoryDAO();
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -61,7 +63,7 @@ public class ProductController extends HttpServlet {
 
     private void handleViewProduct(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int productId = Integer.parseInt(request.getParameter("id"));
+        int productId = Integer.parseInt(request.getParameter("productId"));
         ProductDTO product = pdao.findById(productId);
         List<ProductItemDTO> productItems = pidao.getByProductId(productId);
 
@@ -74,8 +76,15 @@ public class ProductController extends HttpServlet {
     private void handleSearchProducts(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
-        List<ProductDTO> products = pdao.getProductsByName(keyword);
-        request.setAttribute("products", products);
+        keyword = keyword == null? "":keyword;
+        int categoryId = toInt(request.getParameter("categoryId"));
+        
+        if(categoryId == -1){
+            request.setAttribute("productList", pdao.retrieve("is_active = 1 and name like ?", "%" + keyword + "%"));
+        }else{
+            request.setAttribute("productList", pdao.retrieve("is_active = 1 and category_id = ? and name like ?", categoryId, "%" + keyword + "%"));
+        }
+        request.setAttribute("categoryList", CDAO.retrieve("is_active = 1"));
         request.getRequestDispatcher("welcome.jsp").forward(request, response);
     }
 
@@ -140,4 +149,11 @@ public class ProductController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    private int toInt(String str){
+        try {
+            return Integer.parseInt(str.trim());
+        } catch (Exception e) {
+            return -1;
+        }
+    }
 }

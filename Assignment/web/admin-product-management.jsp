@@ -7,9 +7,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Product Management</title>
-        <link rel="stylesheet" href="assets/css/address-management.css"/>
+        <link rel="stylesheet" href="assets/css/product-management.css"/>
         </head>
     <body>
+        <div class="layout-container">
+            <jsp:include page="assets/components/sidebar.jsp" />
+        
         <div class="main-container">
             <h1>Product Management</h1>
             <hr>
@@ -91,7 +94,7 @@
             <button form="back" name="action" value="toWelcome">Back</button>
         </div>
         </div>
-
+        </div>
 
         <form id="toCreateProduct" action="MainController" method="POST"></form>
         <form id="seacheProductWithCategory" action="MainController" method="POST"></form>

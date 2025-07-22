@@ -18,6 +18,8 @@ public class AuthenticationUtils {
             "/admin-order-management.jsp",
             "/admin-product-management.jsp",
             "/admin-user-management.jsp",
+            "/cart.jsp",
+            "/cart-form.jsp",
             "/config-table.jsp",
             "/order-details.jsp",
             "/product-form.jsp",
@@ -66,6 +68,8 @@ public class AuthenticationUtils {
     );
 
     public static final List<String> CART_ACTIONS = Arrays.asList(
+            "toCart",
+            "toCheckOut",
             "getCart",
             "addToCart",
             "updateCart",

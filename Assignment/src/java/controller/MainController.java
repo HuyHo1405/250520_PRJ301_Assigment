@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
+import model.dao.CategoryDAO;
+import model.dao.ProductDAO;
 
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 @MultipartConfig
@@ -54,6 +56,8 @@ public class MainController extends HttpServlet {
     );
 
     public static final List<String> CART_ACTIONS = Arrays.asList(
+            "toCart",
+            "toCheckOut",
             "getCart",
             "addToCart",
             "updateCart",
@@ -134,6 +138,9 @@ public class MainController extends HttpServlet {
             ""
     );
 
+    private final ProductDAO PDAO = new ProductDAO();
+    private final CategoryDAO CDAO = new CategoryDAO();
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -168,6 +175,8 @@ public class MainController extends HttpServlet {
             } else if (SYSTEM_CONFIG_ACTIONS.contains(action)) {
                 url = "/SystemConfigController";
             } else if (WELCOME_ACTIONS.contains(action)) {
+                request.setAttribute("productList", PDAO.retrieve("is_active = 1"));
+                request.setAttribute("categoryList", CDAO.retrieve("is_active = 1"));
                 url = WELCOME_PAGE;
             } else {
                 url = ERROR_PAGE;

@@ -7,14 +7,21 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import model.dao.AddressDAO;
 import model.dao.OrderLineDAO;
+import model.dao.PaymentMethodDAO;
 import model.dao.ProductItemDAO;
+import model.dao.ShippingMethodDAO;
 import model.dao.ShoppingCartDAO;
 import model.dao.ShoppingCartItemDAO;
 import model.dao.ShoppingOrderDAO;
+import model.dto.AddressDTO;
 import model.dto.OrderLineDTO;
+import model.dto.PaymentMethodDTO;
+import model.dto.ShippingMethodDTO;
 import model.dto.ShoppingCartItemDTO;
 import model.dto.ShoppingOrderDTO;
+import utils.UserUtils;
 import utils.ValidationUtils;
 
 /**
@@ -29,6 +36,10 @@ public class CartController extends HttpServlet {
     private final ShoppingOrderDAO SODAO = new ShoppingOrderDAO();
     private final OrderLineDAO OLDAO = new OrderLineDAO();
     private final ProductItemDAO PIDAO = new ProductItemDAO();
+    private final AddressDAO ADAO = new AddressDAO();
+    private final PaymentMethodDAO PMDAO = new PaymentMethodDAO();
+    private final ShippingMethodDAO SMDAO = new ShippingMethodDAO();
+    
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -42,6 +53,25 @@ public class CartController extends HttpServlet {
             }
 
             switch (action) {
+                case "toCart":
+                    int cartId = SCDAO.createOrGetUserCartId(UserUtils.getUserId(request));
+                    request.setAttribute("shoppingCartList", SCIDAO.findByCartId(cartId));
+                    url = "cart.jsp";
+                    break;
+                case "toCheckOut":
+                    int userId = UserUtils.getUserId(request); // hoặc lấy từ session
+
+                    List<AddressDTO> addressList = ADAO.getUserAddress(userId);
+                    List<PaymentMethodDTO> paymentMethods = PMDAO.retrieve("is_active = 1");
+                    List<ShippingMethodDTO> shippingMethods = SMDAO.retrieve("is_active = 1");
+
+                    request.setAttribute("userId", userId);
+                    request.setAttribute("addressList", addressList);
+                    request.setAttribute("paymentMethods", paymentMethods);
+                    request.setAttribute("shippingMethods", shippingMethods);
+
+                    url= "cart-form.jsp";
+                    break;
                 case "addToCart":
                     url = handleAddToCart(request, response);
                     break;
@@ -108,7 +138,7 @@ public class CartController extends HttpServlet {
     private String handleAddToCart(HttpServletRequest request, HttpServletResponse response) {
         int userId = toInt(request.getParameter("userId"));
         int itemId = toInt(request.getParameter("itemId"));
-        int quantity = toInt(request.getParameter("itemId"));
+        int quantity = toInt(request.getParameter("quantity"));
         
         if(userId == -1){
             return "error.jsp";
@@ -116,7 +146,7 @@ public class CartController extends HttpServlet {
         
         if(itemId == -1 || quantity == -1 || quantity < 1){
             request.setAttribute("errorMsg", "Invalid input parameter");
-            return "product-detail.jsp";
+            return "product_detail.jsp";
         }
         
         int cartId = SCDAO.createOrGetUserCartId(userId);
@@ -126,7 +156,7 @@ public class CartController extends HttpServlet {
         }
         
         request.setAttribute("msg", "Add item to cart successfully!");
-        return ""; // trang bấm product detail để thêm dô cart
+        return "welcome.jsp";
     }
 
     private String handleUpdateCart(String action, HttpServletRequest request, HttpServletResponse response) {
@@ -202,7 +232,8 @@ public class CartController extends HttpServlet {
                 || ValidationUtils.isInvalidId(paymentMethodId)
                 || ValidationUtils.isInvalidId(shippingMethodId)) {
             request.setAttribute("errorMsg", "Thông tin không hợp lệ.");
-            return "checkout.jsp";
+            System.out.println("1:");
+            return "cart.jsp";
         }
 
         int cartId = SCDAO.createOrGetUserCartId(userId);
@@ -220,10 +251,13 @@ public class CartController extends HttpServlet {
         int orderId = SODAO.createReturnId(order);
         if(ValidationUtils.isInvalidId(orderId)){
             request.setAttribute("errorMsg", "Internal Error.");
-            return "checkout.jsp";
+            System.out.println("2:");
+            return "cart.jsp";
         }
+        order.setOrder_code(String.format("ORD%06d", orderId));
+        SODAO.update(order);
         
-        List<ShoppingCartItemDTO> cartItems = SCIDAO.retrieve("cart_id = ? AND is_deleted = 0", cartId);
+        List<ShoppingCartItemDTO> cartItems = SCIDAO.retrieve("cart_id = ?", cartId);
         for (ShoppingCartItemDTO ci : cartItems) {
             double price = PIDAO.getPrice(ci.getItem_id());
             OrderLineDTO line =  new OrderLineDTO(
@@ -234,10 +268,9 @@ public class CartController extends HttpServlet {
             );
             OLDAO.create(line);
         }
-        
         SCIDAO.softDeleteCartItem(cartId);
         request.setAttribute("successMsg", "Đặt hàng thành công!");
-        return ""; // order detail or order management
+        return "cart.jsp"; 
     }
 
     private int toInt(String str) {

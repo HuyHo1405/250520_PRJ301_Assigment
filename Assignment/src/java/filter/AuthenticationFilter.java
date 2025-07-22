@@ -38,7 +38,19 @@ public class AuthenticationFilter implements Filter {
 
         String action = req.getParameter("action");
         if (action == null) action = "";
+        String uri = req.getRequestURI();
+        
+        if (uri.startsWith(req.getContextPath() + "/assets/")
+                || uri.endsWith(".css") || uri.endsWith(".js")
+                || uri.endsWith(".png") || uri.endsWith(".jpg")
+                || uri.endsWith(".jpeg") || uri.endsWith(".gif")
+                || uri.endsWith(".woff") || uri.endsWith(".woff2")
+                || uri.endsWith(".ttf") || uri.endsWith(".svg")) {
 
+            chain.doFilter(request, response);
+            return;
+        }
+        
         List<String> ignoreActions = Arrays.asList(
             "toLogin", "login",
             "toRegister", "register",
@@ -46,6 +58,8 @@ public class AuthenticationFilter implements Filter {
             "toResetPassword", "resetPassword"
         );
 
+        
+        
         // Bỏ qua kiểm tra đăng nhập cho các action cho phép
         if (!ignoreActions.contains(action)) {
             HttpSession session = req.getSession(false);

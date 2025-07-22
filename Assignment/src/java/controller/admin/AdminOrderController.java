@@ -26,6 +26,7 @@ import model.dto.PaymentTypeDTO;
 import model.dto.ShippingMethodDTO;
 import model.dto.ShoppingOrderDTO;
 import model.dto.UserDTO;
+import utils.MailUtils;
 import utils.OrderUtils;
 import utils.ValidationUtils;
 
@@ -227,6 +228,22 @@ public class AdminOrderController extends HttpServlet {
         order.setOrderStatusId(orderStatusId);
         SODAO.update(order);
 
+        try {
+            UserDTO user = UDAO.findById(order.getUserId());
+            if (user != null) {
+                String toEmail = user.getEmail_address();
+                String newStatusName = statusList.get(0).getStatus();
+                String subject = "Your Order #" + order.getOrder_code() + " Status Update";
+
+                String content = "<h3>Your Order Status Has Been Updated</h3>"
+                        + "<p>Your order <b>#" + order.getOrder_code() + "</b> has been updated to: <b>" + newStatusName + "</b>.</p>"
+                        + "<p>Thank you for shopping with us!</p>";
+
+                MailUtils.sendHtmlEmail(toEmail, subject, content);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         request.setAttribute("orderList", SODAO.retrieve("1 = 1"));
         request.setAttribute("statusMap", OrderUtils.getMap(OSDAO.retrieve("1=1")));
         return ADMIN_ORDER_MANAGEMENT_PAGE;

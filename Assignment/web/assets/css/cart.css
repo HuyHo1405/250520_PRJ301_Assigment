@@ -1,0 +1,333 @@
+/* General Layout (assuming dashboard-wrapper is a main layout) */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
+    color: #333;
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.dashboard-wrapper {
+    display: flex;
+    width: 100%;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px 30px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin: 20px; /* Add some margin around the main content */
+    border-radius: 8px;
+}
+
+/* Cart Container Specific Styles */
+.cart-container {
+    max-width: 1000px;
+    margin: 0 auto; /* Center the cart content */
+    padding: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 2.5em;
+    text-align: center;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+}
+
+/* Empty Cart Message */
+.empty-cart-message {
+    text-align: center;
+    font-size: 1.2em;
+    color: #666;
+    margin: 50px 0;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+}
+
+.empty-cart-message a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.empty-cart-message a:hover {
+    text-decoration: underline;
+}
+
+/* Cart Table Styling */
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden; /* Ensures rounded corners */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cart-table thead tr {
+    background-color: #007bff;
+    color: white;
+}
+
+.cart-table th,
+.cart-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+.cart-table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.cart-table tbody tr:nth-of-type(even) {
+    background-color: #f8f9fa;
+}
+
+.cart-table tbody tr:hover {
+    background-color: #e2f0ff;
+}
+
+/* Product Name Link */
+.cart-table td a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.cart-table td a:hover {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+/* Product Image */
+.cart-item-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    display: block;
+}
+
+/* Quantity Input */
+.quantity-input {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    -moz-appearance: textfield; /* Hide arrows in Firefox */
+}
+
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Hide arrows in Chrome, Safari */
+    margin: 0;
+}
+
+/* Remove Button */
+.remove-button {
+    background-color: #dc3545; /* Red color */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.remove-button:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+/* Total Row */
+.cart-table tfoot td {
+    border-top: 2px solid #ddd;
+    font-weight: bold;
+    font-size: 1.2em;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.cart-table tfoot .total-label {
+    text-align: right;
+    padding-right: 15px;
+}
+
+.cart-table tfoot .total-price {
+    text-align: left; /* Align total price to the left for better readability */
+    color: #007bff;
+}
+
+
+/* Cart Actions (Buttons) */
+.cart-actions {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 15px; /* Space between buttons */
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.continue-shopping-button, .checkout-button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-decoration: none; /* For the anchor tag */
+    display: inline-flex; /* To center text vertically */
+    align-items: center;
+    justify-content: center;
+}
+
+.continue-shopping-button {
+    background-color: #6c757d; /* Grey */
+    color: white;
+}
+
+.continue-shopping-button:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.checkout-button {
+    background-color: #28a745; /* Green */
+    color: white;
+}
+
+.checkout-button:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .dashboard-wrapper {
+        flex-direction: column; /* Stack sidebar and main content */
+    }
+
+    #sidebar {
+        width: 100%; /* Sidebar takes full width */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: relative; /* Not fixed anymore */
+        height: auto;
+    }
+
+    .main-content {
+        margin: 0; /* Remove side margins when stacked */
+        border-radius: 0;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    /* Make table stack on small screens */
+    .cart-table, .cart-table tbody, .cart-table tr, .cart-table th, .cart-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .cart-table thead {
+        display: none; /* Hide table headers */
+    }
+
+    .cart-table tr {
+        margin-bottom: 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    }
+
+    .cart-table td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%; /* Space for pseudo-element label */
+        text-align: right;
+    }
+
+    .cart-table td:last-child {
+        border-bottom: 0;
+        text-align: center; /* Center action buttons */
+    }
+
+    .cart-table td:before {
+        content: attr(data-label); /* Use data-label for mobile view */
+        position: absolute;
+        left: 10px;
+        width: calc(50% - 20px);
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #555;
+    }
+
+    /* Adjust specific data-label contents */
+    .cart-table td:nth-of-type(1):before { content: "Sản phẩm:"; }
+    .cart-table td:nth-of-type(2):before { content: "Mã phiên bản:"; }
+    .cart-table td:nth-of-type(3):before { content: "Ảnh:"; }
+    .cart-table td:nth-of-type(4):before { content: "Giá:"; }
+    .cart-table td:nth-of-type(5):before { content: "Số lượng:"; }
+    .cart-table td:nth-of-type(6):before { content: "Tổng tiền:"; }
+    .cart-table td:nth-of-type(7):before { content: "Hành động:"; }
+
+    .cart-table tfoot td {
+        text-align: center !important; /* Center footer on mobile */
+        padding: 15px !important;
+    }
+    .cart-table tfoot .total-price {
+        text-align: center !important; /* Ensure total price is centered */
+    }
+
+    .cart-actions {
+        flex-direction: column; /* Stack buttons vertically */
+        align-items: center; /* Center stacked buttons */
+        gap: 10px;
+    }
+
+    .continue-shopping-button, .checkout-button {
+        width: 100%;
+        max-width: 300px; /* Limit button width */
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        font-size: 1.8em;
+    }
+    .main-content {
+        padding: 10px;
+    }
+    .cart-container {
+        padding: 10px;
+    }
+    .cart-table td {
+        padding-left: 40%; /* Adjust padding for very small screens */
+    }
+    .cart-table td:before {
+        width: calc(40% - 20px);
+    }
+}

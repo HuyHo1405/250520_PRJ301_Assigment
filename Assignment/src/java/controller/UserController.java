@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import model.dao.CategoryDAO;
+import model.dao.ProductDAO;
 import model.dao.UserDAO;
 import model.dto.UserDTO;
 import utils.HashUtils;
@@ -23,6 +25,8 @@ public class UserController extends HttpServlet {
     private static final String USER_FORM_PAGE = "user-form.jsp";
     private static final String ERROR_PAGE = "error.jsp";
     private final UserDAO UDAO = new UserDAO();
+    private final ProductDAO PDAO = new ProductDAO();
+    private final CategoryDAO CDAO = new CategoryDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -143,9 +147,11 @@ public class UserController extends HttpServlet {
         if (!ls.isEmpty()) {
             HttpSession session = request.getSession();
             session.setAttribute("user", ls.get(0));
+            request.setAttribute("productList", PDAO.retrieve("is_active = 1"));
+            request.setAttribute("categoryList", CDAO.retrieve("is_active = 1"));
             return WELCOME_PAGE;
         } else {
-            request.setAttribute("error", "Email hoặc mật khẩu không đúng.");
+            request.setAttribute("error", "Email Or Password is Incorrect.");
             request.setAttribute("inputEmail", email);
             return USER_FORM_PAGE;
         }

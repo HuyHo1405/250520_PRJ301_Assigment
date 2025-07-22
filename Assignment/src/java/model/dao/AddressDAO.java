@@ -101,6 +101,26 @@ public class AddressDAO {
         return null;
     }
 
+    public List<AddressDTO> getUserAddress(int userId){
+        String sql = "select a.* from address a \n"
+                + "join user_address ua on a.id = ua.address_id\n"
+                + "where ua.user_id = ?";
+        try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, userId);
+            ResultSet rs = ps.executeQuery();
+            List<AddressDTO> list = new ArrayList<>();
+            while (rs.next()) {
+                list.add(mapToAddress(rs));
+            }
+
+            return list;
+        } catch (Exception e) {
+            System.err.println("Error in retrieve(): " + e.getMessage());
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+    
     public boolean update(AddressDTO address) {
         String sql = "UPDATE " + TABLE_NAME + " SET country_id = ?, unit_number = ?, street_number = ?, address_line1 = ?, address_line2 = ?, city = ?, region = ? WHERE id = ?";
         try ( Connection conn = DbUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -155,5 +175,12 @@ public class AddressDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+    
+    public static void main(String[] args) {
+        AddressDAO dao = new AddressDAO();
+        for (AddressDTO a : dao.getUserAddress(12)) {
+            System.out.println(a);
+        }
     }
 }

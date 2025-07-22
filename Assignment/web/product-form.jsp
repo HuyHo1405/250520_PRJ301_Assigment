@@ -13,10 +13,14 @@
                 <c:otherwise>View Product</c:otherwise>
             </c:choose>
         </title>
-       <link rel="stylesheet" href="assets/css/address-management.css">
+       <link rel="stylesheet" href="assets/css/product-form.css">
         </head>
     <body>
-        <div class="main-container">
+        
+        <div class="dashboard-wrapper">
+        <jsp:include page="assets/components/sidebar.jsp" />
+
+        <div class="main-content">
             <h1>
                 <c:choose>
                     <c:when test="${actionType eq 'createProduct'}">Create New Product</c:when>
@@ -129,7 +133,7 @@
                 </div>
             </c:if>
         </div>
-
+        </div>
         <script>
             console.log("JS loaded");
             document.getElementById("imageFileInput").addEventListener("change", function () {

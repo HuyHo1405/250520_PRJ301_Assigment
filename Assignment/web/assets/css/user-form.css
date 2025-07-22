@@ -1,100 +1,202 @@
+/* assets/css/user-form.css */
+
+/* Optional: Universal Box Sizing */
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f3f4f6;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
     margin: 0;
-    padding: 0;
+    font-size: 1.5em; /* Kích thước font cơ bản cho body */
 }
 
 .container {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 40px 20px;
-    gap: 40px;
-    max-width: 1200px;
-    margin: auto;
-    flex-wrap: wrap;
+    /* Loại bỏ width và height cố định để container linh hoạt hơn */
+    width: 90%; /* Chiều rộng mặc định 90% của viewport */
+    max-width: 900px; /* Chiều rộng tối đa để form không quá lớn trên màn hình rộng */
+    /* Bạn có thể điều chỉnh max-width này theo ý muốn, ví dụ: 700px, 800px */
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px; /* Thêm bo góc nhẹ cho container */
+    overflow: hidden;
 }
 
 .left-banner {
-    flex: 1;
-    max-width: 500px;
-}
-
-.left-banner img {
-    width: 100%;
-    height: auto;
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    width: 30%;
+    /* Sử dụng min-height thay vì height cố định để banner co giãn theo form */
+    min-height: 100%; /* Đảm bảo banner có chiều cao tối thiểu bằng form-box */
+    background-color: #48a5ea;
+    /* Thêm thuộc tính căn giữa nội dung nếu có ảnh hoặc text trong banner */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .form-box {
-    flex: 1;
-    max-width: 500px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    flex: 1; /* Cho phép form-box chiếm phần còn lại của không gian */
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 500px; /* Chiều cao tối thiểu của form-box */
+    /* Nếu nội dung ít, min-height sẽ đảm bảo chiều cao tối thiểu. */
+    /* Nếu nội dung nhiều, form sẽ tự động co giãn. */
 }
 
-.form-box .heading h1 {
-    font-size: 28px;
+.heading {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.heading h1 {
+    color: #333;
+    margin: 0;
+    font-size: 3em; /* Điều chỉnh font size nhỏ lại cho hợp lý hơn trên nhiều màn hình */
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #eee;
+    margin-bottom: 25px;
+}
+
+p {
+    margin-top: 0;
     margin-bottom: 20px;
-    color: #1f2937;
-    border-bottom: 2px solid #d1d5db;
-    padding-bottom: 10px;
+    text-align: center;
 }
 
-.form-box .error {
-    background-color: #fee2e2;
-    border-left: 4px solid #ef4444;
-    padding: 10px;
-    margin-bottom: 15px;
-    color: #991b1b;
-    border-radius: 4px;
+p[style="color:red;"] {
+    color: #d9534f !important;
+    font-weight: bold;
+}
+
+p[style="color:green;"] {
+    color: #5cb85c !important;
+    font-weight: bold;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 form input[type="email"],
 form input[type="text"],
 form input[type="password"] {
-    width: 100%;
-    padding: 10px 12px;
-    margin: 10px 0;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
+    width: 100%; /* Set width to 100% and rely on padding and gap */
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1.05em;
 }
 
 form button {
-    background-color: #2563eb;
+    background-color: #48a5ea;
     color: white;
+    padding: 12px 18px;
     border: none;
-    padding: 10px 18px;
-    margin-top: 10px;
-    margin-right: 8px;
-    border-radius: 8px;
-    font-size: 14px;
+    border-radius: 50px;
     cursor: pointer;
+    font-size: 1.15em;
     transition: background-color 0.3s ease;
+    width: 100%;
 }
 
 form button:hover {
-    background-color: #1d4ed8;
+    background-color: #0056b3;
 }
 
-form {
-    margin-bottom: 10px;
+/* New class for inline buttons, applied to a wrapping div or directly to form if structure allows */
+/* Example HTML change: <div class="button-group"> <form><button></button></form> <form><button></button></form> </div> */
+/* Or, if only a single form contains these buttons: <form class="inline-buttons-form"> */
+
+/* Assuming you have a div wrapping the two buttons "Register" and "Forgot Password" with class "login-options" as per your JSP */
+.login-options {
+    display: flex;
+    flex-direction: row;
+    flex:1;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 20px;
 }
+
+.login-options button { /* Targeting buttons directly inside .login-options */
+    flex-grow: 1; /* Allow buttons to grow and take equal space */
+    width: auto; /* Allow flex-grow to manage width */
+    background-color: #6c757d; /* Default color for these buttons */
+    padding: 10px 15px;
+    font-size: 1em;
+}
+
+.login-options button:hover {
+    background-color: #5a6268;
+}
+
+/* Specific style for "Back" button, assuming it's the only button in its own form when action is not 'login' */
+/* Add a class to the "Back" button for cleaner targeting, e.g., <button class="back-button" ...> */
+.back-button { /* Example: if you add class="back-button" to the Back button */
+    background-color: #f0ad4e !important; /* Use important if absolutely necessary to override .login-options button */
+}
+
+.back-button:hover {
+    background-color: #ec971f !important;
+}
+
 
 @media (max-width: 768px) {
     .container {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: column; /* Stack banner and form vertically on small screens */
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+        box-shadow: none; /* Remove shadow on mobile for full-width look */
+    }
+
+    .left-banner {
+        width: 100%; /* Banner takes full width on small screens */
+        height: 150px; /* Fixed height for banner on mobile */
+    }
+
+    .form-box {
+        padding: 30px;
+        min-height: unset; /* Allow form-box to collapse or expand with content */
+    }
+
+    .heading h1 {
+        font-size: 2.5em; /* Adjust font size for smaller screens */
+    }
+
+    .login-options {
+        flex-direction: column; /* Stack login options vertically on very small screens */
+    }
+
+    .login-options button {
+        margin-bottom: 10px; /* Add space between stacked buttons */
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-box {
         padding: 20px;
     }
 
-    .left-banner,
-    .form-box {
-        max-width: 100%;
+    .heading h1 {
+        font-size: 2em; /* Even smaller font for heading on tiny screens */
+    }
+
+    form button {
+        font-size: 1em;
+        padding: 8px 10px;
     }
 }

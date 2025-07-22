@@ -16,7 +16,7 @@
     <body>
         <!-- Main Profile Layout Container -->
         <div class="main-profile-layout">
-            <!-- Left Column for Account and Address Info -->
+            <jsp:include page="assets/components/sidebar.jsp" />
             <div class="left-column">
                 <h1>${sessionScope.user.email_address} Profile</h1>
                 
@@ -71,18 +71,6 @@
                 </form>
             </div>
 
-            <!-- Right Column for Admin Action -->
-                <div class="right-column">
-            <c:if test="${sessionScope.user.role eq 'admin'}">
-                    <h2>Admin Action</h2>
-                    <form action="MainController" method="post">
-                        <button name="action" value="toSystemConfigManagement">System Configuration Management</button>
-                        <button name="action" value="toAdminUserPage">Admin User Management</button>
-                        <button name="action" value="toAdminProductPage">Admin Product Management</button>
-                        <button name="action" value="toAdminOrderPage">Admin Order Management</button>
-                    </form>
-            </c:if>
-                </div>
         </div>
     </body>
 </html>

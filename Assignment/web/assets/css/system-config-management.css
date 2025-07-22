@@ -1,0 +1,371 @@
+/* Import Google Font - Inter */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    body {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f3f4f6; /* Light gray background */
+        color: #374151; /* Dark gray text */
+        line-height: 1.6;
+    }
+
+    /* Main Layout Container (wraps sidebar and content) */
+    .layout-container {
+        display: flex; /* Use flexbox to align sidebar and main content */
+        min-height: 100vh;
+        padding: 1.5rem; /* Overall padding around the layout */
+        gap: 1.5rem; /* Space between sidebar and content */
+        box-sizing: border-box; /* Include padding in element's total width and height */
+    }
+
+    /* Sidebar Container */
+    .sidebar {
+        /* Assuming sidebar.jsp handles its own width/styling, but you can add specific styles here if needed */
+        flex-shrink: 0; /* Prevent it from shrinking */
+        /* Example: width: 250px; */
+    }
+
+    /* Main Content Area */
+    .content { /* Changed from .content-container to .content as per new HTML */
+        flex-grow: 1; /* Allows it to take available space */
+        background-color: #ffffff; /* White background for the main content area */
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .content hr { /* Not explicitly in the new HTML, but good to keep if it's implicitly rendered or added later */
+        border: none;
+        border-top: 1px solid #e5e7eb; /* Light gray horizontal rule */
+        margin: 1.5rem 0;
+    }
+
+    /* New: Grid for Configuration Sections */
+    .content > .config-section:first-of-type { /* Target the first config section to start the grid */
+        margin-top: 0; /* Remove top margin from the first section if it's the first child of a grid */
+    }
+
+    /* Apply grid to a container that holds config-sections.
+       Since config-sections are direct children of .content,
+       we'll apply grid to .content itself and adjust its padding and gap. */
+    .content {
+        display: grid; /* Use CSS Grid for layout */
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); /* Two columns on large screens, one on small */
+        gap: 2rem; /* Space between grid items (config sections) */
+        padding: 2rem; /* Maintain padding for the content area */
+        /* Remove flex-direction: column; from .content as grid handles layout */
+        /* flex-direction: column; */ /* Commented out as grid takes over */
+    }
+    /* Adjust padding for the h1 and actions div if they are not part of the grid */
+    .content h1,
+    .content .actions {
+        grid-column: 1 / -1; /* Make h1 and actions span all columns */
+    }
+
+
+    /* Configuration Section Styling */
+    .config-section {
+        background-color: #f9fafb; /* Lighter background for each section */
+        padding: 2rem;
+        border-radius: 0.75rem;
+        /* margin-bottom: 2rem; */ /* Removed as gap handles spacing */
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        height: fit-content; /* Ensure sections don't stretch unnecessarily in grid */
+    }
+
+    .config-section .section-title { /* Selector for the div with class section-title */
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #4f46e5; /* Indigo underline */
+        padding-bottom: 0.75rem;
+    }
+
+    /* Generic Table Styling (for config-table.jsp includes) */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        overflow: hidden; /* Ensures rounded corners apply to table content */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    table th,
+    table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb; /* Light gray border for rows */
+    }
+
+    table th {
+        background-color: #f3f4f6; /* Lighter background for table headers */
+        font-weight: 600;
+        color: #4b5563;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+    }
+
+    table tbody tr:last-child td {
+        border-bottom: none; /* No border for the last row */
+    }
+
+    table tbody tr:hover {
+        background-color: #f9fafb; /* Subtle hover effect for rows */
+    }
+
+    /* Input fields within tables (for edit/add mode) */
+    table input[type="text"] {
+        width: calc(100% - 2rem); /* Full width minus padding */
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        font-size: 0.9rem;
+        color: #4b5563;
+        box-sizing: border-box;
+    }
+
+    /* Action Buttons within tables */
+    table td form {
+        display: inline-block; /* Allow forms to sit next to each other */
+        margin-right: 0.5rem; /* Space between buttons */
+        margin-bottom: 0.5rem; /* For stacking on small screens */
+    }
+
+    table td button {
+        padding: 0.6rem 1rem;
+        border: none;
+        border-radius: 0.375rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    /* Specific Button Colors for Actions */
+    button[name="action"][value*="Add"] { /* For Add buttons */
+        background-color: #10b981; /* Green */
+        color: #ffffff;
+    }
+    button[name="action"][value*="Add"]:hover {
+        background-color: #059669;
+        transform: translateY(-1px);
+    }
+
+    button[name="action"][value*="Edit"] { /* For Edit buttons */
+        background-color: #3b82f6; /* Blue */
+        color: #ffffff;
+    }
+    button[name="action"][value*="Edit"]:hover {
+        background-color: #2563eb;
+        transform: translateY(-1px);
+    }
+
+    button[name="action"][value*="Update"] { /* For Update buttons */
+        background-color: #4f46e5; /* Indigo */
+        color: #ffffff;
+    }
+    button[name="action"][value*="Update"]:hover {
+        background-color: #4338ca;
+        transform: translateY(-1px);
+    }
+
+    button[name="action"][value*="Delete"] { /* For Delete buttons */
+        background-color: #ef4444; /* Red */
+        color: #ffffff;
+    }
+    button[name="action"][value*="Delete"]:hover {
+        background-color: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    button[name="action"][value*="Cancel"] { /* For Cancel buttons */
+        background-color: #6b7280; /* Gray */
+        color: #ffffff;
+    }
+    button[name="action"][value*="Cancel"]:hover {
+        background-color: #4b5563;
+        transform: translateY(-1px);
+    }
+
+    /* Back to Home button within the new .actions div */
+    .actions {
+        text-align: center;
+        margin-top: 2rem;
+        grid-column: 1 / -1; /* Make actions span all columns in the grid */
+    }
+
+    .actions form button { /* Target the button inside the .actions form */
+        background-color: #6b7280; /* Gray for Back button */
+        color: #ffffff;
+        padding: 0.85rem 1.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: inline-block;
+        width: auto;
+    }
+
+    .actions form button:hover {
+        background-color: #4b5563; /* Darker gray on hover */
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1024px) {
+        .layout-container {
+            flex-direction: column; /* Stack sidebar and main content */
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        .content { /* Changed from .content-container to .content */
+            margin: 0; /* Remove auto margin from previous .main-container */
+            padding: 1.5rem; /* Adjust padding for content when it's a single column layout */
+            grid-template-columns: 1fr; /* Force single column on smaller screens */
+        }
+
+        .content h1 {
+            font-size: 2rem;
+        }
+
+        .config-section {
+            padding: 1.5rem;
+        }
+
+        .config-section .section-title { /* Updated selector */
+            font-size: 1.5rem;
+        }
+
+        table th,
+        table td {
+            padding: 0.8rem;
+        }
+
+        table input[type="text"],
+        table td button {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .layout-container {
+            padding: 0.75rem;
+        }
+
+        .content { /* Changed from .content-container to .content */
+            padding: 1rem;
+        }
+
+        .content h1 {
+            font-size: 1.75rem;
+        }
+
+        .config-section {
+            padding: 1rem;
+        }
+
+        .config-section .section-title { /* Updated selector */
+            font-size: 1.35rem;
+        }
+
+        table {
+            font-size: 0.9rem;
+            display: block; /* Make table scrollable on very small screens */
+            overflow-x: auto;
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+
+        table thead, table tbody, table th, table td, table tr {
+            display: block;
+        }
+
+        table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        table tr {
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.625em;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        table td {
+            border: none;
+            border-bottom: 1px solid #e5e7eb;
+            position: relative;
+            padding-left: 50%; /* Space for the "label" */
+            text-align: right;
+            white-space: normal; /* Allow text to wrap within cells */
+        }
+
+        table td:before {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        /* Labels for table cells on small screens */
+        .config-section table td:nth-of-type(1):before { content: "ID:"; }
+        .config-section table td:nth-of-type(2):before { content: "Value:"; } /* Adjust this based on actual fieldName */
+        .config-section table td:nth-of-type(3):before { content: "Action:"; }
+
+        table td form {
+            display: block; /* Stack buttons vertically */
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .layout-container {
+            padding: 0.5rem;
+        }
+
+        .content { /* Changed from .content-container to .content */
+            padding: 0.75rem;
+        }
+
+        .content h1 {
+            font-size: 1.5rem;
+        }
+
+        .config-section {
+            padding: 0.75rem;
+        }
+
+        .config-section .section-title { /* Updated selector */
+            font-size: 1.2rem;
+        }
+    }

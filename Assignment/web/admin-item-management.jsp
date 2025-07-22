@@ -12,9 +12,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Product Item Management</title>
-        <link rel="stylesheet" href="assets/css/address-management.css">
+        <link rel="stylesheet" href="assets/css/item-management.css">
         </head>
     <body>
+        <div class="page-layout">
+             <jsp:include page="assets/components/sidebar.jsp" />
         <div class="main-container">
             <h1>Product Item Management</h1>
             <hr>
@@ -221,12 +223,13 @@
             <form id="cancel" action="MainController" method="post" style="display:inline;">
                 
             </form>
-        </div>
-        <hr>
         <div class="back-button-container">
             <form action="MainController" method="post" style="display:inline;">
                 <button name="action" value="toAdminProductPage">Back</button>
             </form>
         </div>
+        </div>
+        <hr>
+         </div>
     </body>
 </html>

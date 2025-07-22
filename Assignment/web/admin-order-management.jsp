@@ -5,9 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Order Management</title>
-    <link rel="stylesheet" href="assets/css/address-management.css"/>
+    <link rel="stylesheet" href="assets/css/order-management.css"/>
     </head>
 <body>
+    <div class="layout-container">
+            <jsp:include page="assets/components/sidebar.jsp" />
     <div class="main-container">
         <h1>Order Management</h1>
         <hr>
@@ -78,6 +80,6 @@
         </form>
     </div>
     </div>
-    
+    </div>
 </body>
 </html>

@@ -197,7 +197,7 @@ public class ProductItemDAO {
     }
 
     public List<ProductItemDTO> getByProductId(int productId) {
-        return retrieve("product_id = ?", productId);
+        return retrieve("product_id = ? AND is_deleted = 0", productId);
     }
     
     public static void main(String[] args) {

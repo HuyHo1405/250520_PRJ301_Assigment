@@ -25,15 +25,27 @@ public class AuthorizationFilter implements Filter {
         String action = req.getParameter("action");
         String uri = req.getRequestURI();
 
+        if (uri.startsWith(req.getContextPath() + "/assets/")
+                || uri.endsWith(".css") || uri.endsWith(".js")
+                || uri.endsWith(".png") || uri.endsWith(".jpg")
+                || uri.endsWith(".jpeg") || uri.endsWith(".gif")
+                || uri.endsWith(".woff") || uri.endsWith(".woff2")
+                || uri.endsWith(".ttf") || uri.endsWith(".svg")) {
+
+            chain.doFilter(request, response);
+            return;
+        }
+
         boolean isProtected = AuthorizationUtils.isProtectedJsp(uri) 
                             || AuthorizationUtils.isProtectedAction(uri, action);
         
-        boolean isFounder = UserUtils.isAdmin(req);
+        boolean isAdmin = UserUtils.isAdmin(req);
 
-        if (isProtected && !isFounder) {
+        if (isProtected && !isAdmin) {
             res.sendRedirect("welcome.jsp");
         }else{
         }
+        chain.doFilter(request, response);
 
     }
 

@@ -26,7 +26,7 @@
     <c:set var="list" value="${requestScope[param.listName]}" />
     <c:set var="categoryList" value="${requestScope.categoryList}" />
 
-    <div class="container mx-auto w-auto bg-white p-6 rounded shadow-md">
+    <div class="tcontainer mx-auto w-auto bg-white p-6 rounded shadow-md">
 
         <table class="min-w-full table-auto border border-gray-300 divide-y divide-gray-200">
             <thead class="bg-gray-100">
@@ -183,7 +183,7 @@
             <form action="MainController" method="post" class="mt-4">
                 <input type="hidden" name="action" value="toSystemConfigManagement" />
                 <input type="hidden" name="addModeType" value="${type}" /> 
-                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow">Thêm Mới</button>
+                <button type="submit" class="add">Add New</button>
             </form>
         </c:if>
     </div>

@@ -6,9 +6,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Order Details</title>
+    <link rel="stylesheet" href="assets/css/order-details.css"/>
 </head>
 <body>
 
+<div class="layout">
+<jsp:include page="assets/components/sidebar.jsp" />
+
+        <div class="main-content">
+        <div class="order-details-container">
 <h1>Order Details</h1>
 <hr>
 
@@ -107,6 +113,9 @@
     <input type="hidden" name="action" value="${sessionScope.user.role eq 'admin' ? 'toAdminOrdersPage' : 'listMyOrders'}"/>
     <input type="submit" value="Back to Order List"/>
 </form>
+
+</div> <!-- end container -->
+</div> <!-- end container -->
 
 </body>
 </html>

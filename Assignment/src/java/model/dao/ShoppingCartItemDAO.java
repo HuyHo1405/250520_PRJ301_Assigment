@@ -110,7 +110,7 @@ public class ShoppingCartItemDAO {
     }
     
     public List<ShoppingCartItemDTO> findByCartId(int cartId) {
-        return retrieve("cart_id = ?", cartId);
+        return retrieve("cart_id = ? and is_deleted = 0", cartId);
     }
 
     public ShoppingCartItemDTO findByCartIdAndItemId(int cartId, int itemId) {
@@ -148,5 +148,12 @@ public class ShoppingCartItemDAO {
         }
         return 0;
     }
+ 
     
+    public static void main(String[] args) {
+        ShoppingCartItemDAO dao = new ShoppingCartItemDAO();
+        for (ShoppingCartItemDTO i : dao.findByCartId(1)) {
+            System.out.println(i);
+        }
+    }
 }
