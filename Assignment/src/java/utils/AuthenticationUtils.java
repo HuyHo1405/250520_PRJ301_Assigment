@@ -9,15 +9,24 @@ public class AuthenticationUtils {
 
     // Danh sách các JSP cần đăng nhập mới được truy cập
     private static final List<String> PROTECTED_JSP = Arrays.asList(
-            "/user-form.jsp",
-            "/welcome.jsp",
-            "/profile.jsp",
-            "/address-management.jsp",
+//            "/user-form.jsp",
+//            "/index.jsp",
+//            "/forgot-password.jsp",
             "/address-form.jsp",
+            "/address-management.jsp",
+            "/admin-item-management.jsp",
             "/admin-order-management.jsp",
+            "/admin-product-management.jsp",
+            "/admin-user-management.jsp",
+            "/config-table.jsp",
             "/order-details.jsp",
-            "/system-config.jsp",
-            "/index.jsp"
+            "/product-form.jsp",
+            "/product_detail.jsp",
+            "/profile.jsp",
+            "/reviews.jsp",
+            "/system-config-management.jsp",
+            "/user-order.jsp",
+            "/welcome.jsp"
     );
 
     // Các ACTION cần xác thực theo controller
@@ -26,80 +35,115 @@ public class AuthenticationUtils {
             "toAddressManagement",
             "toAddAddress",
             "toEditAddress",
-            "addAddress", 
+            "addAddress",
             "searchAddress",
-            "updateAddress", 
-            "updateDefaultAddress", 
+            "updateAddress",
+            "updateDefaultAddress",
             "removeAddress"
     );
 
     public static final List<String> USER_ACTIONS = Arrays.asList(
-            "logout", 
-            "changePassword", 
+//            "toLogin",
+//            "toRegister",
+//            "toForgotPassword",
+//            "toResetPassword",
+            "toProfile",
+//            "register",
+//            "login",
+            "logout",
+//            "forgotPassword",
+//            "resetPassword",
             "updateProfile"
     );
 
+    public static final List<String> PRODUCT_ACTIONS = Arrays.asList(
+            "listProducts",
+            "viewProduct",
+            "searchProducts",
+            "categoryProducts",
+            "featuredProducts",
+            "newArrivals"
+    );
+
     public static final List<String> CART_ACTIONS = Arrays.asList(
-            "getCart", 
-            "addToCart", 
-            "updateCart", 
-            "removeFromCart", 
-            "clearCart", 
+            "getCart",
+            "addToCart",
+            "updateCart",
+            "removeFromCart",
+            "clearCart",
             "checkoutCart"
     );
 
     public static final List<String> ORDER_ACTIONS = Arrays.asList(
-            "listMyOrders", 
-            "viewMyOrder", 
-            "placeOrder", 
-            "cancelOrder", 
+            "listMyOrders",
+            "viewMyOrder",
+            "placeOrder",
+            "cancelOrder",
             "trackOrder"
     );
 
     public static final List<String> REVIEW_ACTIONS = Arrays.asList(
-            "submitReview", 
-            "updateReview", 
-            "deleteReview"
+            "listReviewsByProduct",
+            "submitReview",
+            "updateReview",
+            "deleteReview",
+            "viewReview"
     );
 
     public static final List<String> ADMIN_ORDER_ACTIONS = Arrays.asList(
-            "toAdminOrdersPage", 
-            "viewOrderDetail", 
+            "toAdminOrdersPage",
+            "viewOrderDetail",
             "updateOrderStatus",
-            "disableOrder", 
-            "searchOrders", 
+            "disableOrder",
+            "searchOrders",
             "exportOrders"
     );
 
     public static final List<String> ADMIN_PRODUCT_ACTIONS = Arrays.asList(
-            "listAllProducts", 
-            "viewProductDetail", 
-            "createProduct", 
+            "toAdminProductPage",
+            "toCreateProduct",
+            "toEditProduct",
+            "viewProductDetail",
+            "createProduct",
             "updateProduct",
-            "disableProduct",
-            "uploadProductImages", 
-            "searchProducts"
+//            "uploadProductImages",
+            "toggleIsActiveProduct",
+            "searchProductsManagement"
     );
-
+    
+    public static final List<String> ADMIN_PRODUCT_ITEM_ACTIONS = Arrays.asList(
+            "toAdminProductItemPage", 
+            "updateProductItem", 
+            "toggleIsActiveProductItem", 
+            "addOption",
+            "addVariation",
+            "updateOption",
+            "updateVariation",
+            "removeOption",
+            "removeVariation",
+            "generateProductItemMatrix",
+            "exportProductItemList"
+    );
+    
     public static final List<String> ADMIN_USER_ACTIONS = Arrays.asList(
-            "listAllUsers", 
-            "viewUserDetail", 
-            "createUser", 
-            "updateUser",
-            "disableUser", 
-            "changeUserRole", 
-            "resetUserPassword"
+            "toAdminUserPage",
+            "createUser",
+            "toggleIsActiveUser",
+            "changeUserRole"
     );
 
     public static final List<String> SYSTEM_CONFIG_ACTIONS = Arrays.asList(
-            "getSystemConfig", 
-            "updateSystemConfig", 
-            "getAppVersion", 
+            "toSystemConfigManagement",
+            "getSystemConfig",
+            "addSystemConfig",
+            "updateSystemConfig",
+            "toggleIsActiveSystemConfig",
             "clearSystemCache"
     );
 
     public static final List<String> MAIN_ACTIONS = Arrays.asList(
-            "toWelcome"
+            "toWelcome",
+            ""
     );
 
     // Dữ liệu ánh xạ controller → actions
@@ -109,11 +153,13 @@ public class AuthenticationUtils {
         Map<String, List<String>> map = new HashMap<>();
         map.put("AddressController", ADDRESS_ACTIONS);
         map.put("UserController", USER_ACTIONS);
+        map.put("ProductController", PRODUCT_ACTIONS);
         map.put("CartController", CART_ACTIONS);
         map.put("OrderController", ORDER_ACTIONS);
         map.put("ReviewController", REVIEW_ACTIONS);
         map.put("AdminOrderController", ADMIN_ORDER_ACTIONS);
         map.put("AdminProductController", ADMIN_PRODUCT_ACTIONS);
+        map.put("AdminProductItemController", ADMIN_PRODUCT_ITEM_ACTIONS);
         map.put("AdminUserController", ADMIN_USER_ACTIONS);
         map.put("SystemConfigController", SYSTEM_CONFIG_ACTIONS);
         map.put("MainController", MAIN_ACTIONS);

@@ -33,27 +33,27 @@ public class AuthenticationFilter implements Filter {
             FilterChain chain)
             throws IOException, ServletException {
 
-//        HttpServletRequest req = (HttpServletRequest) request;
-//        HttpServletResponse res = (HttpServletResponse) response;
-//
-//        String action = req.getParameter("action");
-//        if (action == null) action = "";
-//
-//        List<String> ignoreActions = Arrays.asList(
-//            "toLogin", "login",
-//            "toRegister", "register",
-//            "toForgotPassword", "forgotPassword",
-//            "toResetPassword", "resetPassword"
-//        );
-//
-//        // Bỏ qua kiểm tra đăng nhập cho các action cho phép
-//        if (!ignoreActions.contains(action)) {
-//            HttpSession session = req.getSession(false);
-//            if (session == null || session.getAttribute("user") == null) {
-//                res.sendRedirect("MainController?action=toLogin");
-//                return; // Dừng filter nếu chưa đăng nhập
-//            }
-//        }
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+
+        String action = req.getParameter("action");
+        if (action == null) action = "";
+
+        List<String> ignoreActions = Arrays.asList(
+            "toLogin", "login",
+            "toRegister", "register",
+            "toForgotPassword", "forgotPassword",
+            "toResetPassword", "resetPassword"
+        );
+
+        // Bỏ qua kiểm tra đăng nhập cho các action cho phép
+        if (!ignoreActions.contains(action)) {
+            HttpSession session = req.getSession(false);
+            if (session == null || session.getAttribute("user") == null) {
+                res.sendRedirect("MainController?action=toLogin");
+                return; // Dừng filter nếu chưa đăng nhập
+            }
+        }
 
         chain.doFilter(request, response); // Cho phép tiếp tục xử lý
     }

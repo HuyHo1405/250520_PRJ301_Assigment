@@ -19,22 +19,21 @@ public class AuthorizationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-//        HttpServletRequest req = (HttpServletRequest) request;
-//        HttpServletResponse res = (HttpServletResponse) response;
-//
-//        String action = req.getParameter("action");
-//        String uri = req.getRequestURI();
-//
-//        boolean isProtected = AuthorizationUtils.isProtectedJsp(uri) 
-//                            || AuthorizationUtils.isProtectedAction(uri, action);
-//        
-//        boolean isFounder = UserUtils.isAdmin(req);
-//
-//        if (isProtected && !isFounder) {
-//            res.sendRedirect("welcome.jsp");
-//        }else{
-//        }
-            chain.doFilter(request, response);
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+
+        String action = req.getParameter("action");
+        String uri = req.getRequestURI();
+
+        boolean isProtected = AuthorizationUtils.isProtectedJsp(uri) 
+                            || AuthorizationUtils.isProtectedAction(uri, action);
+        
+        boolean isFounder = UserUtils.isAdmin(req);
+
+        if (isProtected && !isFounder) {
+            res.sendRedirect("welcome.jsp");
+        }else{
+        }
 
     }
 
