@@ -1,0 +1,290 @@
+/* General Body and Layout */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5; /* Light grey background for the whole page */
+    color: #333;
+    line-height: 1.6;
+    display: flex; /* Enables flexbox for sidebar and main content */
+    min-height: 100vh; /* Ensures full viewport height */
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Dashboard Wrapper for Sidebar and Main Content */
+.dashboard-wrapper {
+    display: flex;
+    width: 100%;
+}
+
+/* Main Content Area */
+.main-content {
+    flex-grow: 1; /* Takes up remaining space */
+    padding: 20px 30px; /* Padding inside the main content area */
+    box-sizing: border-box; /* Include padding in element's total width */
+    /* No specific background here, it will be defined by .container for the content box */
+}
+
+/* Container for the specific content (My Orders table, title, messages) */
+.ucontainer {
+ /* Adjust max-width as per your image for the content area */
+    margin: 20px auto; /* Center the container horizontally, add vertical margin */
+    background-color: #ffffff; /* White background for the content box */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Soft shadow as in the image */
+}
+
+/* Page Title */
+h1 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 2.5em;
+    text-align: left; /* Align to left as per image */
+    border-bottom: 2px solid #e0e0e0; /* Underline for heading */
+    padding-bottom: 15px;
+}
+
+/* Messages (Error/Success) */
+.message {
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.message.error {
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red text */
+    border: 1px solid #f5c6cb;
+}
+
+.message.success {
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green text */
+    border: 1px solid #c3e6cb;
+}
+
+/* Orders Table */
+.orders-table {
+    width: 100%;
+    border-collapse: collapse; /* Remove space between cells */
+    margin-top: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden; /* Ensures rounded corners for content */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Subtle shadow for table */
+}
+
+.orders-table thead tr {
+    background-color: #007bff; /* Blue header background */
+    color: white;
+}
+
+.orders-table th,
+.orders-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6; /* Light grey bottom border for rows */
+    vertical-align: middle;
+}
+
+.orders-table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.orders-table tbody tr:nth-of-type(even) {
+    background-color: #f8f9fa; /* Alternate row background */
+}
+
+.orders-table tbody tr:hover {
+    background-color: #e2f0ff; /* Light blue on hover */
+}
+
+/* Order Status Badges */
+.order-status-badge {
+    padding: 5px 10px;
+    border-radius: 4px; /* Slightly rounded corners for badges */
+    font-size: 0.85em;
+    font-weight: bold;
+    display: inline-block;
+    min-width: 70px; /* Ensure consistent width for badges */
+    text-align: center;
+}
+
+/* Specific status colors matching the image's "Shipped" and "Pending" */
+/* You'll need to define colors for all your status names here */
+.status-pending { background-color: #ffe082; color: #8d6e63; } /* Light orange-yellow for Pending */
+.status-confirmed { background-color: #a7d9f7; color: #2196f3; } /* Light blue for Confirmed */
+.status-processing { background-color: #ffcc80; color: #e65100; } /* Orange for Processing */
+.status-shipped { background-color: #81c784; color: #388e3c; } /* Green for Shipped */
+.status-delivered { background-color: #66bb6a; color: #1b5e20; } /* Darker green for Delivered */
+.status-cancelled { background-color: #ef9a9a; color: #c62828; } /* Light red for Cancelled */
+.status-returned { background-color: #b39ddb; color: #512da8; } /* Purple for Returned */
+.status-refunded { background-color: #90caf9; color: #1976d2; } /* Blue for Refunded */
+.status-unknown { background-color: #e0e0e0; color: #757575; } /* Grey for Unknown */
+
+
+/* Action Buttons */
+.order-actions {
+    display: flex;
+    flex-wrap: wrap; /* Allow buttons to wrap to next line if space is limited */
+    gap: 8px; /* Space between buttons */
+    justify-content: flex-start; /* Align buttons to the left */
+}
+
+.button {
+    padding: 8px 12px;
+    border: 1px solid #007bff; /* Border matching primary color */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    text-decoration: none; /* In case you use <a> tags later */
+    display: inline-flex; /* For better alignment */
+    align-items: center;
+    justify-content: center;
+}
+
+.view-details-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.view-details-button:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.cancel-order-button {
+    background-color: white; /* White background as in image */
+    color: #dc3545; /* Red text */
+    border-color: #dc3545; /* Red border */
+}
+
+.cancel-order-button:hover {
+    background-color: #dc3545; /* Red background on hover */
+    color: white; /* White text on hover */
+    transform: translateY(-1px);
+}
+
+/* Inline forms to keep buttons together */
+.inline-form {
+    display: inline-block;
+    margin: 0;
+}
+
+/* No Orders Message */
+.no-orders-message {
+    text-align: center;
+    font-size: 1.2em;
+    color: #666;
+    margin: 50px 0;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .dashboard-wrapper {
+        flex-direction: column; /* Stack sidebar and main content */
+    }
+
+    /* Adjust main content padding when sidebar is stacked */
+    .main-content {
+        padding: 15px;
+    }
+
+    .container {
+        padding: 15px;
+        margin: 10px auto;
+    }
+
+    h1 {
+        font-size: 2em;
+        text-align: center; /* Center title on smaller screens */
+    }
+
+    /* Table stacking on small screens */
+    .orders-table, .orders-table tbody, .orders-table tr, .orders-table th, .orders-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .orders-table thead {
+        display: none; /* Hide original headers */
+    }
+
+    .orders-table tr {
+        margin-bottom: 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    }
+
+    .orders-table td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 45%; /* Space for pseudo-element label */
+        text-align: right;
+    }
+
+    .orders-table td:last-child {
+        border-bottom: 0;
+        text-align: center; /* Center action buttons */
+    }
+
+    .orders-table td:before {
+        content: attr(data-label); /* Use data-label for mobile view */
+        position: absolute;
+        left: 10px;
+        width: calc(45% - 20px);
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #555;
+    }
+
+    /* Adjust specific data-label contents (make sure they match your th in JSP) */
+    .orders-table td:nth-of-type(1):before { content: "Order ID:"; }
+    .orders-table td:nth-of-type(2):before { content: "Status:"; }
+    .orders-table td:nth-of-type(3):before { content: "Total Price:"; }
+    .orders-table td:nth-of-type(4):before { content: "Order Date:"; }
+    .orders-table td:nth-of-type(5):before { content: "Actions:"; }
+
+    .order-actions {
+        justify-content: center; /* Center buttons horizontally on small screens */
+        width: 100%;
+        margin-top: 10px; /* Space between last data item and buttons */
+    }
+
+    .button {
+        flex: 1 1 auto; /* Allow buttons to grow/shrink, max out at parent width */
+        max-width: 160px; /* Limit button width on small screens */
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        font-size: 1.8em;
+    }
+    .container {
+        padding: 10px;
+    }
+    .orders-table td {
+        padding-left: 40%;
+    }
+    .orders-table td:before {
+        width: calc(40% - 20px);
+    }
+}

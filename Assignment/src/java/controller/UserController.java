@@ -21,6 +21,19 @@ import utils.ValidationUtils;
 @WebServlet(name = "UserController", urlPatterns = {"/UserController"})
 public class UserController extends HttpServlet {
 
+    /**
+     * UserController chịu trách nhiệm xử lý các hành động liên quan đến người
+     * dùng như: đăng nhập, đăng ký, quên mật khẩu, cập nhật hồ sơ và đặt lại
+     * mật khẩu. Controller này định tuyến theo tham số `action` và trả về trang
+     * phù hợp.
+     *
+     * Các action xử lý gồm: login, logout, register, forgotPassword,
+     * resetPassword, updateProfile.
+     *
+     * Các trang JSP liên quan: - welcome.jsp: Trang chính sau khi đăng nhập -
+     * user-form.jsp: Form dùng chung cho login, register, forgot/reset password
+     * - error.jsp: Trang hiển thị lỗi
+     */
     private static final String WELCOME_PAGE = "welcome.jsp";
     private static final String USER_FORM_PAGE = "user-form.jsp";
     private static final String ERROR_PAGE = "error.jsp";
@@ -28,6 +41,9 @@ public class UserController extends HttpServlet {
     private final ProductDAO PDAO = new ProductDAO();
     private final CategoryDAO CDAO = new CategoryDAO();
 
+    /**
+     * Xử lý các yêu cầu GET và POST, định tuyến theo action.
+     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -121,6 +137,11 @@ public class UserController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    /**
+     * Đăng nhập người dùng.
+     *
+     * @return Tên trang JSP cần forward đến.
+     */
     public String handleLogin(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -157,6 +178,11 @@ public class UserController extends HttpServlet {
         }
     }
 
+    /**
+     * Đăng xuất người dùng.
+     *
+     * @return Chuyển hướng về form đăng nhập.
+     */
     public String handleLogout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -166,6 +192,12 @@ public class UserController extends HttpServlet {
         return USER_FORM_PAGE;
     }
 
+    /**
+     * Đăng ký người dùng mới.
+     *
+     * @return Trả về trang form với lỗi nếu đăng ký thất bại, hoặc chuyển sang
+     * login nếu thành công.
+     */
     public String handleRegister(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
@@ -210,6 +242,12 @@ public class UserController extends HttpServlet {
         return USER_FORM_PAGE;
     }
 
+    /**
+     * Cập nhật thông tin người dùng (email, số điện thoại).
+     *
+     * @return Trả về trang form với lỗi nếu thất bại, hoặc logout và yêu cầu
+     * đăng nhập lại nếu thành công.
+     */
     public String handleUpdate(HttpServletRequest request, HttpServletResponse response) {
         String newEmail = request.getParameter("email");
         String newPhone = request.getParameter("phone");
@@ -253,29 +291,39 @@ public class UserController extends HttpServlet {
         return USER_FORM_PAGE;
     }
 
-
-    public String handleChangePassword(HttpServletRequest request, HttpServletResponse response){
+    /**
+     * Đổi mật khẩu người dùng đang đăng nhập.
+     *
+     * @return Chuyển hướng về trang đăng nhập nếu thành công, hiển thị lỗi nếu
+     * mật khẩu không khớp.
+     */
+    public String handleChangePassword(HttpServletRequest request, HttpServletResponse response) {
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
-        
+
         if (!password.equals(confirmPassword)) {
             request.setAttribute("error", "Mật khẩu xác nhận không khớp.");
             return USER_FORM_PAGE;
         }
-        
+
         String hashedPassword = HashUtils.hashPassword(password);
         UserDTO user = UserUtils.getUser(request);
         user.setHashed_password(hashedPassword);
-        
+
         UDAO.update(user);
         request.getSession().invalidate();
         request.setAttribute("actionType", "login");
         return USER_FORM_PAGE;
     }
-    
+
+    /**
+     * Gửi email đặt lại mật khẩu nếu email hợp lệ và tồn tại trong hệ thống.
+     *
+     * @return Trả về form với thông báo hoặc lỗi.
+     */
     private String handleForgotPassword(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
-        
+
         UserDTO user = UDAO.findByEmail(email);
 
         if (user == null) {
@@ -299,7 +347,13 @@ public class UserController extends HttpServlet {
         request.setAttribute("actionType", "forgotPassword");
         return USER_FORM_PAGE;
     }
-    
+
+    /**
+     * Xử lý khi người dùng click vào link đặt lại mật khẩu và nhập mật khẩu
+     * mới.
+     *
+     * @return Trả về trang form với lỗi nếu thất bại hoặc không hợp lệ.
+     */
     private String handleResetPassword(HttpServletRequest request, HttpServletResponse response) {
         String token = request.getParameter("token");
         String emailFromToken = ResetTokenManager.getEmailIfValid(token);
@@ -333,6 +387,12 @@ public class UserController extends HttpServlet {
         return USER_FORM_PAGE;
     }
 
+    /**
+     * Kiểm tra email đã tồn tại trong hệ thống chưa.
+     *
+     * @param email Email cần kiểm tra.
+     * @return true nếu email đã tồn tại, false nếu chưa.
+     */
     private boolean isExistedEmail(String email) {
         return !UDAO.retrieve("email_address = ?", email).isEmpty();
     }

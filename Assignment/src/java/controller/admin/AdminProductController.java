@@ -21,6 +21,12 @@ import model.dto.ProductDTO;
 import utils.ProductUtils;
 import utils.ValidationUtils;
 
+/**
+ * The `AdminProductController` servlet handles administrative operations related to
+ * product management, including viewing, creating, editing, activating/deactivating,
+ * searching products, and uploading product images.
+ * It interacts with various Data Access Objects (DAOs) to manage product-related data.
+ */
 @WebServlet(name = "AdminProductController", urlPatterns = {"/AdminProductController"})
 @MultipartConfig
 public class AdminProductController extends HttpServlet {
@@ -35,6 +41,16 @@ public class AdminProductController extends HttpServlet {
     private final VariationDAO VDAO = new VariationDAO();
     private final VariationOptionDAO VODAO = new VariationOptionDAO();
 
+    /**
+     * Processes requests for both HTTP `GET` and `POST` methods.
+     * This method acts as a central dispatcher for various product-related actions
+     * based on the "action" parameter.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -80,7 +96,8 @@ public class AdminProductController extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP <code>GET</code> method.
+     * Handles the HTTP `GET` method.
+     * Delegates to the `processRequest` method to handle the request.
      *
      * @param request servlet request
      * @param response servlet response
@@ -94,7 +111,10 @@ public class AdminProductController extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
+     * Handles the HTTP `POST` method.
+     * This method specifically handles `multipart/form-data` requests for file uploads,
+     * particularly for `uploadProductImages` action, and delegates other POST requests
+     * to `processRequest`.
      *
      * @param request servlet request
      * @param response servlet response
@@ -152,6 +172,15 @@ public class AdminProductController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    /**
+     * Handles the search functionality for products.
+     * Retrieves products based on a keyword and an optional category ID.
+     * Sets the product list and category map as request attributes.
+     *
+     * @param request The HttpServletRequest object.
+     * @param response The HttpServletResponse object.
+     * @return The path to the admin product management page.
+     */
     private String handleSearchProducts(HttpServletRequest request, HttpServletResponse response) {
         String keyword = request.getParameter("keyword");
         keyword = keyword == null ? "" : keyword;
@@ -169,6 +198,15 @@ public class AdminProductController extends HttpServlet {
         return ADMIN_PRODUCT_MANAGEMENT_PAGE;
     }
 
+    /**
+     * Prepares the product form for creation, editing, or viewing product details.
+     * Retrieves product data if an ID is provided and sets relevant attributes
+     * for the JSP form.
+     *
+     * @param request The HttpServletRequest object.
+     * @param action The action type (e.g., "toCreateProduct", "toEditProduct", "viewProductDetail").
+     * @return The path to the product form JSP page or an error page.
+     */
     private String handleToProductForm(HttpServletRequest request, String action) {
         ProductDTO product = null;
         if (!"toCreateProduct".equals(action)) {
@@ -187,6 +225,15 @@ public class AdminProductController extends HttpServlet {
         return PRODUCT_FORM;
     }
 
+    /**
+     * Handles the creation of a new product.
+     * Retrieves product details from request parameters, creates a `ProductDTO` object,
+     * and attempts to persist it to the database.
+     *
+     * @param request The HttpServletRequest object.
+     * @param response The HttpServletResponse object.
+     * @return The path to the admin product management page after creation attempt.
+     */
     private String handleCreateProduct(HttpServletRequest request, HttpServletResponse response) {
         int categoryId = toInt(request.getParameter("categoryId"));
         String name = request.getParameter("name");
@@ -202,6 +249,16 @@ public class AdminProductController extends HttpServlet {
         return handleSearchProducts(request, response);
     }
 
+    /**
+     * Handles the update of an existing product.
+     * Retrieves product ID and updated details from request parameters,
+     * finds the existing product, updates its properties, and persists changes
+     * to the database.
+     *
+     * @param request The HttpServletRequest object.
+     * @param response The HttpServletResponse object.
+     * @return The path to the admin product management page after update attempt.
+     */
     private String handleUpdateProduct(HttpServletRequest request, HttpServletResponse response) {
         int productId = toInt(request.getParameter("productId"));
 
@@ -235,33 +292,51 @@ public class AdminProductController extends HttpServlet {
         return handleSearchProducts(request, response);
     }
 
+    /**
+     * Toggles the `is_active` status of a product (activates or deactivates it).
+     * Retrieves the product by ID, flips its `is_active` status, and updates it
+     * in the database.
+     *
+     * @param request The HttpServletRequest object.
+     * @param response The HttpServletResponse object.
+     * @return The path to the admin product management page or an error page.
+     */
     private String handleToggleIsActive(HttpServletRequest request, HttpServletResponse response) {
         int id = toInt(request.getParameter("productId"));
-        
+
         System.out.println(id);
-        
-        if(ValidationUtils.isInvalidId(id)){
+
+        if (ValidationUtils.isInvalidId(id)) {
             request.setAttribute("errorMsg", "Invalid Id");
             return ERROR_PAGE;
         }
-        
+
         ProductDTO product = PDAO.findById(id);
-        
-        if(product == null){
+
+        if (product == null) {
             request.setAttribute("errorMsg", "Product Not Found");
             return ERROR_PAGE;
         }
-        
+
         product.setIs_active(!product.getIs_active());
-        if(PDAO.update(product)){
+        if (PDAO.update(product)) {
             request.setAttribute("message", "Action Success");
             return handleSearchProducts(request, response);
-        }else{
+        } else {
             request.setAttribute("errorMsg", "Product Not Found");
             return ERROR_PAGE;
         }
     }
 
+    /**
+     * Handles the upload of product images.
+     * Retrieves the image file from the multipart request, uploads it using
+     * `ImageUploadUtils`, and sends the generated image URL back as a response.
+     *
+     * @param request The HttpServletRequest object, containing the multipart file.
+     * @param response The HttpServletResponse object to write the image URL or error message.
+     * @throws IOException if an I/O error occurs during file processing or response writing.
+     */
     private void handleUploadProductImages(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain");
 
@@ -293,7 +368,13 @@ public class AdminProductController extends HttpServlet {
         }
     }
 
-    // Utility methods
+    /**
+     * Converts a string value to an integer.
+     * Returns -1 if the string is null or cannot be parsed as an integer.
+     *
+     * @param val The string to convert.
+     * @return The integer value, or -1 if conversion fails.
+     */
     private int toInt(String val) {
         try {
             return Integer.parseInt(val.trim());
@@ -302,17 +383,34 @@ public class AdminProductController extends HttpServlet {
         }
     }
 
+    /**
+     * Prepares the product form with necessary data for display.
+     * This includes category data, action type (create, update, view),
+     * product details, and associated variation and variation option data.
+     *
+     * @param request The HttpServletRequest object.
+     * @param product The `ProductDTO` object to pre-populate the form (can be null for creation).
+     * @param action The action type (e.g., "toCreateProduct", "toEditProduct", "viewProductDetail").
+     */
     private void prepareProductForm(HttpServletRequest request, ProductDTO product, String action) {
         request.setAttribute("categoryMap", ProductUtils.getCategoryMap(CDAO.retrieve("is_active = 1")));
         request.setAttribute("actionType", "createProduct");
         if ("viewProductDetail".equals(action) || "toEditProduct".equals(action)) {
-                request.setAttribute("actionType", action.equals("toEditProduct")? "updateProduct": "viewProductDetail");
-                request.setAttribute("product", product);
-                request.setAttribute("variation", VDAO.retrieve("product_id = ? and is_deleted = 0", product.getId()));
-                request.setAttribute("variationOption", VODAO.getOptionsByProductId(product.getId()));
+            request.setAttribute("actionType", action.equals("toEditProduct") ? "updateProduct" : "viewProductDetail");
+            request.setAttribute("product", product);
+            request.setAttribute("variation", VDAO.retrieve("product_id = ? and is_deleted = 0", product.getId()));
+            request.setAttribute("variationOption", VODAO.getOptionsByProductId(product.getId()));
         }
     }
 
+    /**
+     * Sets an error message as a request attribute and returns the path to the
+     * error page.
+     *
+     * @param request The HttpServletRequest object.
+     * @param msg The error message to set.
+     * @return The path to the error page.
+     */
     private String error(HttpServletRequest request, String msg) {
         request.setAttribute("errorMsg", msg);
         return ERROR_PAGE;

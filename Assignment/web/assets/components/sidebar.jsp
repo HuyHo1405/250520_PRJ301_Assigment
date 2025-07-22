@@ -28,6 +28,13 @@
             <button type="submit">Shopping Cart</button>
         </form>
     </div>
+    
+    <div class="order-btn">
+        <form action="MainController" method="post">
+            <input type="hidden" name="action" value="listMyOrders"/>
+            <button type="submit">Order</button>
+        </form>
+    </div>
 
     <!-- Chỉ hiển thị nếu là admin -->
     <c:if test="${sessionScope.user.role eq 'admin'}">
