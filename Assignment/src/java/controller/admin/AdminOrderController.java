@@ -31,11 +31,10 @@ import utils.OrderUtils;
 import utils.ValidationUtils;
 
 /**
- * The AdminOrderController servlet handles administrative operations related to
- * customer orders, such as viewing order details, updating order statuses,
- * disabling orders, searching orders, and exporting order data.
- * It interacts with various Data Access Objects (DAOs) to retrieve and
- * manipulate order-related information.
+ * AdminOrderController handles order management operations for administrators,
+ * including viewing orders, updating statuses, searching, disabling, and exporting.
+ *
+ * URL pattern: /AdminOrderController
  */
 @WebServlet(name = "AdminOrderController", urlPatterns = {"/AdminOrderController"})
 public class AdminOrderController extends HttpServlet {
@@ -58,13 +57,12 @@ public class AdminOrderController extends HttpServlet {
     private final int CANCEL_ID = 6;
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Main controller method that dispatches requests based on the "action" parameter.
      *
-     * @param request servlet request
-     * @param response servlet response
+     * @param request  HTTP request
+     * @param response HTTP response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -146,15 +144,12 @@ public class AdminOrderController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    //handle methods
     /**
-     * Handles the request to view the details of a specific order.
-     * Retrieves order, status, payment, shipping, address, and user information
-     * based on the provided order ID and sets them as request attributes.
+     * Loads all details of a specific order by ID and sets attributes for the JSP view.
      *
-     * @param request The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
-     * @return The path to the order details JSP page or an error page.
+     * @param request  HTTP request
+     * @param response HTTP response
+     * @return JSP path for displaying order details
      */
     private String handleViewOrderDetail(HttpServletRequest request, HttpServletResponse response) {
 
@@ -218,18 +213,17 @@ public class AdminOrderController extends HttpServlet {
         request.setAttribute("user", user);
         request.setAttribute("orderItemList", orderItems);
         request.setAttribute("orderStatusList", OSDAO.retrieve("1=1"));
-
+        
         System.out.println("All data loaded successfully. Forwarding to ORDER_DETAILS.");
         return ORDER_DETAILS;
     }
 
     /**
-     * Handles the request to disable an order by setting its status to the
-     * predefined CANCEL_ID.
+     * Sets an order’s status to "Cancelled" by using a predefined status ID.
      *
-     * @param request The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin order management page or an error page.
+     * @param request  HTTP request
+     * @param response HTTP response
+     * @return JSP path for result view
      */
     private String handleDisableOrder(HttpServletRequest request, HttpServletResponse response) {
         int orderId = toInt(request.getParameter("orderId"));
@@ -237,13 +231,11 @@ public class AdminOrderController extends HttpServlet {
     }
 
     /**
-     * Handles the request to update the status of an order.
-     * This method extracts orderId and orderStatusId from request parameters
-     * and delegates to the overloaded `handleUpdateOrderStatus` method.
+     * Updates the status of an order to a new status from request parameters.
      *
-     * @param request The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin order management page or an error page.
+     * @param request  HTTP request
+     * @param response HTTP response
+     * @return JSP path for result view
      */
     private String handleUpdateOrderStatus(HttpServletRequest request, HttpServletResponse response) {
         int orderId = toInt(request.getParameter("orderId"));
@@ -251,14 +243,13 @@ public class AdminOrderController extends HttpServlet {
         return handleUpdateOrderStatus(orderId, orderStatusId, request);
     }
 
-    /**
-     * Updates the status of a specific order and sends an email notification
-     * to the associated user.
+     /**
+     * Handles the actual update of an order’s status and sends email notification to user.
      *
-     * @param orderId The ID of the order to update.
-     * @param orderStatusId The new status ID for the order.
-     * @param request The HttpServletRequest object.
-     * @return The path to the admin order management page or an error page.
+     * @param orderId       ID of the order
+     * @param orderStatusId New status ID
+     * @param request       HTTP request
+     * @return JSP path for result view
      */
     private String handleUpdateOrderStatus(int orderId, int orderStatusId, HttpServletRequest request) {
         if (ValidationUtils.isInvalidId(orderId) || ValidationUtils.isInvalidId(orderStatusId)) {
@@ -301,12 +292,11 @@ public class AdminOrderController extends HttpServlet {
     }
 
     /**
-     * Handles the request to search for orders based on a keyword.
-     * The search is performed on the order code.
+     * Searches for orders by order code using a keyword.
      *
-     * @param request The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin order management page.
+     * @param request  HTTP request
+     * @param response HTTP response
+     * @return JSP path for displaying filtered order list
      */
     private String handleSearchOrder(HttpServletRequest request, HttpServletResponse response) {
         String keyword = request.getParameter("strKeyword");
@@ -316,13 +306,11 @@ public class AdminOrderController extends HttpServlet {
     }
 
     /**
-     * Handles the request to export order data as a CSV file.
-     * Retrieves all order details necessary for export and writes them to the
-     * HTTP response as a CSV attachment.
+     * Exports the full list of orders as a CSV file to be downloaded by admin.
      *
-     * @param request The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
-     * @throws IOException if an I/O error occurs during CSV writing.
+     * @param request  HTTP request
+     * @param response HTTP response
+     * @throws IOException if an I/O error occurs while writing the file
      */
     private void handleExportOrders(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
@@ -355,13 +343,11 @@ public class AdminOrderController extends HttpServlet {
         writer.close();
     }
 
-    //useful methods
     /**
-     * Converts a string to an integer. Returns -1 if the string is null or
-     * cannot be parsed as an integer.
+     * Safely parses an integer from a string. Returns -1 on failure.
      *
-     * @param str The string to convert.
-     * @return The integer value, or -1 if conversion fails.
+     * @param str the string to parse
+     * @return parsed integer or -1 if invalid
      */
     private int toInt(String str) {
         if (str != null) {
@@ -374,25 +360,23 @@ public class AdminOrderController extends HttpServlet {
     }
 
     /**
-     * Sets an error message as a request attribute and returns the path to the
-     * error page.
+     * Sets an error message in the request scope and returns the error page path.
      *
-     * @param request The HttpServletRequest object.
-     * @param msg The error message to set.
-     * @return The path to the error page.
+     * @param request HTTP request
+     * @param msg     error message to show
+     * @return error JSP path
      */
     private String error(HttpServletRequest request, String msg) {
         request.setAttribute("errorMsg", msg);
         return ERROR_PAGE;
     }
-
+    
     /**
-     * Escapes a string for CSV output.
-     * Adds double quotes around the value if it contains commas, double quotes,
-     * or newlines, and escapes any existing double quotes by doubling them.
+     * Escapes a string to be safely written into a CSV field.
+     * Encloses in quotes if necessary and escapes inner quotes.
      *
-     * @param value The string to escape.
-     * @return The escaped string, suitable for CSV.
+     * @param value original string value
+     * @return escaped CSV-compatible string
      */
     private String escapeCSV(String value) {
         if (value == null) {

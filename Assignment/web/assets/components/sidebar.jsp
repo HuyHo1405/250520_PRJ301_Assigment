@@ -65,5 +65,12 @@
                 <button type="submit">Admin Order Management</button>
             </form>
         </div>
+        
     </c:if>
+    <div class="aproduct-btn">
+        <form action="MainController" method="post" >
+            <input type="hidden" name="action" value="logout"/>
+            <button type="submit" style="background-color: red; color: white;ư">Logout</button>
+        </form>
+    </div>
 </div>

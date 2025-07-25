@@ -12,30 +12,22 @@ import java.util.List;
 import model.dao.CategoryDAO;
 import model.dao.ProductDAO;
 
+
 /**
- * The `MainController` acts as a central dispatcher for all incoming web requests.
- * It determines which specific controller should handle a request based on the
- * "action" parameter in the URL. It also defines lists of actions grouped by
- * their functional areas (e.g., user management, product handling, cart operations).
- * The `@MultipartConfig` annotation is used to enable handling of file uploads,
- * particularly for product image uploads.
+ * MainController is the central servlet that routes incoming requests
+ * based on the 'action' parameter to the appropriate sub-controllers.
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
-@MultipartConfig // Enables multipart form data handling for file uploads
+@MultipartConfig
 public class MainController extends HttpServlet {
 
     private static final String LOGIN_PAGE = "login.jsp";
     private static final String ERROR_PAGE = "error.jsp";
     private static final String WELCOME_PAGE = "welcome.jsp";
 
-    // Lists of actions, categorised by the controller responsible for handling them.
-    // These lists help the MainController to route requests efficiently.
-
-    /**
-     * Actions related to user addresses.
-     */
+    /** Actions related to address management */
     public static final List<String> ADDRESS_ACTIONS = Arrays.asList(
-            "toProfile", // Often includes address management
+            "toProfile",
             "toAddressManagement",
             "toAddAddress",
             "toEditAddress",
@@ -46,9 +38,7 @@ public class MainController extends HttpServlet {
             "removeAddress"
     );
 
-    /**
-     * Actions related to user authentication and profile management.
-     */
+    /** Actions related to user account management */
     public static final List<String> USER_ACTIONS = Arrays.asList(
             "toLogin",
             "toRegister",
@@ -63,9 +53,7 @@ public class MainController extends HttpServlet {
             "updateProfile"
     );
 
-    /**
-     * Actions for public product Browse and viewing.
-     */
+    /** Actions related to product browsing and filtering */
     public static final List<String> PRODUCT_ACTIONS = Arrays.asList(
             "listProducts",
             "viewProduct",
@@ -75,13 +63,11 @@ public class MainController extends HttpServlet {
             "newArrivals"
     );
 
-    /**
-     * Actions related to the shopping cart.
-     */
+    /** Actions related to shopping cart */
     public static final List<String> CART_ACTIONS = Arrays.asList(
             "toCart",
             "toCheckOut",
-            "getCart", // Redundant if "toCart" serves this purpose
+            "getCart",
             "addToCart",
             "updateCart",
             "removeFromCart",
@@ -89,20 +75,16 @@ public class MainController extends HttpServlet {
             "checkoutCart"
     );
 
-    /**
-     * Actions related to user's personal orders.
-     */
+    /** Actions for user-side order handling */
     public static final List<String> ORDER_ACTIONS = Arrays.asList(
             "listMyOrders",
             "viewMyOrder",
-            "placeOrder", // This might be handled by CartController's checkoutCart
+            "placeOrder",
             "cancelOrder",
             "trackOrder"
     );
 
-    /**
-     * Actions related to product reviews.
-     */
+    /** Actions related to product reviews */
     public static final List<String> REVIEW_ACTIONS = Arrays.asList(
             "listReviewsByProduct",
             "submitReview",
@@ -111,53 +93,45 @@ public class MainController extends HttpServlet {
             "viewReview"
     );
 
-    /**
-     * Actions for administrator management of orders.
-     */
+    /** Actions related to admin order management */
     public static final List<String> ADMIN_ORDER_ACTIONS = Arrays.asList(
             "toAdminOrdersPage",
             "viewOrderDetail",
             "updateOrderStatus",
-            "disableOrder", // Soft delete or deactivate order
+            "disableOrder",
             "searchOrders",
             "exportOrders"
     );
 
-    /**
-     * Actions for administrator management of products (main product entries).
-     */
+    /** Actions related to admin product management */
     public static final List<String> ADMIN_PRODUCT_ACTIONS = Arrays.asList(
             "toAdminProductPage",
             "toCreateProduct",
             "toEditProduct",
-            "viewProductDetail", // Admin view of product detail
+            "viewProductDetail",
             "createProduct",
             "updateProduct",
-            // "uploadProductImages", // Handled internally by create/update product or a separate utility
-            "toggleIsActiveProduct", // Activate/deactivate a product
+//            "uploadProductImages",
+            "toggleIsActiveProduct",
             "searchProductsManagement"
     );
     
-    /**
-     * Actions for administrator management of product items (variants, SKUs).
-     */
+    /** Actions related to admin product item variations and options */
     public static final List<String> ADMIN_PRODUCT_ITEM_ACTIONS = Arrays.asList(
             "toAdminProductItemPage", 
             "updateProductItem", 
             "toggleIsActiveProductItem", 
-            "addOption",       // For product options (e.g., Color, Size)
-            "addVariation",    // For specific variations (e.g., Red-Large)
+            "addOption",
+            "addVariation",
             "updateOption",
             "updateVariation",
             "removeOption",
             "removeVariation",
-            "generateProductItemMatrix", // Potentially for generating all combinations of options
+            "generateProductItemMatrix",
             "exportProductItemList"
     );
     
-    /**
-     * Actions for administrator management of users.
-     */
+    /** Actions related to admin user management */
     public static final List<String> ADMIN_USER_ACTIONS = Arrays.asList(
             "toAdminUserPage",
             "createUser",
@@ -165,9 +139,7 @@ public class MainController extends HttpServlet {
             "changeUserRole"
     );
 
-    /**
-     * Actions for system configuration and cache management.
-     */
+    /** Actions related to system configuration management */
     public static final List<String> SYSTEM_CONFIG_ACTIONS = Arrays.asList(
             "toSystemConfigManagement",
             "getSystemConfig",
@@ -177,25 +149,20 @@ public class MainController extends HttpServlet {
             "clearSystemCache"
     );
 
-    /**
-     * Actions leading to the welcome or home page.
-     */
+    /** Actions that load the welcome page */
     public static final List<String> WELCOME_ACTIONS = Arrays.asList(
             "toWelcome",
-            "" // Default action if no "action" parameter is provided
+            ""
     );
 
-    // Data Access Objects (DAOs) used by the MainController, typically for common data needed on welcome/home pages.
     private final ProductDAO PDAO = new ProductDAO();
     private final CategoryDAO CDAO = new CategoryDAO();
     
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * This method acts as the main dispatcher, routing incoming requests to the
-     * appropriate specialized controller based on the "action" request parameter.
+     * Central handler that delegates requests to corresponding controllers based on 'action' parameter.
      *
-     * @param request servlet request
-     * @param response servlet response
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
@@ -203,17 +170,13 @@ public class MainController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        String url = LOGIN_PAGE; // Default URL if no action is matched
+        String url = LOGIN_PAGE;
 
         try {
             String action = request.getParameter("action");
-            System.out.println("Action received: " + action); // For debugging purposes
-
-            if (action == null || action.trim().isEmpty() || WELCOME_ACTIONS.contains(action)) {
-                // If action is null, empty, or a welcome action, prepare welcome page data.
-                request.setAttribute("productList", PDAO.retrieve("is_active = 1"));
-                request.setAttribute("categoryList", CDAO.retrieve("is_active = 1"));
-                url = WELCOME_PAGE;
+            System.out.println(action);
+            if (action == null || action.trim().isEmpty()) {
+                url = ERROR_PAGE;
             } else if (ADDRESS_ACTIONS.contains(action)) {
                 url = "/AddressController";
             } else if (USER_ACTIONS.contains(action)) {
@@ -236,23 +199,23 @@ public class MainController extends HttpServlet {
                 url = "/AdminUserController";
             } else if (SYSTEM_CONFIG_ACTIONS.contains(action)) {
                 url = "/SystemConfigController";
+            } else if (WELCOME_ACTIONS.contains(action)) {
+                request.setAttribute("productList", PDAO.retrieve("is_active = 1"));
+                request.setAttribute("categoryList", CDAO.retrieve("is_active = 1"));
+                url = WELCOME_PAGE;
             } else {
-                // If no matching action is found, direct to an error page.
                 url = ERROR_PAGE;
             }
         } catch (Exception e) {
-            e.printStackTrace(); // Log the exception for debugging
-            url = ERROR_PAGE; // Ensure error page is shown on unexpected exceptions
         } finally {
-            // Forward the request to the determined URL.
             request.getRequestDispatcher(url).forward(request, response);
         }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
-     * Delegates to the `processRequest` method to handle the request.
      *
      * @param request servlet request
      * @param response servlet response
@@ -267,9 +230,6 @@ public class MainController extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     * It specifically checks for "multipart/form-data" content type to route
-     * file upload requests (like product image uploads) directly to
-     * `AdminProductController`. Otherwise, it delegates to `processRequest`.
      *
      * @param request servlet request
      * @param response servlet response
@@ -281,10 +241,9 @@ public class MainController extends HttpServlet {
             throws ServletException, IOException {
         String contentType = request.getContentType();
         if (contentType != null && contentType.startsWith("multipart/form-data")) {
-            // If it's a file upload (e.g., for product images), forward to AdminProductController
             request.getRequestDispatcher("/AdminProductController").forward(request, response);
         } else {
-            // For regular POST requests (e.g., application/x-www-form-urlencoded, application/json)
+            // Đây là request POST bình thường (ví dụ: application/x-www-form-urlencoded, application/json)
             processRequest(request, response);
         }
     }
@@ -296,7 +255,7 @@ public class MainController extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Main dispatcher servlet for the application.";
+        return "Short description";
     }// </editor-fold>
 
 }

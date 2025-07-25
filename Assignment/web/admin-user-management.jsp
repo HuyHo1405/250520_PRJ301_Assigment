@@ -25,7 +25,6 @@
                     <th>ID</th>
                     <th>Email Address</th>
                     <th>Phone Number</th>
-                    <th>Password</th>
                     <th>Role</th>
                     <th>Status</th>
                     <th>Action</th>
@@ -45,7 +44,6 @@
                                         <td>${user.id}</td>
                                         <td>${user.email_address}</td>
                                         <td>${user.phone_number}</td>
-                                        <td class="password-cell">${user.hashed_password}</td>
                                         <td>
                                             <input form="editUser" type="hidden" name="action" value="updateUser"/>
                                             <input form="editUser" type="hidden" name="userId" value="${user.id}"/>
@@ -71,7 +69,6 @@
                                         <td>${user.id}</td>
                                         <td><c:out value="${user.email_address}"/></td>
                                         <td><c:out value="${user.phone_number}"/></td>
-                                        <td class="password-cell"><c:out value="${user.hashed_password}"/></td>
                                         <td><c:out value="${user.role}"/></td>
                                         <td>
                                             <span class="${user.is_active ? 'status-active' : 'status-inactive'}">
@@ -80,11 +77,6 @@
                                         </td>
                                         <td class="action-buttons">
                                             <c:if test="${user.id != sessionScope.user.id}">
-                                                <form action="MainController" method="post" style="display: inline;">
-                                                    <input type="hidden" name="action" value="toAdminUserPage"/>
-                                                    <button type="submit" name="editId" value="${user.id}" class="button-edit">Edit</button>
-                                                </form>
-
                                                 <form action="MainController" method="post" style="display: inline;">
                                                     <input type="hidden" name="action" value="changeUserRole"/>
                                                     <input type="hidden" name="userId" value="${user.id}"/>

@@ -18,22 +18,13 @@ import utils.ResetTokenManager;
 import utils.UserUtils;
 import utils.ValidationUtils;
 
+/**
+ * Servlet controller that handles all user-related actions such as login,
+ * registration, logout, profile update, password reset, and password recovery.
+ */
 @WebServlet(name = "UserController", urlPatterns = {"/UserController"})
 public class UserController extends HttpServlet {
 
-    /**
-     * UserController chịu trách nhiệm xử lý các hành động liên quan đến người
-     * dùng như: đăng nhập, đăng ký, quên mật khẩu, cập nhật hồ sơ và đặt lại
-     * mật khẩu. Controller này định tuyến theo tham số `action` và trả về trang
-     * phù hợp.
-     *
-     * Các action xử lý gồm: login, logout, register, forgotPassword,
-     * resetPassword, updateProfile.
-     *
-     * Các trang JSP liên quan: - welcome.jsp: Trang chính sau khi đăng nhập -
-     * user-form.jsp: Form dùng chung cho login, register, forgot/reset password
-     * - error.jsp: Trang hiển thị lỗi
-     */
     private static final String WELCOME_PAGE = "welcome.jsp";
     private static final String USER_FORM_PAGE = "user-form.jsp";
     private static final String ERROR_PAGE = "error.jsp";
@@ -41,8 +32,15 @@ public class UserController extends HttpServlet {
     private final ProductDAO PDAO = new ProductDAO();
     private final CategoryDAO CDAO = new CategoryDAO();
 
+    
     /**
-     * Xử lý các yêu cầu GET và POST, định tuyến theo action.
+     * Processes all incoming HTTP requests (both GET and POST) based on the "action" parameter.
+     * Delegates to the appropriate handler method for login, register, logout, etc.
+     *
+     * @param request the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -138,9 +136,11 @@ public class UserController extends HttpServlet {
     }// </editor-fold>
 
     /**
-     * Đăng nhập người dùng.
+     * Handles user login logic, including validation and authentication.
      *
-     * @return Tên trang JSP cần forward đến.
+     * @param request the HttpServletRequest object containing login credentials
+     * @param response the HttpServletResponse object
+     * @return the JSP page to forward to
      */
     public String handleLogin(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
@@ -179,9 +179,11 @@ public class UserController extends HttpServlet {
     }
 
     /**
-     * Đăng xuất người dùng.
+     * Handles user logout by invalidating the session.
      *
-     * @return Chuyển hướng về form đăng nhập.
+     * @param request the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @return the login page
      */
     public String handleLogout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
@@ -191,12 +193,13 @@ public class UserController extends HttpServlet {
         request.setAttribute("actionType", "login");
         return USER_FORM_PAGE;
     }
-
+    
     /**
-     * Đăng ký người dùng mới.
+     * Handles user registration logic, including input validation and account creation.
      *
-     * @return Trả về trang form với lỗi nếu đăng ký thất bại, hoặc chuyển sang
-     * login nếu thành công.
+     * @param request the HttpServletRequest object containing registration data
+     * @param response the HttpServletResponse object
+     * @return the page to forward to
      */
     public String handleRegister(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
@@ -243,10 +246,11 @@ public class UserController extends HttpServlet {
     }
 
     /**
-     * Cập nhật thông tin người dùng (email, số điện thoại).
+     * Handles user profile update logic (email and phone number).
      *
-     * @return Trả về trang form với lỗi nếu thất bại, hoặc logout và yêu cầu
-     * đăng nhập lại nếu thành công.
+     * @param request the HttpServletRequest object containing updated info
+     * @param response the HttpServletResponse object
+     * @return the page to forward to
      */
     public String handleUpdate(HttpServletRequest request, HttpServletResponse response) {
         String newEmail = request.getParameter("email");
@@ -292,38 +296,41 @@ public class UserController extends HttpServlet {
     }
 
     /**
-     * Đổi mật khẩu người dùng đang đăng nhập.
+     * Handles password change for a logged-in user.
      *
-     * @return Chuyển hướng về trang đăng nhập nếu thành công, hiển thị lỗi nếu
-     * mật khẩu không khớp.
+     * @param request the HttpServletRequest object containing new password info
+     * @param response the HttpServletResponse object
+     * @return the page to forward to
      */
-    public String handleChangePassword(HttpServletRequest request, HttpServletResponse response) {
+    public String handleChangePassword(HttpServletRequest request, HttpServletResponse response){
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
-
+        
         if (!password.equals(confirmPassword)) {
             request.setAttribute("error", "Mật khẩu xác nhận không khớp.");
             return USER_FORM_PAGE;
         }
-
+        
         String hashedPassword = HashUtils.hashPassword(password);
         UserDTO user = UserUtils.getUser(request);
         user.setHashed_password(hashedPassword);
-
+        
         UDAO.update(user);
         request.getSession().invalidate();
         request.setAttribute("actionType", "login");
         return USER_FORM_PAGE;
     }
-
+    
     /**
-     * Gửi email đặt lại mật khẩu nếu email hợp lệ và tồn tại trong hệ thống.
+     * Handles the "forgot password" process by sending a reset link to user's email.
      *
-     * @return Trả về form với thông báo hoặc lỗi.
+     * @param request the HttpServletRequest object containing the email
+     * @param response the HttpServletResponse object
+     * @return the page to forward to
      */
     private String handleForgotPassword(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
-
+        
         UserDTO user = UDAO.findByEmail(email);
 
         if (user == null) {
@@ -347,12 +354,13 @@ public class UserController extends HttpServlet {
         request.setAttribute("actionType", "forgotPassword");
         return USER_FORM_PAGE;
     }
-
+    
     /**
-     * Xử lý khi người dùng click vào link đặt lại mật khẩu và nhập mật khẩu
-     * mới.
+     * Handles the actual password reset using a secure token from email.
      *
-     * @return Trả về trang form với lỗi nếu thất bại hoặc không hợp lệ.
+     * @param request the HttpServletRequest object containing token and new password
+     * @param response the HttpServletResponse object
+     * @return the page to forward to
      */
     private String handleResetPassword(HttpServletRequest request, HttpServletResponse response) {
         String token = request.getParameter("token");
@@ -388,10 +396,10 @@ public class UserController extends HttpServlet {
     }
 
     /**
-     * Kiểm tra email đã tồn tại trong hệ thống chưa.
+     * Checks whether an email already exists in the system.
      *
-     * @param email Email cần kiểm tra.
-     * @return true nếu email đã tồn tại, false nếu chưa.
+     * @param email the email to check
+     * @return true if the email exists, false otherwise
      */
     private boolean isExistedEmail(String email) {
         return !UDAO.retrieve("email_address = ?", email).isEmpty();

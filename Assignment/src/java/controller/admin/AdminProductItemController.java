@@ -20,11 +20,11 @@ import utils.ProductUtils;
 import utils.ValidationUtils;
 
 /**
- * The `AdminProductItemController` servlet handles administrative operations related to
- * managing product items (SKUs), including updating stock and price,
- * toggling active status, and managing variations and variation options
- * that define product items.
- * It interacts with various Data Access Objects (DAOs) to manage product item data.
+ * AdminProductItemController handles admin operations related to product items
+ * and variations, including adding/removing/updating variation options and
+ * variations, toggling item status, and managing product item combinations.
+ *
+ * URL Pattern: /AdminProductItemController
  */
 @WebServlet(name = "AdminProductItemController", urlPatterns = {"/AdminProductItemController"})
 public class AdminProductItemController extends HttpServlet {
@@ -38,14 +38,14 @@ public class AdminProductItemController extends HttpServlet {
     private static final ProductConfigDAO PCDAO = new ProductConfigDAO();
 
     /**
-     * Processes requests for both HTTP `GET` and `POST` methods.
-     * This method acts as a central dispatcher for various product item-related actions
-     * based on the "action" parameter.
+     * Central method that handles routing based on the 'action' parameter from
+     * the request. Supports operations like adding/updating variations/options
+     * and toggling product items.
      *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @param request HTTP request
+     * @param response HTTP response
+     * @throws ServletException in case of servlet-related issues
+     * @throws IOException in case of I/O issues
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -93,8 +93,7 @@ public class AdminProductItemController extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP `GET` method.
-     * Delegates to the `processRequest` method to handle the request.
+     * Handles the HTTP <code>GET</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -108,8 +107,7 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP `POST` method.
-     * Delegates to the `processRequest` method to handle the request.
+     * Handles the HTTP <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -133,12 +131,13 @@ public class AdminProductItemController extends HttpServlet {
     }// </editor-fold>
 
     /**
-     * Handles the update of a product item's stock and price.
-     * Validates input parameters and updates the corresponding product item in the database.
+     * Updates the price and stock quantity of a product item.
      *
-     * @param request The HttpServletRequest object containing item ID, stock, and price.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin product item management page or an error page.
+     * @param request the HTTP request containing item ID, stock, and price
+     * parameters
+     * @param response the HTTP response
+     * @return the path to the product item management page, or an error page if
+     * input is invalid or update fails
      */
     private String handleUpdateProductItem(HttpServletRequest request, HttpServletResponse response) {
         int id = toInt(request.getParameter("itemId"));
@@ -165,12 +164,12 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Handles toggling the active status of a product item.
-     * Validates the item ID, retrieves the item, and updates its `is_active` status in the database.
+     * Toggles the active status (is_active) of a product item.
      *
-     * @param request The HttpServletRequest object containing the item ID.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin product item management page or an error page.
+     * @param request the HTTP request containing the item ID
+     * @param response the HTTP response
+     * @return the path to the product item management page, or an error page if
+     * the item is invalid or not found
      */
     private String handleToggleIsActiveProductItem(HttpServletRequest request, HttpServletResponse response) {
         int id = toInt(request.getParameter("itemId"));
@@ -192,13 +191,14 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Handles adding a new variation option to a product's variations.
-     * Creates a new variation option and then rebuilds product items to reflect
-     * the new combination created by the added option.
+     * Adds a new variation option to an existing variation and rebuilds
+     * associated product items.
      *
-     * @param request The HttpServletRequest object containing option value, variation ID, and product ID.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin product item management page or an error page.
+     * @param request the HTTP request with option value, variation ID, and
+     * product ID
+     * @param response the HTTP response
+     * @return the management page path, or error page if input is invalid or
+     * rebuild fails
      */
     private String handleAddOption(HttpServletRequest request, HttpServletResponse response) {
         String optionValue = request.getParameter("optionValue");
@@ -228,14 +228,13 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Handles adding a new variation to a product.
-     * Creates a new variation, deletes all existing product items for the product,
-     * and then regenerates new product item combinations based on all current
-     * variations and options.
+     * Adds a new variation to a product and regenerates product items based on
+     * all current variations and options.
      *
-     * @param request The HttpServletRequest object containing product ID and variation name.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin product item management page or an error page.
+     * @param request the HTTP request with product ID and variation name
+     * @param response the HTTP response
+     * @return the product item management page path, or error page if input or
+     * generation fails
      */
     private String handleAddVariation(HttpServletRequest request, HttpServletResponse response) {
         int productId = toInt(request.getParameter("productId"));
@@ -279,14 +278,15 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Handles updating or removing a variation option.
-     * If updating, it modifies the option's value and then rebuilds product items.
-     * If removing, it soft deletes the option and deletes associated product items.
+     * Updates or soft-deletes a variation option and regenerates product items
+     * accordingly.
      *
-     * @param action The action type ("updateOption" or "removeOption").
-     * @param request The HttpServletRequest object containing option ID, product ID, and optionally option value.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin product item management page or an error page.
+     * @param action the action to perform ("updateOption" or "deleteOption")
+     * @param request the HTTP request containing option ID, value, and product
+     * ID
+     * @param response the HTTP response
+     * @return the management page path, or error page if update/deletion fails
+     * or option not found
      */
     private String handleUpdateOption(String action, HttpServletRequest request, HttpServletResponse response) {
         int optionId = toInt(request.getParameter("optionId"));
@@ -328,14 +328,13 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Handles updating or removing a variation.
-     * If updating, it modifies the variation's name.
-     * If removing, it soft deletes the variation, deletes all associated product items,
-     * and then regenerates new product items based on the remaining variations.
+     * Updates or soft-deletes a variation. If deleted, the method regenerates
+     * product items excluding the variation.
      *
-     * @param request The HttpServletRequest object containing variation ID, product ID, variation name, and action.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin product item management page or an error page.
+     * @param request the HTTP request containing variation ID, product ID, and
+     * new name
+     * @param response the HTTP response
+     * @return the product item management page path, or error page on failure
      */
     private String handleUpdateVariation(HttpServletRequest request, HttpServletResponse response) {
         int variationId = toInt(request.getParameter("variationId"));
@@ -383,13 +382,12 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Rebuilds product items for a given product after a variation has been modified or removed.
-     * It generates all possible combinations of product items based on existing variations and options,
-     * and then creates new product items and their configurations in the database.
+     * Regenerates product item combinations based on existing variations and
+     * options after a variation change.
      *
-     * @param productId The ID of the product for which to rebuild items.
-     * @param variation The variation that triggered the rebuild (can be used for specific logic if needed, but currently not fully utilized in `generateComb`).
-     * @return `true` if items are rebuilt successfully, `false` otherwise.
+     * @param productId the ID of the product to rebuild items for
+     * @param variation the variation being updated or deleted
+     * @return true if successful, false otherwise
      */
     private boolean rebuildItemsWithVariation(int productId, VariationDTO variation) {
         List<VariationDTO> variations = VDAO.retrieve("product_id = ? AND is_deleted = 0", productId);
@@ -414,14 +412,13 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Rebuilds product items for a given product specifically when a new option is added.
-     * It generates new product item combinations that include the newly added option,
-     * and then creates these new product items and their configurations in the database.
+     * Regenerates product item combinations using a newly added or updated
+     * variation option.
      *
-     * @param request The HttpServletRequest object (used for setting error messages if needed).
-     * @param productId The ID of the product for which to rebuild items.
-     * @param newOption The newly added variation option.
-     * @return `true` if items are rebuilt successfully, `false` otherwise.
+     * @param request the HTTP request for setting error messages
+     * @param productId the product to rebuild items for
+     * @param newOption the new or updated variation option
+     * @return true if successful, false if item creation or config fails
      */
     private boolean rebuildItemsWithOption(HttpServletRequest request, int productId, VariationOptionDTO newOption) {
         List<VariationDTO> variations = VDAO.retrieve("product_id = ? AND is_deleted = 0", productId);
@@ -450,11 +447,10 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Prepares the necessary data for the product item management page.
-     * Retrieves and sets product variations, variation options, and product items
-     * as request attributes based on the provided product ID.
+     * Prepares and sets request attributes needed for the product item
+     * management page. Includes variation list, option list, and item list.
      *
-     * @param request The HttpServletRequest object.
+     * @param request the HTTP request where attributes will be set
      */
     private void prepareProductItemManagement(HttpServletRequest request) {
         int productId = toInt(request.getParameter("productId"));
@@ -470,11 +466,10 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Converts a string value to an integer.
-     * Returns -1 if the string is null or cannot be parsed as an integer.
+     * Safely parses a string into an integer.
      *
-     * @param val The string to convert.
-     * @return The integer value, or -1 if conversion fails.
+     * @param val the input string
+     * @return the parsed integer, or -1 if parsing fails
      */
     private int toInt(String val) {
         try {
@@ -485,11 +480,10 @@ public class AdminProductItemController extends HttpServlet {
     }
 
     /**
-     * Converts a string value to a double.
-     * Returns -1 if the string is null or cannot be parsed as a double.
+     * Safely parses a string into a double.
      *
-     * @param str The string to convert.
-     * @return The double value, or -1 if conversion fails.
+     * @param str the input string
+     * @return the parsed double, or -1 if parsing fails
      */
     private double toDouble(String str) {
         try {

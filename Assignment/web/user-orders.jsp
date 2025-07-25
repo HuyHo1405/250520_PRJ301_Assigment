@@ -72,8 +72,8 @@
                                         <fmt:formatDate value="${order.orderDate}" pattern="yyyy-MM-dd"/>
                                     </td>
                                     <td data-label="Actions:" class="order-actions">
-                                        <form action="MainController" method="get" class="inline-form">
-                                            <input type="hidden" name="action" value="viewMyOrderDetails"/>
+                                        <form action="MainController" method="Post" class="inline-form">
+                                            <input type="hidden" name="action" value="viewMyOrder"/>
                                             <input type="hidden" name="orderId" value="${order.id}"/>
                                             <button type="submit" class="button view-details-button">View Details</button>
                                         </form>

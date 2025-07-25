@@ -110,8 +110,8 @@
 
 <hr>
 <form action="MainController" method="post">
-    <input type="hidden" name="action" value="${sessionScope.user.role eq 'admin' ? 'toAdminOrdersPage' : 'listMyOrders'}"/>
-    <input type="submit" value="Back to Order List"/>
+    <input type="hidden" name="action" value="toWelcome"/>
+    <input type="submit" value="Back"/>
 </form>
 
 </div> <!-- end container -->

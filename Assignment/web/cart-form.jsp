@@ -49,8 +49,10 @@
         <button type="submit">Xác nhận đặt hàng</button>
     </form>
 
+        <form action="MainController" method="post">
+            <button name="action" value="toWelcome">Back</button>
+        </form>
     <br>
-    <a href="MainController?action=viewCart">← Quay lại giỏ hàng</a>
 </div>
 </div> 
 </body>

@@ -13,26 +13,26 @@ import utils.HashUtils;
 import utils.ValidationUtils;
 
 /**
- * The `AdminUserController` servlet handles administrative operations related to
- * user management, including listing all users, creating new users,
- * toggling user active status, changing user roles, and redirecting to password reset.
- * It interacts with the `UserDAO` to perform database operations.
+ * Servlet controller for managing administrative user actions.
+ * Handles listing users, creating users, toggling activation status,
+ * changing roles, and redirecting to password reset page.
+ *
+ * Mapped to URL: /AdminUserController
  */
 @WebServlet(name = "AdminUserController", urlPatterns = {"/AdminUserController"})
 public class AdminUserController extends HttpServlet {
     private static final String ERROR_PAGE = "error.jsp";
     private static final String ADMIN_USER_MANAGEMENT_PAGE = "admin-user-management.jsp";
     private final UserDAO UDAO = new UserDAO();
-
+    
     /**
-     * Processes requests for both HTTP `GET` and `POST` methods.
-     * This method acts as a central dispatcher for various user-related actions
-     * based on the "action" parameter.
+     * Central dispatcher method that routes requests based on the 'action' parameter.
+     * Supports operations such as listing users, creating users, changing roles, etc.
      *
-     * @param request servlet request
-     * @param response servlet response
+     * @param request  HTTP request
+     * @param response HTTP response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -72,31 +72,27 @@ public class AdminUserController extends HttpServlet {
         }
 
     }
-
+    
     /**
-     * Handles listing all users in the system.
-     * Retrieves all users from the database, sorts them, and sets the list
-     * as a request attribute for display on the admin user management page.
+     * Retrieves and displays all users, sorted by active status and role.
      *
-     * @param request The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin user management page.
+     * @param request  HTTP request
+     * @param response HTTP response
+     * @return path to the user management page
      */
     private String handleListAllUsers(HttpServletRequest request, HttpServletResponse response) {
-        List<UserDTO> list = UDAO.retrieve("1 = 1 ORDER BY is_active DESC, role ASC");
+        List<UserDTO> list = UDAO.retrieve("1 = 1 ORDER BY is_active DESC, role ASC, id ASC");
         request.setAttribute("userList", list);
         return ADMIN_USER_MANAGEMENT_PAGE;
     }
-
+    
     /**
-     * Handles the creation of a new user.
-     * Retrieves user details from request parameters, hashes the password,
-     * creates a `UserDTO` object, and attempts to persist it to the database.
-     * Sets a message indicating success or failure.
+     * Handles creation of a new user based on input parameters.
+     * Hashes the password before saving and sets user role and active status.
      *
-     * @param request The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin user management page after creation attempt.
+     * @param request  HTTP request containing user details
+     * @param response HTTP response
+     * @return path to the user list page with a success or failure message
      */
     private String handleCreateUser(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
@@ -118,22 +114,20 @@ public class AdminUserController extends HttpServlet {
     }
 
     /**
-     * Toggles the `is_active` status of a user (activates or deactivates them).
-     * Retrieves the user by ID, flips their `is_active` status, and updates it
-     * in the database. Handles invalid user ID or user not found scenarios.
+     * Toggles the 'is_active' status of a user based on user ID.
      *
-     * @param request The HttpServletRequest object containing the user ID.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin user management page or an error page.
+     * @param request  HTTP request containing the user ID
+     * @param response HTTP response
+     * @return path to the user list page or error page if validation fails
      */
     private String handleToggleIsActive(HttpServletRequest request, HttpServletResponse response) {
         int userId = toInt(request.getParameter("userId"));
-
+        
         if(ValidationUtils.isInvalidId(userId)){
             request.setAttribute("errorMsg", "Invalid Id.");
             return ERROR_PAGE;
         }
-
+        
         UserDTO user = UDAO.findById(userId);
         if(user == null){
             request.setAttribute("errorMsg", "User Not Found");
@@ -146,14 +140,11 @@ public class AdminUserController extends HttpServlet {
     }
 
     /**
-     * Changes the role of a specific user.
-     * Retrieves the user ID and the new role from request parameters,
-     * and attempts to update the user's role in the database.
-     * Sets a message indicating success or failure.
+     * Updates the role of a user.
      *
-     * @param request The HttpServletRequest object containing user ID and new role.
-     * @param response The HttpServletResponse object.
-     * @return The path to the admin user management page after role update attempt.
+     * @param request  HTTP request with user ID and new role
+     * @param response HTTP response
+     * @return path to the user list page with result message
      */
     private String handleChangeUserRole(HttpServletRequest request, HttpServletResponse response) {
         int userId = toInt(request.getParameter("userId"));
@@ -166,23 +157,22 @@ public class AdminUserController extends HttpServlet {
 
         return handleListAllUsers(request, response);
     }
-
+    
     /**
-     * Checks if a user with the given email address already exists in the database.
+     * Checks if a user email already exists in the database.
      *
-     * @param email The email address to check.
-     * @return `true` if an account with the email exists, `false` otherwise.
+     * @param email the email address to check
+     * @return true if email exists, false otherwise
      */
     private boolean isExistedEmail(String email) {
         return !UDAO.retrieve("email_address = ?", email).isEmpty();
     }
 
     /**
-     * Converts a string value to an integer.
-     * Returns -1 if the string is null or cannot be parsed as an integer.
+     * Checks if a user email already exists in the database.
      *
-     * @param value The string to convert.
-     * @return The integer value, or -1 if conversion fails.
+     * @param email the email address to check
+     * @return true if email exists, false otherwise
      */
     private int toInt(String value) {
         try {
@@ -194,8 +184,7 @@ public class AdminUserController extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP `GET` method.
-     * Delegates to the `processRequest` method to handle the request.
+     * Handles the HTTP <code>GET</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -209,8 +198,7 @@ public class AdminUserController extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP `POST` method.
-     * Delegates to the `processRequest` method to handle the request.
+     * Handles the HTTP <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -232,4 +220,7 @@ public class AdminUserController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    
+
 }

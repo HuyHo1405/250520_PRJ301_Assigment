@@ -11,7 +11,7 @@
 <body>
 
 <div class="form-container">
-    <h1>${actionType != null ? 'Address Edit Form' : 'Address Add Form'}</h1>
+    <h1>Address Form</h1>
     <hr>
 
     <c:if test="${not empty error}">

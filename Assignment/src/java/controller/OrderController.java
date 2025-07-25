@@ -21,33 +21,30 @@ import model.dto.UserDTO;
 import utils.UserUtils;
 
 /**
- * The `OrderController` servlet manages all user-facing order-related operations.
- * This includes displaying a user's order history, viewing details of a specific order,
- * and allowing users to cancel orders based on their current status.
+ * OrderController handles user-related order actions such as listing orders,
+ * viewing specific order details, and canceling existing orders. 
+ * It ensures that only authenticated users can access these operations.
  */
 @WebServlet(name = "OrderController", urlPatterns = {"/OrderController"})
 public class OrderController extends HttpServlet {
     
-    // Constants for JSP page paths
     private static final String USER_ORDER_LIST_PAGE = "user-orders.jsp";
-    private static final String ORDER_DETAIL_PAGE = "order-detail.jsp";
+    private static final String ORDER_DETAIL_PAGE = "order-details.jsp";
     private static final String ERROR_PAGE = "error.jsp";
     
-    // Data Access Objects (DAOs) for interacting with the database
     private static final ShoppingOrderDAO SODAO = new ShoppingOrderDAO();
-    private static final ProductDAO PDAO = new ProductDAO(); // Used to get product details for order lines
-    private static final AddressDAO ADAO = new AddressDAO(); // Used to get shipping address details
-    private static final OrderLineDAO OLDAO = new OrderLineDAO(); // Used to get items within an order
+    private static final ProductDAO PDAO = new ProductDAO();
+    private static final AddressDAO ADAO = new AddressDAO();
+    private static final OrderLineDAO OLDAO =new OrderLineDAO();
     
     /**
-     * Processes requests for both HTTP `GET` and `POST` methods.
-     * This method acts as the central dispatcher for order-related actions.
-     * It ensures that a user is logged in before proceeding with any order operations.
+     * Main request processor that handles different user order actions.
+     * Requires user to be authenticated.
      *
-     * @param request servlet request
-     * @param response servlet response
+     * @param request  HTTP request
+     * @param response HTTP response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -55,64 +52,49 @@ public class OrderController extends HttpServlet {
         
         String action = request.getParameter("action");
         String url = "";
-        UserDTO loggedInUser = UserUtils.getUser(request); // Retrieve the logged-in user from session/request
+        UserDTO loggedInUser = UserUtils.getUser(request);
 
-        // Check if the user is logged in. If not, redirect to the login page.
         if (loggedInUser == null) {
-            request.setAttribute("errorMessage", "Bạn cần đăng nhập để truy cập chức năng đơn hàng.");
-            request.getRequestDispatcher("user-form.jsp").forward(request, response); // Redirect to login/user form
+            request.setAttribute("errorMessage", "You need to be logged in to access order functions.");
+            request.getRequestDispatcher("user-form.jsp").forward(request, response);
             return;
         }
 
+
         try {
-            // Determine which action to perform based on the "action" parameter
             switch (action) {
                 case "listMyOrders":
-                    // Handles displaying a list of all orders for the logged-in user.
                     url = handleSearchOrders(request, response, loggedInUser.getId());
                     break;
                 case "viewMyOrder":
-                    // Handles displaying detailed information for a specific order.
                     url = handleViewOrders(request, response, loggedInUser.getId());
                     break;
                 case "placeOrder":
-                    // This case is commented out, suggesting "checkoutCart" in CartController handles order placement.
-                    // If order placement functionality is ever moved here, it would be implemented in handlePlaceOrders.
-                    // url = handlePlaceOrders(request, response, loggedInUser.getId());
+//                    url = handlePlaceOrders(request, response, loggedInUser.getId());
                     break;
                 case "cancelOrder":
-                    // Handles the cancellation of a user's order.
                     url = handleCancelOrder(request, response, loggedInUser.getId());
                     break;
                 case "toOrder":
-                    // Navigates to the user's order list page directly without fetching data.
-                    // Typically, `listMyOrders` would be called to populate the data first.
-                    url = USER_ORDER_LIST_PAGE;
+                    url = "user-orders.jsp";
                     break;
                 default:
-                    // If an unknown action is received, set an error message.
-                    request.setAttribute("errorMessage", "Hành động đơn hàng không hợp lệ: " + action);
-                    url = ERROR_PAGE; // Fallback to a general error page
+                    request.setAttribute("errorMessage", "Invalid order action: " + action);
                     break;
             }
         } catch (Exception e) {
-            // Catch any unexpected exceptions during request processing
-            System.err.println("Lỗi trong OrderController: " + e.getMessage());
-            e.printStackTrace(); // Print stack trace for debugging
-            request.setAttribute("errorMessage", "Đã xảy ra lỗi không mong muốn: " + e.getMessage());
-            url = ERROR_PAGE; // Redirect to a general error page
+            System.err.println("Error in OrderController: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An unexpected error occurred: " + e.getMessage());
         } finally {
-            // Forward the request to the determined URL in a finally block to ensure execution
-            if (!response.isCommitted()) { // Prevent IllegalStateException if response has already been committed by a redirect
-                request.getRequestDispatcher(url).forward(request, response);
-            }
+            request.getRequestDispatcher(url).forward(request, response);
         }
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
-     * Delegates the processing to the `processRequest` method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -127,7 +109,6 @@ public class OrderController extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     * Delegates the processing to the `processRequest` method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -147,86 +128,85 @@ public class OrderController extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Controller for user order management.";
+        return "Short description";
     }// </editor-fold>
 
     /**
-     * Returns the human-readable name for an order status ID.
-     * This utility method helps in displaying user-friendly status messages.
+     * Converts order status ID to a user-friendly string label.
      *
-     * @param statusId The integer ID of the order status.
-     * @return A string representing the order status name.
+     * @param statusId order status ID
+     * @return human-readable order status name
      */
     private String getOrderStatusName(int statusId) {
         String statusName;
         switch (statusId) {
             case 1:
-                statusName = "Đang chờ xử lý"; // Pending
+                statusName = "Pending";
                 break;
             case 2:
-                statusName = "Đã xác nhận"; // Confirmed
+                statusName = "Confirmed";
                 break;
             case 3:
-                statusName = "Đang xử lý"; // Processing
+                statusName = "Processing";
                 break;
             case 4:
-                statusName = "Đã giao hàng"; // Shipped
+                statusName = "Shipped";
                 break;
             case 5:
-                statusName = "Đã nhận hàng"; // Delivered
+                statusName = "Delivered";
                 break;
             case 6:
-                statusName = "Đã hủy"; // Cancelled
+                statusName = "Cancelled";
                 break;
             case 7:
-                statusName = "Đã trả lại"; // Returned
+                statusName = "Returned";
                 break;
             case 8:
-                statusName = "Đã hoàn tiền"; // Refunded
+                statusName = "Refunded";
                 break;
             default:
-                statusName = "Không xác định"; // Unknown
+                statusName = "Unknown";
                 break;
         }
         return statusName;
     }
 
     /**
-     * Handles retrieving and displaying all orders for a specific user.
-     * Sets the list of orders as a request attribute.
+     * Retrieves all orders for the currently logged-in user.
      *
-     * @param request The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
-     * @param userId The ID of the user whose orders are to be retrieved.
-     * @return The JSP page path to display the list of orders.
+     * @param request  HTTP request
+     * @param response HTTP response
+     * @param userId   the ID of the logged-in user
+     * @return the name of the JSP page to forward to
      */
     private String handleSearchOrders(HttpServletRequest request, HttpServletResponse response, int userId) {
+
+        ShoppingOrderDAO orderDAO = new ShoppingOrderDAO();
         List<ShoppingOrderDTO> myOrders = SODAO.findByUserId(userId);
 
         if (myOrders != null) {
             request.setAttribute("myOrders", myOrders);
             return USER_ORDER_LIST_PAGE;
         } else {
-            request.setAttribute("errorMessage", "Không thể truy xuất đơn hàng của bạn.");
+            request.setAttribute("errorMessage", "Could not retrieve your orders.");
             return ERROR_PAGE;
         }
     }
 
     /**
-     * Handles viewing the detailed information of a specific order.
-     * It retrieves the order, its associated order lines, shipping address, and product details.
-     * Ensures that the requested order belongs to the logged-in user for security.
+     * Retrieves and displays detailed information about a specific order
+     * including products, shipping address, and order lines.
      *
-     * @param request The HttpServletRequest object, containing the "orderId" parameter.
-     * @param response The HttpServletResponse object.
-     * @param userId The ID of the currently logged-in user.
-     * @return The JSP page path to display the order details.
+     * @param request  HTTP request (expects "orderId" parameter)
+     * @param response HTTP response
+     * @param userId   the ID of the logged-in user
+     * @return the name of the JSP page to forward to
      */
     private String handleViewOrders(HttpServletRequest request, HttpServletResponse response, int userId) {
         String orderIdStr = request.getParameter("orderId");
         if (orderIdStr == null || orderIdStr.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Mã đơn hàng bị thiếu.");
-            return USER_ORDER_LIST_PAGE; // Go back to order list if ID is missing
+            request.setAttribute("errorMessage", "Order ID is missing.");
+            return USER_ORDER_LIST_PAGE;
         }
 
         try {
@@ -234,34 +214,31 @@ public class OrderController extends HttpServlet {
 
             ShoppingOrderDTO order = SODAO.findById(orderId);
 
-            // Check if the order exists
             if (order == null) {
-                request.setAttribute("errorMessage", "Không tìm thấy đơn hàng.");
+                request.setAttribute("errorMessage", "Order not found.");
                 return USER_ORDER_LIST_PAGE;
             }
 
-            // Security check: Ensure the order belongs to the current user
             if (order.getUserId() != userId) {
-                request.setAttribute("errorMessage", "Bạn không được phép xem đơn hàng này.");
+                request.setAttribute("errorMessage", "You are not authorized to view this order.");
                 return USER_ORDER_LIST_PAGE;
             }
 
-            // Retrieve associated data for the order details page
             List<OrderLineDTO> orderLines = OLDAO.findByOrderId(orderId);
             AddressDTO address = ADAO.findById(order.getAddressId());
 
-            // Create a Map to hold product details, keyed by product ID, for easy lookup in JSP
+            // Create a Map to hold products, keyed by product ID
             Map<Integer, ProductDTO> productsMap = new HashMap<>();
             if (orderLines != null) {
                 for (OrderLineDTO line : orderLines) {
                     ProductDTO product = PDAO.findById(line.getItem_id());
+                    // Add the product to the map, using its ID as the key
                     if (product != null) {
                         productsMap.put(product.getId(), product);
                     }
                 }
             }
 
-            // Set attributes for the JSP page
             request.setAttribute("order", order);
             request.setAttribute("orderLines", orderLines);
             request.setAttribute("shippingAddress", address);
@@ -270,64 +247,62 @@ public class OrderController extends HttpServlet {
             return ORDER_DETAIL_PAGE;
 
         } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Định dạng Mã đơn hàng không hợp lệ.");
+            request.setAttribute("errorMessage", "Invalid Order ID format.");
             return USER_ORDER_LIST_PAGE;
         }
     }
 
     /**
-     * Handles the cancellation of a user's order.
-     * It validates the order ID, checks ownership, and verifies if the order status
-     * allows for cancellation before updating the order status to "Cancelled".
+     * Cancels an order if it is in a cancellable state (e.g., Pending or Confirmed).
      *
-     * @param request The HttpServletRequest object, containing the "orderId" parameter.
-     * @param response The HttpServletResponse object.
-     * @param userId The ID of the currently logged-in user.
-     * @return The JSP page path to display the updated list of orders.
+     * @param request  HTTP request (expects "orderId" parameter)
+     * @param response HTTP response
+     * @param userId   the ID of the logged-in user
+     * @return the name of the JSP page to forward to
      */
     private String handleCancelOrder(HttpServletRequest request, HttpServletResponse response, int userId) {
         String orderIdStr = request.getParameter("orderId");
         if (orderIdStr == null || orderIdStr.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Mã đơn hàng bị thiếu để hủy.");
+            request.setAttribute("errorMessage", "Order ID is missing for cancellation.");
             return USER_ORDER_LIST_PAGE;
         }
 
         try {
             int orderId = Integer.parseInt(orderIdStr);
+            ShoppingOrderDAO orderDAO = new ShoppingOrderDAO();
             ShoppingOrderDTO order = SODAO.findById(orderId);
 
-            // Check if the order exists
             if (order == null) {
-                request.setAttribute("errorMessage", "Không tìm thấy đơn hàng để hủy.");
+                request.setAttribute("errorMessage", "Order not found for cancellation.");
                 return USER_ORDER_LIST_PAGE;
             }
 
-            // Security check: Ensure the order belongs to the current user
+            // Ensure the order belongs to the logged-in user
             if (order.getUserId() != userId) {
-                request.setAttribute("errorMessage", "Bạn không được phép hủy đơn hàng này.");
+                request.setAttribute("errorMessage", "You are not authorized to cancel this order.");
                 return USER_ORDER_LIST_PAGE;
             }
 
-            // Check if the order status allows cancellation (e.g., Pending (1) or Confirmed (2))
+            // Check if the order status allows cancellation (e.g., Pending or Confirmed)
             // Order Status: 1=Pending, 2=Confirmed, 3=Processing, 4=Shipped, 5=Delivered, 6=Cancelled
             if (order.getOrderStatusId() == 1 || order.getOrderStatusId() == 2) {
                 order.setOrderStatusId(6); // Set status to Cancelled
                 java.util.Date now = new java.util.Date();
-                order.setUpdatedAt(new java.sql.Timestamp(now.getTime())); // Update timestamp
+                order.setUpdatedAt(new java.sql.Timestamp(now.getTime()));
 
-                if (SODAO.update(order)) {
-                    request.setAttribute("successMessage", "Đơn hàng " + orderId + " đã được hủy thành công.");
+                if (orderDAO.update(order)) {
+                    request.setAttribute("successMessage", "Order " + orderId + " has been successfully cancelled.");
                 } else {
-                    request.setAttribute("errorMessage", "Không thể hủy đơn hàng " + orderId + ".");
+                    request.setAttribute("errorMessage", "Failed to cancel order " + orderId + ".");
                 }
             } else {
-                request.setAttribute("errorMessage", "Đơn hàng " + orderId + " không thể hủy vì trạng thái hiện tại là: " + getOrderStatusName(order.getOrderStatusId()) + ".");
+                request.setAttribute("errorMessage", "Order " + orderId + " cannot be cancelled as it is already " + getOrderStatusName(order.getOrderStatusId()) + ".");
             }
-            // After cancellation attempt, refresh the order list
             return handleSearchOrders(request, response, userId);
         } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Định dạng Mã đơn hàng không hợp lệ để hủy.");
+            request.setAttribute("errorMessage", "Invalid Order ID format for cancellation.");
             return USER_ORDER_LIST_PAGE;
         }
     }
+    
 }
